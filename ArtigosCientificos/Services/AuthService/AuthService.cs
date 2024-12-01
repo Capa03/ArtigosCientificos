@@ -1,12 +1,11 @@
 ﻿using ArtigosCientificos.Api.Data;
 using System.Security.Cryptography;
-using ArtigosCientificos.Api.Models;
 using ArtigosCientificos.Api.Services.JWTService;
-using Azure.Core;
-using Azure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ArtigosCientificos.Api.Models.User;
+using ArtigosCientificos.Api.Models.Token;
+using ArtigosCientificos.Api.Models.Role;
 
 namespace ArtigosCientificos.Api.Services.AuthService
 {
@@ -28,11 +27,12 @@ namespace ArtigosCientificos.Api.Services.AuthService
                 return new BadRequestObjectResult("User already exists.");
             }
 
+            
             var user = new User
             {
                 Username = userDTO.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password),
-                Role = "Researcher"
+                Role = _context.UserRoles.FirstOrDefaultAsync(r => r.Name == "Reviwer").Result
             };
 
             _context.Users.Add(user);
@@ -41,49 +41,70 @@ namespace ArtigosCientificos.Api.Services.AuthService
             return new OkObjectResult(user);
         }
 
-        public async Task<(ActionResult<User>, RefreshToken)> Login(UserDTO userDTO)
+        public async Task<(ActionResult<string>, UserToken)> Login(UserDTO userDTO)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userDTO.Username);
+            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Username == userDTO.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(userDTO.Password, user.PasswordHash))
             {
                 return (new BadRequestObjectResult("Invalid username or password."), null);
             }
 
-            var token = this._jwt.CreateToken(user);
-            var refreshToken = this._jwt.GenerateRefreshToken();
+            var jwtToken = this._jwt.CreateToken(user);
+            
+            var refreshToken = new UserToken
+            {
+                TokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Created = DateTime.Now,
+                Expired = DateTime.Now.AddDays(7)
+            };
+            
             await SetRefreshToken(user, refreshToken);
-
-            return (new OkObjectResult(token), refreshToken);
+            
+            return (new OkObjectResult(jwtToken), refreshToken);
         }
 
 
-        public async Task<(ActionResult<string>, RefreshToken)> RefreshToken(string currentRefreshToken)
+
+        public async Task<(ActionResult<string>, UserToken)> RefreshToken(string currentRefreshToken)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == currentRefreshToken);
-            if (user == null || user.RefreshTokenExpiryTime < DateTime.Now)
+            var token = await _context.UserTokens
+                .Include(t => t.User) 
+                .FirstOrDefaultAsync(t => t.TokenValue == currentRefreshToken);
+
+            if (token == null)
+            {
+                return (new BadRequestObjectResult("Invalid or expired refresh token."),null);
+            }
+
+            var user = token.User;
+
+            if (user == null || token.Expired < DateTime.Now)
             {
                 return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
             }
 
-            var token = this._jwt.CreateToken(user);
+            token.TokenValue = this._jwt.CreateToken(user);
             var newRefreshToken = this._jwt.GenerateRefreshToken();
             await SetRefreshToken(user, newRefreshToken);
 
-            return (new OkObjectResult(token), newRefreshToken);
+            return (new OkObjectResult(token.TokenValue), newRefreshToken);
         }
 
 
-        public async Task<RefreshToken> SetRefreshToken(User user, RefreshToken refreshToken)
+        public async Task<UserToken> SetRefreshToken(User user, UserToken refreshToken)
         {
-            user.RefreshToken = refreshToken.Token;
-            user.CreationTime = refreshToken.Created;
-            user.RefreshTokenExpiryTime = refreshToken.Expired;
+            refreshToken.UserId = user.Id;
 
-            _context.Users.Update(user);
+            _context.UserTokens.Add(refreshToken);
+
+            var oldTokens = _context.UserTokens.Where(t => t.UserId == user.Id && t.Expired < DateTime.Now);
+            _context.UserTokens.RemoveRange(oldTokens);
+
             await _context.SaveChangesAsync();
 
-            return refreshToken; 
+            return refreshToken;
         }
+
 
     }
 }

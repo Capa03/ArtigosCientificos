@@ -33,7 +33,7 @@ namespace ArtigosCientificos.Api.Controllers
                     HttpOnly = true,
                     Expires = refreshToken.Expired
                 };
-                Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
+                Response.Cookies.Append("refreshToken", refreshToken.TokenValue, cookieOptions);
             }
 
             return Ok(result.Result);
@@ -58,7 +58,7 @@ namespace ArtigosCientificos.Api.Controllers
                     HttpOnly = true,
                     Expires = newRefreshToken.Expired
                 };
-                Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
+                Response.Cookies.Append("refreshToken", newRefreshToken.TokenValue, cookieOptions);
             }
 
             return Ok(result.Result);

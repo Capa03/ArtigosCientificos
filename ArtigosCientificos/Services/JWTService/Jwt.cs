@@ -1,4 +1,4 @@
-﻿using ArtigosCientificos.Api.Models;
+﻿using ArtigosCientificos.Api.Models.Token;
 using ArtigosCientificos.Api.Models.User;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -24,7 +24,7 @@ namespace ArtigosCientificos.Api.Services.JWTService
             List<Claim> claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, user.Role)
+            new Claim(ClaimTypes.Role, user.Role.Name)
         };
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("AppSettings:Token").Value!));
@@ -41,11 +41,11 @@ namespace ArtigosCientificos.Api.Services.JWTService
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public RefreshToken GenerateRefreshToken()
+        public UserToken GenerateRefreshToken()
         {
-            return new RefreshToken
+            return new UserToken
             {
-                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                TokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
                 Expired = DateTime.Now.AddDays(7)
             };
         }

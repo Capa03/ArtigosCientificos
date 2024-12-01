@@ -1,4 +1,7 @@
-﻿namespace ArtigosCientificos.Api.Models.User
+﻿using ArtigosCientificos.Api.Models.Role;
+using ArtigosCientificos.Api.Models.Token;
+
+namespace ArtigosCientificos.Api.Models.User
 {
     public class User
     {
@@ -6,9 +9,11 @@
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
 
-        public string RefreshToken { get; set; } = string.Empty;
-        public DateTime CreationTime { get; set; }
-        public DateTime RefreshTokenExpiryTime { get; set; }
-        public string? Role { get; set; }
+        // Foreign key for Role
+        public int RoleId { get; set; }
+        public UserRole Role { get; set; } = new UserRole();
+
+        // Navigation property for Tokens
+        //public ICollection<UserToken> Tokens { get; set; } = new List<UserToken>();
     }
 }
