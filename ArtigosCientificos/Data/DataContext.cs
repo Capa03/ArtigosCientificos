@@ -21,7 +21,7 @@ namespace ArtigosCientificos.Api.Data
             // Seed roles if not present
             modelBuilder.Entity<UserRole>().HasData(
                 new UserRole { Id = 1, Name = "Researcher" },
-                new UserRole { Id = 2, Name = "Reviwer" }
+                new UserRole { Id = 2, Name = "Reviewer" }
             );
 
             modelBuilder.Entity<User>()
