@@ -29,25 +29,10 @@ namespace ArtigosCientificos.Api.Controllers
 
             user.Username = userDTO.Username;
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
-            user.Role = userDTO.Role ?? "Researcher"; 
+            user.Role = "Researcher"; 
 
             return Ok(user);
         }
-
-        [HttpGet("researcher-data")]
-        [Authorize(Roles = "Researcher")]
-        public IActionResult GetResearcherData()
-        {
-            return Ok("This data is accessible only to Researchers.");
-        }
-
-        [HttpGet("reviewer-data")]
-        [Authorize(Roles = "Reviewer")]
-        public IActionResult GetReviewerData()
-        {
-            return Ok("This data is accessible only to Reviewers.");
-        }
-
 
 
         [HttpPost("login")]
@@ -69,6 +54,8 @@ namespace ArtigosCientificos.Api.Controllers
 
             return Ok(token);
         }
+
+
 
         [HttpPost("refresh-token")]
         public async Task<ActionResult<string>> RefreshToken()

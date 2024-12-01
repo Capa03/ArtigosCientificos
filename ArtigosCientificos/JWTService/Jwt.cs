@@ -38,5 +38,7 @@ namespace ArtigosCientificos.Api.JWTService
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+
+
     }
 }

@@ -9,6 +9,5 @@ namespace ArtigosCientificos.Api.Models
         [Required]
         public string Password { get; set; } = string.Empty;
 
-        public string? Role { get; set; } = "Researcher"; // Default role
     }
 }
