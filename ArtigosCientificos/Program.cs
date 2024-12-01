@@ -1,7 +1,9 @@
 
 
 using System.Text;
+using ArtigosCientificos.Api.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -61,6 +63,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireReviewerRole", policy => policy.RequireRole("Reviewer", "Researcher"));
 });
 
+builder.Services.AddDbContext<DataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
 var app = builder.Build();
 
