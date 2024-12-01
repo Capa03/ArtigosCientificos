@@ -1,10 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography;
-using ArtigosCientificos.Api.JWTService;
-using ArtigosCientificos.Api.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using ArtigosCientificos.Api.Models;
+using ArtigosCientificos.Api.Services.AuthService;
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace ArtigosCientificos.Api.Controllers
 {
@@ -12,49 +8,36 @@ namespace ArtigosCientificos.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        public static User user = new User();
-        private readonly IConfiguration configuration;
-        public AuthController(IConfiguration _configuration)
+        private readonly IAuthService _authService;
+
+        public AuthController(IAuthService authService)
         {
-            this.configuration = _configuration;    
+            _authService = authService;
         }
 
         [HttpPost("register")]
-        public ActionResult<User> Register(UserDTO userDTO)
+        public async Task<ActionResult<User>> Register(UserDTO userDTO)
         {
-            if (userDTO == null)
-            {
-                return BadRequest("Invalid data");
-            }
-
-            user.Username = userDTO.Username;
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
-            user.Role = "Researcher"; 
-
-            return Ok(user);
+            return await _authService.Register(userDTO);
         }
-
 
         [HttpPost("login")]
-        public ActionResult<User> Login(UserDTO userDTO)
+        public async Task<ActionResult<User>> Login(UserDTO userDTO)
         {
+            var (result, refreshToken) = await _authService.Login(userDTO);
 
-            if (user.Username != userDTO.Username)
+            if (refreshToken != null)
             {
-                return BadRequest("Invalid username");
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = refreshToken.Expired
+                };
+                Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
             }
-            if (!BCrypt.Net.BCrypt.Verify(userDTO.Password, user.PasswordHash))
-            {
-                return BadRequest("Invalid password");
-            }
-            var token = new Jwt(this.configuration).CreateToken(user);
 
-            var refreshToken = GenerateRefreshToken();
-            SetRefreshToken(refreshToken);
-
-            return Ok(token);
+            return Ok(result.Result);
         }
-
 
 
         [HttpPost("refresh-token")]
@@ -63,43 +46,22 @@ namespace ArtigosCientificos.Api.Controllers
             var refreshToken = Request.Cookies["refreshToken"];
             if (string.IsNullOrEmpty(refreshToken))
             {
-                return BadRequest("Invalid refresh token");
+                return BadRequest("Invalid refresh token.");
             }
-            if (user.RefreshToken != refreshToken)
+
+            var (result, newRefreshToken) = await _authService.RefreshToken(refreshToken);
+
+            if (newRefreshToken != null)
             {
-                return BadRequest("Invalid refresh token");
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = newRefreshToken.Expired
+                };
+                Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
             }
-            if (user.RefreshTokenExpiryTime < DateTime.Now)
-            {
-                return BadRequest("Refresh token expired");
-            }
-            var token = new Jwt(this.configuration).CreateToken(user);
-            var newRefreshToken = GenerateRefreshToken();
-            SetRefreshToken(newRefreshToken);
-            return Ok(token);
-        }
 
-        private RefreshToken GenerateRefreshToken()
-        {
-            var refreshToken = new RefreshToken { 
-                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expired = DateTime.Now.AddDays(7)
-            };
-            return refreshToken;
-        }
-
-        private void SetRefreshToken(RefreshToken refreshToken)
-        {
-            CookieOptions cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = refreshToken.Expired
-            };
-            Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
-
-            user.RefreshToken = refreshToken.Token;
-            user.CreationTime = refreshToken.Created;
-            user.RefreshTokenExpiryTime = refreshToken.Expired;
+            return Ok(result.Result);
         }
 
     }
