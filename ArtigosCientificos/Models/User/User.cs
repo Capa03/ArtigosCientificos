@@ -1,4 +1,4 @@
-﻿namespace ArtigosCientificos.Api.Models
+﻿namespace ArtigosCientificos.Api.Models.User
 {
     public class User
     {
@@ -9,6 +9,6 @@
         public string RefreshToken { get; set; } = string.Empty;
         public DateTime CreationTime { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
-        public string? Role { get; set; } 
+        public string? Role { get; set; }
     }
 }

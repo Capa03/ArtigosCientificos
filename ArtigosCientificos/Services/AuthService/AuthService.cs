@@ -6,18 +6,19 @@ using Azure.Core;
 using Azure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ArtigosCientificos.Api.Models.User;
 
 namespace ArtigosCientificos.Api.Services.AuthService
 {
     public class AuthService : IAuthService
     {
         private readonly DataContext _context;
-        private readonly IConfiguration _configuration;
+        private readonly Jwt _jwt;
 
         public AuthService(DataContext context, IConfiguration configuration)
         {
             _context = context;
-            _configuration = configuration;
+            this._jwt = new Jwt(configuration);
         }
 
         public async Task<ActionResult<User>> Register(UserDTO userDTO)
@@ -48,8 +49,8 @@ namespace ArtigosCientificos.Api.Services.AuthService
                 return (new BadRequestObjectResult("Invalid username or password."), null);
             }
 
-            var token = new Jwt(_configuration).CreateToken(user);
-            var refreshToken = GenerateRefreshToken();
+            var token = this._jwt.CreateToken(user);
+            var refreshToken = this._jwt.GenerateRefreshToken();
             await SetRefreshToken(user, refreshToken);
 
             return (new OkObjectResult(token), refreshToken);
@@ -64,22 +65,13 @@ namespace ArtigosCientificos.Api.Services.AuthService
                 return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
             }
 
-            var token = new Jwt(_configuration).CreateToken(user);
-            var newRefreshToken = GenerateRefreshToken();
+            var token = this._jwt.CreateToken(user);
+            var newRefreshToken = this._jwt.GenerateRefreshToken();
             await SetRefreshToken(user, newRefreshToken);
 
             return (new OkObjectResult(token), newRefreshToken);
         }
 
-
-        public RefreshToken GenerateRefreshToken()
-        {
-            return new RefreshToken
-            {
-                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expired = DateTime.Now.AddDays(7)
-            };
-        }
 
         public async Task<RefreshToken> SetRefreshToken(User user, RefreshToken refreshToken)
         {

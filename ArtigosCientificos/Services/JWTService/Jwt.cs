@@ -1,7 +1,9 @@
 ﻿using ArtigosCientificos.Api.Models;
+using ArtigosCientificos.Api.Models.User;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace ArtigosCientificos.Api.Services.JWTService
@@ -39,7 +41,14 @@ namespace ArtigosCientificos.Api.Services.JWTService
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-
+        public RefreshToken GenerateRefreshToken()
+        {
+            return new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Expired = DateTime.Now.AddDays(7)
+            };
+        }
 
     }
 }

@@ -1,4 +1,4 @@
-﻿using ArtigosCientificos.Api.Models;
+﻿using ArtigosCientificos.Api.Models.User;
 using Microsoft.EntityFrameworkCore;
 
 

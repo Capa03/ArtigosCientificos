@@ -1,4 +1,5 @@
 ﻿using ArtigosCientificos.Api.Models;
+using ArtigosCientificos.Api.Models.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArtigosCientificos.Api.Services.AuthService
@@ -8,7 +9,6 @@ namespace ArtigosCientificos.Api.Services.AuthService
         Task<ActionResult<User>> Register(UserDTO userDTO);
         Task<(ActionResult<User>, RefreshToken)> Login(UserDTO userDTO);
         Task<(ActionResult<string>, RefreshToken)> RefreshToken(string currentRefreshToken);
-        RefreshToken GenerateRefreshToken();
         Task<RefreshToken> SetRefreshToken(User user, RefreshToken refreshToken);
     }
 }
