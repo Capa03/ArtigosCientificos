@@ -27,7 +27,7 @@ namespace ArtigosCientificos.Api.Services.AuthService
                 return new BadRequestObjectResult("User already exists.");
             }
 
-            
+
             var user = new User
             {
                 Username = userDTO.Username,
@@ -43,37 +43,46 @@ namespace ArtigosCientificos.Api.Services.AuthService
 
         public async Task<(ActionResult<string>, UserToken)> Login(UserDTO userDTO)
         {
-            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Username == userDTO.Username);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(userDTO.Password, user.PasswordHash))
+           
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Username.Equals(userDTO.Username));
+
+            if (!user.Username.Equals(userDTO.Username))
             {
                 return (new BadRequestObjectResult("Invalid username or password."), null);
             }
 
-            var jwtToken = this._jwt.CreateToken(user);
-            
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userDTO.Password, user.PasswordHash);
+            if (!isPasswordValid)
+            {
+                return (new BadRequestObjectResult("Invalid username or password."), null);
+            }
+
+            var jwtToken = _jwt.CreateToken(user);
+
             var refreshToken = new UserToken
             {
                 TokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Created = DateTime.Now,
-                Expired = DateTime.Now.AddDays(7)
+                Created = DateTime.UtcNow,  
+                Expired = DateTime.UtcNow.AddDays(7)
             };
-            
+
             await SetRefreshToken(user, refreshToken);
-            
+
             return (new OkObjectResult(jwtToken), refreshToken);
         }
-
 
 
         public async Task<(ActionResult<string>, UserToken)> RefreshToken(string currentRefreshToken)
         {
             var token = await _context.UserTokens
-                .Include(t => t.User) 
+                .Include(t => t.User)
                 .FirstOrDefaultAsync(t => t.TokenValue == currentRefreshToken);
 
             if (token == null)
             {
-                return (new BadRequestObjectResult("Invalid or expired refresh token."),null);
+                return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
             }
 
             var user = token.User;

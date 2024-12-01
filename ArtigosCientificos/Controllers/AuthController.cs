@@ -66,7 +66,7 @@ namespace ArtigosCientificos.Api.Controllers
             return Ok(result.Result);
         }
 
-        [HttpGet(Name = "GetWeatherForecast"), Authorize(Roles = "Reviewer")]
+        [HttpGet(Name = "GetWeatherForecast"), Authorize(Roles = "Researcher")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
