@@ -1,5 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-
+using System.Security.Cryptography;
 using ArtigosCientificos.Api.JWTService;
 using ArtigosCientificos.Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -63,10 +63,57 @@ namespace ArtigosCientificos.Api.Controllers
                 return BadRequest("Invalid password");
             }
             var token = new Jwt(this.configuration).CreateToken(user);
+
+            var refreshToken = GenerateRefreshToken();
+            SetRefreshToken(refreshToken);
+
             return Ok(token);
         }
 
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<string>> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return BadRequest("Invalid refresh token");
+            }
+            if (user.RefreshToken != refreshToken)
+            {
+                return BadRequest("Invalid refresh token");
+            }
+            if (user.RefreshTokenExpiryTime < DateTime.Now)
+            {
+                return BadRequest("Refresh token expired");
+            }
+            var token = new Jwt(this.configuration).CreateToken(user);
+            var newRefreshToken = GenerateRefreshToken();
+            SetRefreshToken(newRefreshToken);
+            return Ok(token);
+        }
 
+        private RefreshToken GenerateRefreshToken()
+        {
+            var refreshToken = new RefreshToken { 
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Expired = DateTime.Now.AddDays(7)
+            };
+            return refreshToken;
+        }
+
+        private void SetRefreshToken(RefreshToken refreshToken)
+        {
+            CookieOptions cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = refreshToken.Expired
+            };
+            Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
+
+            user.RefreshToken = refreshToken.Token;
+            user.CreationTime = refreshToken.Created;
+            user.RefreshTokenExpiryTime = refreshToken.Expired;
+        }
 
     }
 }

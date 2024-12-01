@@ -10,7 +10,7 @@ namespace ArtigosCientificos.Api.JWTService
     {
 
         private readonly IConfiguration configuration;
-
+        private readonly int EXPIRATION_TIME = 1;
         public Jwt(IConfiguration configuration) {
 
             this.configuration = configuration;
@@ -21,7 +21,7 @@ namespace ArtigosCientificos.Api.JWTService
             List<Claim> claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, user.Role) // Add role claim
+            new Claim(ClaimTypes.Role, user.Role) 
         };
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration.GetSection("AppSettings:Token").Value!));
@@ -31,7 +31,7 @@ namespace ArtigosCientificos.Api.JWTService
                 issuer: this.configuration.GetSection("AppSettings:Issuer").Value,
                 audience: this.configuration.GetSection("AppSettings:Audience").Value,
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddHours(this.EXPIRATION_TIME),
                 signingCredentials: creds
             );
 
