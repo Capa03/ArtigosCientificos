@@ -4,6 +4,7 @@ using System.Text;
 using ArtigosCientificos.Api.Data;
 using ArtigosCientificos.Api.Services.AuthService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -52,18 +53,31 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,
+            ValidateLifetime = true,  
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["AppSettings:Issuer"],
             ValidAudience = builder.Configuration["AppSettings:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"])),
+            ClockSkew = TimeSpan.Zero  
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = context =>
+            {
+                context.HandleResponse(); 
+                context.Response.StatusCode = 401;
+                context.Response.Headers.Add("Token-Expired", "true");
+                return Task.CompletedTask;
+            }
         };
     });
+
 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireResearcherRole", policy => policy.RequireRole("Researcher"));
-    options.AddPolicy("RequireReviewerRole", policy => policy.RequireRole("Reviewer", "Researcher"));
+    options.AddPolicy("RequireReviewerRole", policy => policy.RequireRole("Reviewer"));
 });
 
 builder.Services.AddDbContext<DataContext>(options =>

@@ -67,16 +67,29 @@ namespace ArtigosCientificos.Api.Controllers
         }
 
         [HttpGet(Name = "GetWeatherForecast"), Authorize(Roles = "Researcher")]
-        public IEnumerable<WeatherForecast> Get()
+        public IActionResult Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            var user = User; // Get the user principal from the token
+            var expirationClaim = user?.FindFirst("exp");
+
+            if (expirationClaim != null && long.TryParse(expirationClaim.Value, out var expirationTimestamp))
+            {
+                var expirationDate = DateTimeOffset.FromUnixTimeSeconds(expirationTimestamp).UtcDateTime;
+
+                if (expirationDate < DateTime.UtcNow)
+                {
+                    return Unauthorized("Token expired.");
+                }
+            }
+
+            return Ok(Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 TemperatureC = Random.Shared.Next(-20, 55),
-           
             })
-            .ToArray();
+            .ToArray());
         }
+
     }
 
     public class WeatherForecast

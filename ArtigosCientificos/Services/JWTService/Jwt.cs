@@ -22,10 +22,10 @@ namespace ArtigosCientificos.Api.Services.JWTService
         public string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, user.Role.Name)
-        };
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.Role.Name) 
+            };
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("AppSettings:Token").Value!));
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -34,19 +34,20 @@ namespace ArtigosCientificos.Api.Services.JWTService
                 issuer: configuration.GetSection("AppSettings:Issuer").Value,
                 audience: configuration.GetSection("AppSettings:Audience").Value,
                 claims: claims,
-                expires: DateTime.Now.AddHours(EXPIRATION_TIME),
+                expires: DateTime.Now.AddMinutes(EXPIRATION_TIME),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+
         public UserToken GenerateRefreshToken()
         {
             return new UserToken
             {
                 TokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expired = DateTime.Now.AddDays(7)
+                Expired = DateTime.Now.AddMinutes(1)
             };
         }
 

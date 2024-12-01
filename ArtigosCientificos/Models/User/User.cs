@@ -14,6 +14,6 @@ namespace ArtigosCientificos.Api.Models.User
         public UserRole Role { get; set; } = new UserRole();
 
         // Navigation property for Tokens
-        //public ICollection<UserToken> Tokens { get; set; } = new List<UserToken>();
+        public ICollection<UserToken> Tokens { get; set; } = new List<UserToken>();
     }
 }
