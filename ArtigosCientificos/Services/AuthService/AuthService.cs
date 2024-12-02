@@ -9,6 +9,13 @@ using ArtigosCientificos.Api.Models.Role;
 
 namespace ArtigosCientificos.Api.Services.AuthService
 {
+
+    public enum Role
+    {
+        RESEARCHER,
+        REVIEWER,
+    }
+
     public class AuthService : IAuthService
     {
         private readonly DataContext _context;
@@ -17,25 +24,26 @@ namespace ArtigosCientificos.Api.Services.AuthService
         public AuthService(DataContext context, IConfiguration configuration)
         {
             _context = context;
-            this._jwt = new Jwt(configuration);
+            _jwt = new Jwt(configuration);
         }
 
         public async Task<ActionResult<User>> Register(UserDTO userDTO)
         {
             if (await _context.Users.AnyAsync(u => u.Username == userDTO.Username))
-            {
                 return new BadRequestObjectResult("User already exists.");
-            }
 
+            var role = await _context.UserRoles.FirstOrDefaultAsync(role => role.Id == (int)Role.RESEARCHER + 1);
+            if (role == null)
+                return new BadRequestObjectResult("Role 'Researcher' does not exist.");
 
             var user = new User
             {
                 Username = userDTO.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password),
-                Role = _context.UserRoles.FirstOrDefaultAsync(r => r.Name == "Reviwer").Result
+                Role = role
             };
 
-            _context.Users.Add(user);
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
             return new OkObjectResult(user);
@@ -43,73 +51,56 @@ namespace ArtigosCientificos.Api.Services.AuthService
 
         public async Task<(ActionResult<string>, UserToken)> Login(UserDTO userDTO)
         {
-           
             var user = await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Username.Equals(userDTO.Username));
+                .FirstOrDefaultAsync(u => u.Username == userDTO.Username);
 
-            if (!user.Username.Equals(userDTO.Username))
-            {
+            if (user == null || !BCrypt.Net.BCrypt.Verify(userDTO.Password, user.PasswordHash))
                 return (new BadRequestObjectResult("Invalid username or password."), null);
-            }
-
-            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userDTO.Password, user.PasswordHash);
-            if (!isPasswordValid)
-            {
-                return (new BadRequestObjectResult("Invalid username or password."), null);
-            }
 
             var jwtToken = _jwt.CreateToken(user);
 
-            var refreshToken = new UserToken
-            {
-                TokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Created = DateTime.UtcNow,  
-                Expired = DateTime.UtcNow.AddDays(1)
-            };
-
+            var refreshToken = GenerateRefreshToken();
             await SetRefreshToken(user, refreshToken);
 
             return (new OkObjectResult(jwtToken), refreshToken);
         }
 
-
         public async Task<(ActionResult<string>, UserToken)> RefreshToken(string currentRefreshToken)
         {
+          
             var token = await _context.UserTokens
                 .Include(t => t.User)
                 .FirstOrDefaultAsync(t => t.TokenValue == currentRefreshToken);
 
-            if (token == null)
-            {
-                return (new BadRequestObjectResult("Invalid refresh token."), null);
-            }
-
-            var user = new User
-            {
-                Id = token.UserId,
-                Username = token.User.Username,
-                RoleId = token.User.RoleId,
-                Role = _context.UserRoles.FirstOrDefault(role => role.Id == token.User.RoleId),
-                Tokens = token.User.Tokens,
-                PasswordHash = token.User.PasswordHash
-            };
-
-            if (user == null || token.Expired < DateTime.Now)
-            {
+            if (token == null || token.Expired <= DateTime.UtcNow)
                 return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
-            }
 
-            var newJwtToken = _jwt.CreateToken(user);
+            if (token.User == null)
+                return (new BadRequestObjectResult("Associated user not found."), null);
 
-            var newRefreshToken = _jwt.GenerateRefreshToken();
+            token.User.Role = await _context.UserRoles.FirstOrDefaultAsync(role => role.Id == token.User.RoleId);
+            if (token.User.Role == null)
+                return (new BadRequestObjectResult("User's role not found."), null);
 
-            await SetRefreshToken(user, newRefreshToken);
+            var newJwtToken = _jwt.CreateToken(token.User);
+            var newRefreshToken = GenerateRefreshToken();
+
+            await SetRefreshToken(token.User, newRefreshToken);
 
             return (new OkObjectResult(newJwtToken), newRefreshToken);
         }
 
 
+        private UserToken GenerateRefreshToken()
+        {
+            return new UserToken
+            {
+                TokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Created = DateTime.UtcNow,
+                Expired = DateTime.UtcNow.AddDays(1)
+            };
+        }
 
         public async Task<UserToken> SetRefreshToken(User user, UserToken refreshToken)
         {
@@ -117,14 +108,13 @@ namespace ArtigosCientificos.Api.Services.AuthService
 
             _context.UserTokens.Add(refreshToken);
 
-            var oldTokens = _context.UserTokens.Where(t => t.UserId == user.Id && t.Expired < DateTime.Now);
-            _context.UserTokens.RemoveRange(oldTokens);
+            var expiredTokens = _context.UserTokens
+                .Where(t => t.UserId == user.Id && t.Expired <= DateTime.UtcNow);
+            _context.UserTokens.RemoveRange(expiredTokens);
 
             await _context.SaveChangesAsync();
 
             return refreshToken;
         }
-
-
     }
 }

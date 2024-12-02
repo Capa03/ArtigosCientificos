@@ -48,7 +48,7 @@ namespace ArtigosCientificos.Api.Controllers
             var refreshToken = Request.Cookies["refreshToken"];
             if (string.IsNullOrEmpty(refreshToken))
             {
-                return BadRequest("Invalid refresh token.");
+                return BadRequest("Refresh token is empty or null.");
             }
 
             var (result, newRefreshToken) = await _authService.RefreshToken(refreshToken);
@@ -66,37 +66,6 @@ namespace ArtigosCientificos.Api.Controllers
             return Ok(result.Result);
         }
 
-        [HttpGet(Name = "GetWeatherForecast"), Authorize(Roles = "Researcher")]
-        public IActionResult Get()
-        {
-            var user = User; // Get the user principal from the token
-            var expirationClaim = user?.FindFirst("exp");
-
-            if (expirationClaim != null && long.TryParse(expirationClaim.Value, out var expirationTimestamp))
-            {
-                var expirationDate = DateTimeOffset.FromUnixTimeSeconds(expirationTimestamp).UtcDateTime;
-
-                if (expirationDate < DateTime.UtcNow)
-                {
-                    return Unauthorized("Token expired.");
-                }
-            }
-
-            return Ok(Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-            })
-            .ToArray());
-        }
-
     }
 
-    public class WeatherForecast
-    {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-     
-    }
 }
