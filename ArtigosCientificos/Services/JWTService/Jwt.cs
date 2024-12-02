@@ -34,7 +34,7 @@ namespace ArtigosCientificos.Api.Services.JWTService
                 issuer: configuration.GetSection("AppSettings:Issuer").Value,
                 audience: configuration.GetSection("AppSettings:Audience").Value,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(EXPIRATION_TIME),
+                expires: DateTime.Now.AddHours(EXPIRATION_TIME),
                 signingCredentials: creds
             );
 
@@ -47,7 +47,7 @@ namespace ArtigosCientificos.Api.Services.JWTService
             return new UserToken
             {
                 TokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expired = DateTime.Now.AddMinutes(1)
+                Expired = DateTime.Now.AddDays(1)
             };
         }
 

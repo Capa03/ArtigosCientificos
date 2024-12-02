@@ -65,7 +65,7 @@ namespace ArtigosCientificos.Api.Services.AuthService
             {
                 TokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
                 Created = DateTime.UtcNow,  
-                Expired = DateTime.UtcNow.AddDays(7)
+                Expired = DateTime.UtcNow.AddDays(1)
             };
 
             await SetRefreshToken(user, refreshToken);
