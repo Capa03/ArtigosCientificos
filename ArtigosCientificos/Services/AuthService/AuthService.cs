@@ -82,23 +82,28 @@ namespace ArtigosCientificos.Api.Services.AuthService
 
             if (token == null)
             {
-                return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
+                return (new BadRequestObjectResult("Invalid refresh token."), null);
             }
 
-            var user = token.User;
+            var user = new User
+            {
+                Id = token.UserId,
+                Username = token.User.Username,
+                RoleId = token.User.RoleId,
+                Role = _context.UserRoles.FirstOrDefault(role => role.Id == token.User.RoleId),
+                Tokens = token.User.Tokens,
+                PasswordHash = token.User.PasswordHash
+            };
 
             if (user == null || token.Expired < DateTime.Now)
             {
                 return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
             }
 
-            // Create a new JWT token with the same claims as the original token
             var newJwtToken = _jwt.CreateToken(user);
 
-            // Generate a new refresh token
             var newRefreshToken = _jwt.GenerateRefreshToken();
 
-            // Set the new refresh token
             await SetRefreshToken(user, newRefreshToken);
 
             return (new OkObjectResult(newJwtToken), newRefreshToken);
