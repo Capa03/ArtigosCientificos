@@ -21,15 +21,23 @@ namespace ArtigosCientificos.Api.Services.JWTService
 
         public string CreateToken(User user)
         {
+            // Create a list of claims
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role.FirstOrDefault(r => r.Id == user.RoleId).Name) 
+                new Claim(ClaimTypes.Name, user.Username)
             };
 
+            
+            if (user.Role != null && user.Role.Any())
+            {
+                claims.AddRange(user.Role.Select(role => new Claim(ClaimTypes.Role, role.Name)));
+            }
+
+            
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("AppSettings:Token").Value!));
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
+            
             JwtSecurityToken token = new JwtSecurityToken(
                 issuer: configuration.GetSection("AppSettings:Issuer").Value,
                 audience: configuration.GetSection("AppSettings:Audience").Value,
@@ -38,8 +46,10 @@ namespace ArtigosCientificos.Api.Services.JWTService
                 signingCredentials: creds
             );
 
+            // Return the serialized token
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
 
         public UserToken GenerateRefreshToken()

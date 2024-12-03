@@ -7,6 +7,7 @@ using ArtigosCientificos.Api.Models.User;
 using ArtigosCientificos.Api.Models.Token;
 using ArtigosCientificos.Api.Models.Role;
 
+
 namespace ArtigosCientificos.Api.Services.AuthService
 {
 
@@ -21,11 +22,20 @@ namespace ArtigosCientificos.Api.Services.AuthService
         private readonly DataContext _context;
         private readonly Jwt _jwt;
 
+
         public AuthService(DataContext context, IConfiguration configuration)
         {
             _context = context;
             _jwt = new Jwt(configuration);
         }
+
+        public async Task<ActionResult<List<User>>> GetAllUsers()
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.Token).ToListAsync();
+        }
+
 
         public async Task<ActionResult<User>> Register(UserDTO userDTO)
         {
