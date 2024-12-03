@@ -1,19 +1,26 @@
-﻿using ArtigosCientificos.Api.Models.Role;
+﻿using System.ComponentModel.DataAnnotations;
+using ArtigosCientificos.Api.Models.Role;
 using ArtigosCientificos.Api.Models.Token;
 
 namespace ArtigosCientificos.Api.Models.User
 {
     public class User
     {
+        [Key]
         public int Id { get; set; }
+
+        [Required]
+        [MaxLength(50)]
         public string Username { get; set; } = string.Empty;
+
+        [Required]
         public string PasswordHash { get; set; } = string.Empty;
 
-        // Foreign key for Role
-        public int RoleId { get; set; }
-        public UserRole Role { get; set; } = new UserRole();
+        // Navigation property for user roles (many-to-many)
+        public int? RoleId { get; set; } 
+        public List<UserRole>? Role { get; set; } = new();
 
-        // Navigation property for Tokens
-        public ICollection<UserToken> Tokens { get; set; } = new List<UserToken>();
+        // Navigation property for tokens (one-to-many)
+        public List<UserToken> Token { get; set; } = new();
     }
 }

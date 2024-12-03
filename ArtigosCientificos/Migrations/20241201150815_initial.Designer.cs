@@ -47,7 +47,7 @@ namespace ArtigosCientificos.Api.Migrations
                     b.Property<DateTime>("RefreshTokenExpiryTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Role")
+                    b.Property<string>("Roles")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Username")

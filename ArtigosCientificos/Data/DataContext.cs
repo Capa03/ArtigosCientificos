@@ -24,16 +24,13 @@ namespace ArtigosCientificos.Api.Data
                 new UserRole { Id = 2, Name = "Reviewer" }
             );
 
+            // Configure many-to-many relationship
             modelBuilder.Entity<User>()
-                .HasOne(u => u.Role)
-                .WithMany()
-                .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasMany(u => u.Role)
+                .WithMany(r => r.Users)
+                .UsingEntity(j => j.ToTable("UserRoleMappings"));
 
-            
-            modelBuilder.Entity<User>()
-                .Property(u => u.RoleId)
-                .HasDefaultValue(1); 
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

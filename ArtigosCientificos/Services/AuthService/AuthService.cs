@@ -7,6 +7,7 @@ using ArtigosCientificos.Api.Models.User;
 using ArtigosCientificos.Api.Models.Token;
 using ArtigosCientificos.Api.Models.Role;
 
+
 namespace ArtigosCientificos.Api.Services.AuthService
 {
 
@@ -21,11 +22,20 @@ namespace ArtigosCientificos.Api.Services.AuthService
         private readonly DataContext _context;
         private readonly Jwt _jwt;
 
+
         public AuthService(DataContext context, IConfiguration configuration)
         {
             _context = context;
             _jwt = new Jwt(configuration);
         }
+
+        public async Task<ActionResult<List<User>>> GetAllUsers()
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.Token).ToListAsync();
+        }
+
 
         public async Task<ActionResult<User>> Register(UserDTO userDTO)
         {
@@ -40,10 +50,13 @@ namespace ArtigosCientificos.Api.Services.AuthService
             {
                 Username = userDTO.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password),
-                Role = role
+                RoleId = role.Id,
             };
 
             await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            user.Role.Add(role);
             await _context.SaveChangesAsync();
 
             return new OkObjectResult(user);
@@ -71,17 +84,11 @@ namespace ArtigosCientificos.Api.Services.AuthService
           
             var token = await _context.UserTokens
                 .Include(t => t.User)
+                .Include(t => t.User.Role)
                 .FirstOrDefaultAsync(t => t.TokenValue == currentRefreshToken);
 
             if (token == null || token.Expired <= DateTime.UtcNow)
                 return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
-
-            if (token.User == null)
-                return (new BadRequestObjectResult("Associated user not found."), null);
-
-            token.User.Role = await _context.UserRoles.FirstOrDefaultAsync(role => role.Id == token.User.RoleId);
-            if (token.User.Role == null)
-                return (new BadRequestObjectResult("User's role not found."), null);
 
             var newJwtToken = _jwt.CreateToken(token.User);
             var newRefreshToken = GenerateRefreshToken();

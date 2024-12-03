@@ -10,5 +10,8 @@ namespace ArtigosCientificos.Api.Services.AuthService
         Task<(ActionResult<string>, UserToken)> Login(UserDTO userDTO);
         Task<(ActionResult<string>, UserToken)> RefreshToken(string currentRefreshToken);
         Task<UserToken> SetRefreshToken(User user, UserToken refreshToken);
+
+
+        Task<ActionResult<List<User>>> GetAllUsers();
     }
 }
