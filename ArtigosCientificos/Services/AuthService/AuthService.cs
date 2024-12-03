@@ -7,9 +7,13 @@ using ArtigosCientificos.Api.Models.User;
 using ArtigosCientificos.Api.Models.Token;
 using ArtigosCientificos.Api.Models.Role;
 
+
 namespace ArtigosCientificos.Api.Services.AuthService
 {
-
+    /// <summary>
+    /// Provides authentication and user management functionality, including registration, login, 
+    /// token generation, and token refreshing.
+    /// </summary>
     public enum Role
     {
         RESEARCHER,
@@ -21,12 +25,35 @@ namespace ArtigosCientificos.Api.Services.AuthService
         private readonly DataContext _context;
         private readonly Jwt _jwt;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthService"/> class.
+        /// </summary>
+        /// <param name="context">The database context for accessing user and token data.</param>
+        /// <param name="configuration">The configuration object for JWT setup.</param>
+
         public AuthService(DataContext context, IConfiguration configuration)
         {
             _context = context;
             _jwt = new Jwt(configuration);
         }
 
+        /// <summary>
+        /// Retrieves all users from the database along with their roles and tokens.
+        /// </summary>
+        /// <returns>A list of users with their associated roles and tokens.</returns>
+
+        public async Task<ActionResult<List<User>>> GetAllUsers()
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.Token).ToListAsync();
+        }
+
+        /// <summary>
+        /// Registers a new user with the role of 'Researcher'.
+        /// </summary>
+        /// <param name="userDTO">The data transfer object containing the user's registration details.</param>
+        /// <returns>The newly created user object or an error if the username already exists.</returns>
         public async Task<ActionResult<User>> Register(UserDTO userDTO)
         {
             if (await _context.Users.AnyAsync(u => u.Username == userDTO.Username))
@@ -39,16 +66,23 @@ namespace ArtigosCientificos.Api.Services.AuthService
             var user = new User
             {
                 Username = userDTO.Username,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password),
-                Role = role
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password)
             };
 
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
+            user.Role.Add(role);
+            await _context.SaveChangesAsync();
+
             return new OkObjectResult(user);
         }
 
+        /// <summary>
+        /// Logs in a user by verifying credentials and generating a JWT token and refresh token.
+        /// </summary>
+        /// <param name="userDTO">The data transfer object containing the user's login credentials.</param>
+        /// <returns>A JWT token and a refresh token, or an error if the credentials are invalid.</returns>
         public async Task<(ActionResult<string>, UserToken)> Login(UserDTO userDTO)
         {
             var user = await _context.Users
@@ -66,22 +100,21 @@ namespace ArtigosCientificos.Api.Services.AuthService
             return (new OkObjectResult(jwtToken), refreshToken);
         }
 
+        /// <summary>
+        /// Refreshes a JWT token using a valid refresh token.
+        /// </summary>
+        /// <param name="currentRefreshToken">The current refresh token provided by the client.</param>
+        /// <returns>A new JWT token and a new refresh token, or an error if the provided refresh token is invalid or expired.</returns>
         public async Task<(ActionResult<string>, UserToken)> RefreshToken(string currentRefreshToken)
         {
           
             var token = await _context.UserTokens
                 .Include(t => t.User)
+                .Include(t => t.User.Role)
                 .FirstOrDefaultAsync(t => t.TokenValue == currentRefreshToken);
 
             if (token == null || token.Expired <= DateTime.UtcNow)
                 return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
-
-            if (token.User == null)
-                return (new BadRequestObjectResult("Associated user not found."), null);
-
-            token.User.Role = await _context.UserRoles.FirstOrDefaultAsync(role => role.Id == token.User.RoleId);
-            if (token.User.Role == null)
-                return (new BadRequestObjectResult("User's role not found."), null);
 
             var newJwtToken = _jwt.CreateToken(token.User);
             var newRefreshToken = GenerateRefreshToken();
@@ -91,6 +124,10 @@ namespace ArtigosCientificos.Api.Services.AuthService
             return (new OkObjectResult(newJwtToken), newRefreshToken);
         }
 
+        /// <summary>
+        /// Generates a new refresh token with a random value and a 24-hour expiration.
+        /// </summary>
+        /// <returns>A newly created refresh token object.</returns>
 
         private UserToken GenerateRefreshToken()
         {
@@ -102,6 +139,12 @@ namespace ArtigosCientificos.Api.Services.AuthService
             };
         }
 
+        /// <summary>
+        /// Associates a refresh token with a user and removes expired tokens for that user.
+        /// </summary>
+        /// <param name="user">The user to associate the refresh token with.</param>
+        /// <param name="refreshToken">The refresh token to set for the user.</param>
+        /// <returns>The newly associated refresh token object.</returns>
         public async Task<UserToken> SetRefreshToken(User user, UserToken refreshToken)
         {
             refreshToken.UserId = user.Id;

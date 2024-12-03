@@ -1,4 +1,5 @@
-﻿using ArtigosCientificos.Api.Models.User;
+﻿using System.Text.Json.Serialization;
+using ArtigosCientificos.Api.Models.User;
 
 namespace ArtigosCientificos.Api.Models.Token
 {
@@ -11,6 +12,7 @@ namespace ArtigosCientificos.Api.Models.Token
 
         
         public int UserId { get; set; }
+        [JsonIgnore]
         public User.User User { get; set; }
     }
 }

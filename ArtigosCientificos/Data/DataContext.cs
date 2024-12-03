@@ -24,16 +24,7 @@ namespace ArtigosCientificos.Api.Data
                 new UserRole { Id = 2, Name = "Reviewer" }
             );
 
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Role)
-                .WithMany()
-                .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            
-            modelBuilder.Entity<User>()
-                .Property(u => u.RoleId)
-                .HasDefaultValue(1); 
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
