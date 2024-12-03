@@ -25,7 +25,7 @@ namespace ArtigosCientificos.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ArtigosCientificos.Api.Models.Role.UserRole", b =>
+            modelBuilder.Entity("ArtigosCientificos.Api.Models.Roles.UserRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -128,20 +128,20 @@ namespace ArtigosCientificos.Api.Migrations
 
             modelBuilder.Entity("ArtigosCientificos.Api.Models.User.User", b =>
                 {
-                    b.HasOne("ArtigosCientificos.Api.Models.Role.UserRole", "Role")
+                    b.HasOne("ArtigosCientificos.Api.Models.Roles.UserRole", "Roles")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ArtigosCientificos.Api.Models.Role.UserRole", null)
+                    b.HasOne("ArtigosCientificos.Api.Models.Roles.UserRole", null)
                         .WithMany("Users")
                         .HasForeignKey("UserRoleId");
 
-                    b.Navigation("Role");
+                    b.Navigation("Roles");
                 });
 
-            modelBuilder.Entity("ArtigosCientificos.Api.Models.Role.UserRole", b =>
+            modelBuilder.Entity("ArtigosCientificos.Api.Models.Roles.UserRole", b =>
                 {
                     b.Navigation("Users");
                 });

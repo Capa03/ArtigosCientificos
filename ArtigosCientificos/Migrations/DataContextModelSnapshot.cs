@@ -32,7 +32,8 @@ namespace ArtigosCientificos.Api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -91,31 +92,38 @@ namespace ArtigosCientificos.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(1);
-
-                    b.Property<int?>("UserRoleId")
+                    b.Property<int?>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("UserRoleId");
-
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("UserUserRole", b =>
+                {
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RoleId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("UserRoleMappings", (string)null);
                 });
 
             modelBuilder.Entity("ArtigosCientificos.Api.Models.Token.UserToken", b =>
                 {
                     b.HasOne("ArtigosCientificos.Api.Models.User.User", "User")
-                        .WithMany("Tokens")
+                        .WithMany("Token")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -123,29 +131,24 @@ namespace ArtigosCientificos.Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ArtigosCientificos.Api.Models.User.User", b =>
+            modelBuilder.Entity("UserUserRole", b =>
                 {
-                    b.HasOne("ArtigosCientificos.Api.Models.Role.UserRole", "Role")
+                    b.HasOne("ArtigosCientificos.Api.Models.Role.UserRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ArtigosCientificos.Api.Models.Role.UserRole", null)
-                        .WithMany("Users")
-                        .HasForeignKey("UserRoleId");
-
-                    b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("ArtigosCientificos.Api.Models.Role.UserRole", b =>
-                {
-                    b.Navigation("Users");
+                    b.HasOne("ArtigosCientificos.Api.Models.User.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ArtigosCientificos.Api.Models.User.User", b =>
                 {
-                    b.Navigation("Tokens");
+                    b.Navigation("Token");
                 });
 #pragma warning restore 612, 618
         }

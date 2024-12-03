@@ -40,10 +40,13 @@ namespace ArtigosCientificos.Api.Services.AuthService
             {
                 Username = userDTO.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password),
-                Role = role
+                RoleId = role.Id,
             };
 
             await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            user.Role.Add(role);
             await _context.SaveChangesAsync();
 
             return new OkObjectResult(user);
@@ -71,17 +74,11 @@ namespace ArtigosCientificos.Api.Services.AuthService
           
             var token = await _context.UserTokens
                 .Include(t => t.User)
+                .Include(t => t.User.Role)
                 .FirstOrDefaultAsync(t => t.TokenValue == currentRefreshToken);
 
             if (token == null || token.Expired <= DateTime.UtcNow)
                 return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
-
-            if (token.User == null)
-                return (new BadRequestObjectResult("Associated user not found."), null);
-
-            token.User.Role = await _context.UserRoles.FirstOrDefaultAsync(role => role.Id == token.User.RoleId);
-            if (token.User.Role == null)
-                return (new BadRequestObjectResult("User's role not found."), null);
 
             var newJwtToken = _jwt.CreateToken(token.User);
             var newRefreshToken = GenerateRefreshToken();
