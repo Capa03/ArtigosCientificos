@@ -47,7 +47,7 @@ namespace ArtigosCientificos.Api.Controllers
         /// <response code="401">If the user is not authorized.</response>
         /// 
         [HttpGet("users")]
-        [Authorize(Roles = "Researchawfer")]
+        [Authorize(Roles = "Researcher")]
         public async Task<ActionResult<List<User>>> GetAllUsers()
         {
             return await _authService.GetAllUsers();
