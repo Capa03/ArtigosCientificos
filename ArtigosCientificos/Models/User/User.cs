@@ -16,8 +16,6 @@ namespace ArtigosCientificos.Api.Models.User
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
 
-        // Navigation property for user roles (many-to-many)
-        public int? RoleId { get; set; } 
         public List<UserRole>? Role { get; set; } = new();
 
         // Navigation property for tokens (one-to-many)

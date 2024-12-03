@@ -23,7 +23,7 @@ namespace ArtigosCientificos.Api.Controllers
             return await _authService.Register(userDTO);
         }
 
-        [Authorize(Roles = "Researcher")]
+        [Authorize(Roles = "Researchawfer")]
 
         [HttpGet("users")]
         public async Task<ActionResult<List<User>>> GetAllUsers()

@@ -49,8 +49,7 @@ namespace ArtigosCientificos.Api.Services.AuthService
             var user = new User
             {
                 Username = userDTO.Username,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password),
-                RoleId = role.Id,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password)
             };
 
             await _context.Users.AddAsync(user);
