@@ -31,7 +31,6 @@ namespace ArtigosCientificos.App.Services.LoginService
                 throw new InvalidOperationException("Login request failed. The server returned a null response.");
             }
 
-
             return loginRequest;
         }
 
