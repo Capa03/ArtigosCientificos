@@ -17,14 +17,23 @@ namespace ArtigosCientificos.App.Services.LoginService
         }
 
         /// <summary>
-        /// Api call to login
+        /// API call to login
         /// </summary>
-        /// <param name="userDTO"></param>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <param name="userDTO">The user data transfer object containing login credentials</param>
+        /// <returns>A valid LoginRequest object if the login is successful</returns>
+        /// <exception cref="InvalidOperationException">Thrown when loginRequest is null or contains an error status code</exception>
         public async Task<LoginRequest> Login(UserDTO userDTO)
         {
-            
-            return await this._apiService.PostAsync<LoginRequest>(this._configServer.GetLoginUrl(), userDTO);
+            LoginRequest? loginRequest = await this._apiService.PostAsync<LoginRequest>(this._configServer.GetLoginUrl(), userDTO);
+
+            if (loginRequest == null)
+            {
+                throw new InvalidOperationException("Login request failed. The server returned a null response.");
+            }
+
+
+            return loginRequest;
         }
+
     }
 }

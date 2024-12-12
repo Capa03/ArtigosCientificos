@@ -1,4 +1,5 @@
-﻿using ArtigosCientificos.App.Models.Login;
+﻿using System.Text.Json;
+using ArtigosCientificos.App.Models.Login;
 using ArtigosCientificos.App.Models.User;
 using ArtigosCientificos.App.Services.LoginService;
 using Microsoft.AspNetCore.Mvc;
@@ -26,19 +27,16 @@ namespace ArtigosCientificos.App.Controllers.Login
         {
             if (ModelState.IsValid)
             {
-                try
+                LoginRequest? user = await _loginService.Login(userDto);
+                if (user != null)
                 {
-                    var user = await _loginService.Login(userDto);
-                    if (user != null)
+                    if (user.StatusCode != 200)
                     {
-                        Console.WriteLine("Login success " + user.Value);
-                        return RedirectToAction("Home");
+                        ModelState.AddModelError("", "Invalid Credentials.");
+                        return View(userDto);
                     }
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $"An error occurred: {ex.Message}");
+                    Console.WriteLine("Login success " + JsonSerializer.Serialize(user).ToString());
+                    return RedirectToAction("Index", "Home");
                 }
             }
             return View(userDto);

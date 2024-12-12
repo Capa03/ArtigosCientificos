@@ -1,5 +1,8 @@
 ﻿
+using System.Text;
 using System.Text.Json;
+using ArtigosCientificos.App.Models.Login;
+using ArtigosCientificos.App.Models.User;
 
 namespace ArtigosCientificos.App.Services.ApiService
 {
@@ -12,10 +15,11 @@ namespace ArtigosCientificos.App.Services.ApiService
             _client = httpClient;
         }
 
-        public async Task<T> PostAsync<T>(string url, object data)
+
+        public async Task<T?> PostAsync<T>(string url, object data)
         {
             var jsonData = JsonSerializer.Serialize(data);
-            var content = new StringContent(jsonData, System.Text.Encoding.UTF8, "application/json");
+            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
             try
             {
@@ -23,13 +27,16 @@ namespace ArtigosCientificos.App.Services.ApiService
                 response.EnsureSuccessStatusCode();
 
                 var responseData = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<T>(responseData);
+                Console.WriteLine("Response data: " + responseData);
+                return JsonSerializer.Deserialize<T>(responseData, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true 
+                });
             }
             catch (HttpRequestException ex)
             {
-                // Log the exception here
                 Console.WriteLine($"Error making request: {ex.Message}");
-                throw; // Rethrow or handle accordingly
+                throw;
             }
         }
     }

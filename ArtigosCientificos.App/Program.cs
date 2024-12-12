@@ -14,7 +14,11 @@ builder.Services.AddSingleton<ConfigServer>();
 builder.Services.AddHttpClient<ApiService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7267/api/");
+}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
 });
+
 
 
 var app = builder.Build();
