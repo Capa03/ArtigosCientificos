@@ -94,7 +94,7 @@ namespace ArtigosCientificos.Api.Services.AuthService
 
             var jwtToken = _jwt.CreateToken(user);
 
-            var refreshToken = GenerateRefreshToken();
+            var refreshToken = _jwt.GenerateRefreshToken();
             await SetRefreshToken(user, refreshToken);
 
             return (new OkObjectResult(jwtToken), refreshToken);
@@ -105,39 +105,31 @@ namespace ArtigosCientificos.Api.Services.AuthService
         /// </summary>
         /// <param name="currentRefreshToken">The current refresh token provided by the client.</param>
         /// <returns>A new JWT token and a new refresh token, or an error if the provided refresh token is invalid or expired.</returns>
-        public async Task<(ActionResult<string>, UserToken)> RefreshToken(string currentRefreshToken)
+        public async Task<(ActionResult<string>, UserToken)> RefreshToken()
         {
-          
+            // Retrieve the most recent valid token for the user
             var token = await _context.UserTokens
                 .Include(t => t.User)
                 .Include(t => t.User.Role)
-                .FirstOrDefaultAsync(t => t.TokenValue == currentRefreshToken);
+                .Where(t => t.UserId == t.User.Id && t.Expired >= DateTime.UtcNow)
+                .OrderByDescending(t => t.Created)  // Order by creation date to get the most recent token
+                .FirstOrDefaultAsync();  // Fetch the first token after sorting
 
-            if (token == null || token.Expired <= DateTime.UtcNow)
+            // If no valid token found, return an error response
+            if (token == null)
                 return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
 
+            // Generate a new JWT and refresh token
             var newJwtToken = _jwt.CreateToken(token.User);
-            var newRefreshToken = GenerateRefreshToken();
+            var newRefreshToken = _jwt.GenerateRefreshToken();
 
+            // Store the new refresh token (likely in a separate table or column)
             await SetRefreshToken(token.User, newRefreshToken);
 
+            // Return the new JWT and refresh token
             return (new OkObjectResult(newJwtToken), newRefreshToken);
         }
 
-        /// <summary>
-        /// Generates a new refresh token with a random value and a 24-hour expiration.
-        /// </summary>
-        /// <returns>A newly created refresh token object.</returns>
-
-        private UserToken GenerateRefreshToken()
-        {
-            return new UserToken
-            {
-                TokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Created = DateTime.UtcNow,
-                Expired = DateTime.UtcNow.AddDays(1)
-            };
-        }
 
         /// <summary>
         /// Associates a refresh token with a user and removes expired tokens for that user.

@@ -8,7 +8,7 @@ namespace ArtigosCientificos.Api.Services.AuthService
     {
         Task<ActionResult<User>> Register(UserDTO userDTO);
         Task<(ActionResult<string>, UserToken)> Login(UserDTO userDTO);
-        Task<(ActionResult<string>, UserToken)> RefreshToken(string currentRefreshToken);
+        Task<(ActionResult<string>, UserToken)> RefreshToken();
         Task<UserToken> SetRefreshToken(User user, UserToken refreshToken);
 
 
