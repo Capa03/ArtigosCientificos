@@ -35,7 +35,6 @@ namespace ArtigosCientificos.App.Controllers.Login
                         ModelState.AddModelError("", "Invalid Credentials.");
                         return View(userDto);
                     }
-                    Console.WriteLine("Login success " + JsonSerializer.Serialize(user).ToString());
                     return RedirectToAction("Index", "Home");
                 }
             }

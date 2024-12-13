@@ -27,10 +27,9 @@ namespace ArtigosCientificos.App.Services.ApiService
                 response.EnsureSuccessStatusCode();
 
                 var responseData = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Response data: " + responseData);
                 return JsonSerializer.Deserialize<T>(responseData, new JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true 
+                    PropertyNameCaseInsensitive = true
                 });
             }
             catch (HttpRequestException ex)
