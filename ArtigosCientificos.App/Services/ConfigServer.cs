@@ -8,5 +8,9 @@
             return "Auth/login";
         }
 
+        public string GetRegisterUrl()
+        {
+            return "Auth/register";
+        }
     }
 }

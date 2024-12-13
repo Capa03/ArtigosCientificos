@@ -1,6 +1,7 @@
 using ArtigosCientificos.App.Services;
 using ArtigosCientificos.App.Services.ApiService;
 using ArtigosCientificos.App.Services.LoginService;
+using ArtigosCientificos.App.Services.RegisterService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddSingleton<ConfigServer>();
 
 
