@@ -69,19 +69,17 @@ namespace ArtigosCientificos.Api.Services.JWTService
 
 
         /// <summary>
-        /// Generates a secure refresh token for use in token renewal.
+        /// Generates a new refresh token with a random value and a 24-hour expiration.
         /// </summary>
-        /// <returns>A new <see cref="UserToken"/> object containing a secure random token value and expiration date.</returns>
-        /// <remarks>
-        /// - The refresh token is a random 64-byte base64-encoded string.
-        /// - The token is set to expire in 24 hours from the time of generation.
-        /// </remarks>
+        /// <returns>A newly created refresh token object.</returns>
+
         public UserToken GenerateRefreshToken()
         {
             return new UserToken
             {
                 TokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expired = DateTime.Now.AddDays(1)
+                Created = DateTime.UtcNow,
+                Expired = DateTime.UtcNow.AddDays(1)
             };
         }
 

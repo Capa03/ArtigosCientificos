@@ -64,17 +64,7 @@ namespace ArtigosCientificos.Api.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<User>> Login(UserDTO userDTO)
         {
-            var (result, refreshToken) = await _authService.Login(userDTO);
-
-            if (refreshToken != null)
-            {
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Expires = refreshToken.Expired
-                };
-                Response.Cookies.Append("refreshToken", refreshToken.TokenValue, cookieOptions);
-            }
+            var result = await _authService.Login(userDTO);
 
             return Ok(result.Result);
         }
@@ -89,26 +79,9 @@ namespace ArtigosCientificos.Api.Controllers
         [HttpPost("refresh-token")]
         public async Task<ActionResult<string>> RefreshToken()
         {
-            var refreshToken = Request.Cookies["refreshToken"];
-            if (string.IsNullOrEmpty(refreshToken))
-            {
-                return BadRequest("Refresh token is empty or null.");
-            }
-
-            var (result, newRefreshToken) = await _authService.RefreshToken(refreshToken);
-
-            if (newRefreshToken != null)
-            {
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Expires = newRefreshToken.Expired
-                };
-                Response.Cookies.Append("refreshToken", newRefreshToken.TokenValue, cookieOptions);
-            }
-
-            return Ok(result.Result);
+            return await _authService.RefreshToken();
         }
+
 
     }
 
