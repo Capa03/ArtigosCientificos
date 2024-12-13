@@ -40,7 +40,6 @@ namespace ArtigosCientificos.App.Controllers.Login
                     return RedirectToAction("Index", "Home");
                 }
             }
-            ModelState.AddModelError("", "Error");
             return View(userDto);
         }
     }
