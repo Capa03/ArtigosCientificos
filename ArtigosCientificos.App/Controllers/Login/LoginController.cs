@@ -25,6 +25,8 @@ namespace ArtigosCientificos.App.Controllers.Login
         [HttpPost]
         public async Task<IActionResult> Index(UserDTO userDto)
         {
+
+            ModelState.Remove("Email");
             if (ModelState.IsValid)
             {
                 LoginRequest? user = await _loginService.Login(userDto);
@@ -40,6 +42,5 @@ namespace ArtigosCientificos.App.Controllers.Login
             }
             return View(userDto);
         }
-
     }
 }

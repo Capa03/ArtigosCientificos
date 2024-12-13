@@ -14,11 +14,14 @@ namespace ArtigosCientificos.Api.Models.User
         public string Username { get; set; } = string.Empty;
 
         [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
         public string PasswordHash { get; set; } = string.Empty;
 
         public List<UserRole>? Role { get; set; } = new();
 
-        // Navigation property for tokens (one-to-many)
         public List<UserToken> Token { get; set; } = new();
     }
 }
