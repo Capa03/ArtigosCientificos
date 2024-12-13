@@ -83,21 +83,21 @@ namespace ArtigosCientificos.Api.Services.AuthService
         /// </summary>
         /// <param name="userDTO">The data transfer object containing the user's login credentials.</param>
         /// <returns>A JWT token and a refresh token, or an error if the credentials are invalid.</returns>
-        public async Task<(ActionResult<string>, UserToken)> Login(UserDTO userDTO)
+        public async Task<ActionResult<string>> Login(UserDTO userDTO)
         {
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Username == userDTO.Username);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(userDTO.Password, user.PasswordHash))
-                return (new BadRequestObjectResult("Invalid username or password."), null);
+                return (new BadRequestObjectResult("Invalid username or password."));
 
             var jwtToken = _jwt.CreateToken(user);
 
             var refreshToken = _jwt.GenerateRefreshToken();
             await SetRefreshToken(user, refreshToken);
 
-            return (new OkObjectResult(jwtToken), refreshToken);
+            return new OkObjectResult(jwtToken);
         }
 
         /// <summary>
@@ -105,19 +105,26 @@ namespace ArtigosCientificos.Api.Services.AuthService
         /// </summary>
         /// <param name="currentRefreshToken">The current refresh token provided by the client.</param>
         /// <returns>A new JWT token and a new refresh token, or an error if the provided refresh token is invalid or expired.</returns>
-        public async Task<(ActionResult<string>, UserToken)> RefreshToken()
+        /// <summary>
+        /// Refreshes a JWT token using a valid refresh token.
+        /// </summary>
+        /// <param name="currentRefreshToken">The current refresh token provided by the client.</param>
+        /// <returns>A new JWT token and a new refresh token, or an error if the provided refresh token is invalid or expired.</returns>
+        public async Task<ActionResult<string>> RefreshToken()
         {
-            // Retrieve the most recent valid token for the user
+            
             var token = await _context.UserTokens
                 .Include(t => t.User)
                 .Include(t => t.User.Role)
-                .Where(t => t.UserId == t.User.Id && t.Expired >= DateTime.UtcNow)
+                .Where(t => t.UserId == t.User.Id && t.Expired >= DateTime.UtcNow)  // Ensure token hasn't expired
                 .OrderByDescending(t => t.Created)  // Order by creation date to get the most recent token
                 .FirstOrDefaultAsync();  // Fetch the first token after sorting
 
-            // If no valid token found, return an error response
-            if (token == null)
-                return (new BadRequestObjectResult("Invalid or expired refresh token."), null);
+            
+            if (token == null || token.Expired <= DateTime.UtcNow)
+            {
+                return new BadRequestObjectResult("Invalid or expired refresh token.");
+            }
 
             // Generate a new JWT and refresh token
             var newJwtToken = _jwt.CreateToken(token.User);
@@ -126,9 +133,11 @@ namespace ArtigosCientificos.Api.Services.AuthService
             // Store the new refresh token (likely in a separate table or column)
             await SetRefreshToken(token.User, newRefreshToken);
 
-            // Return the new JWT and refresh token
-            return (new OkObjectResult(newJwtToken), newRefreshToken);
+            // Return the new JWT token as a string
+            return new OkObjectResult(newJwtToken);  // Adjust this if you need to return both JWT and refresh token.
         }
+
+
 
 
         /// <summary>

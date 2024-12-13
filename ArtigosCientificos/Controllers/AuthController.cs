@@ -66,7 +66,7 @@ namespace ArtigosCientificos.Api.Controllers
         {
             var result = await _authService.Login(userDTO);
 
-            return Ok(result.Item1.Result);
+            return Ok(result.Result);
         }
 
         /// <summary>
@@ -79,9 +79,9 @@ namespace ArtigosCientificos.Api.Controllers
         [HttpPost("refresh-token")]
         public async Task<ActionResult<string>> RefreshToken()
         {
-
-            return Ok(await _authService.RefreshToken());
+            return await _authService.RefreshToken();
         }
+
 
     }
 
