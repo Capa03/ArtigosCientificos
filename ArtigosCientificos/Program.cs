@@ -53,19 +53,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,  
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["AppSettings:Issuer"],
             ValidAudience = builder.Configuration["AppSettings:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"])),
-            ClockSkew = TimeSpan.Zero  
+            ClockSkew = TimeSpan.Zero
         };
 
         options.Events = new JwtBearerEvents
         {
             OnChallenge = context =>
             {
-                context.HandleResponse(); 
+                context.HandleResponse();
                 context.Response.StatusCode = 401;
                 context.Response.Headers.Add("Token-Expired", "true");
                 return Task.CompletedTask;
@@ -85,6 +85,19 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", builder =>
+    {
+        builder.WithOrigins("https://localhost:7181")
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -93,6 +106,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+
+app.UseCors("AllowSpecificOrigins");
 
 app.UseHttpsRedirection();
 
