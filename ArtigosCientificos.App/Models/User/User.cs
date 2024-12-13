@@ -10,6 +10,8 @@ namespace ArtigosCientificos.App.Models.User
 
         public string? Username { get; set; }
 
+        public string? Email { get; set; }
+
         public List<UserRole>? Role { get; set; }
 
         public List<UserToken>? Token { get; set; } 

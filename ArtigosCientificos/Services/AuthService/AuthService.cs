@@ -66,6 +66,7 @@ namespace ArtigosCientificos.Api.Services.AuthService
             var user = new User
             {
                 Username = userDTO.Username,
+                Email = userDTO.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password)
             };
 

@@ -28,6 +28,7 @@ namespace ArtigosCientificos.App.Services.LoginService
         {
             try
             {
+
            
                 var (loginRequest, statusCode) = await this._apiService.PostAsync<LoginRequest>(this._configServer.GetLoginUrl(), userDTO);
 

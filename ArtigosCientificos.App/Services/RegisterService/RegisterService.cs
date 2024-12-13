@@ -24,13 +24,14 @@ namespace ArtigosCientificos.App.Services.RegisterService
                 {
                     Username = registerDTO.Username,
                     Password = registerDTO.Password,
+                    Email = registerDTO.Email
                 };
 
                 // Use the enhanced PostAsync to get data and status code
                 var (user, statusCode) = await this._apiService.PostAsync<UserDTO>(this._configServer.GetRegisterUrl(), userDto);
 
                 // Handle the status code
-                if (statusCode == HttpStatusCode.BadRequest) // Assuming 409 for "User already exists"
+                if (statusCode == HttpStatusCode.BadRequest) 
                 {
                     return "User already exists.";
                 }
