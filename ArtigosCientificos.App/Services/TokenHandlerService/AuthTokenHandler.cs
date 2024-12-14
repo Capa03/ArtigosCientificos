@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Http;
 
 namespace ArtigosCientificos.Api.Services.TokenHandlerService
 {
@@ -13,9 +14,9 @@ namespace ArtigosCientificos.Api.Services.TokenHandlerService
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var httpContext = _httpContextAccessor.HttpContext;
+            var token = GetTokenFromCookies();
 
-            if (httpContext != null && httpContext.Request.Cookies.TryGetValue("AuthToken", out var token) && !string.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(token))
             {
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
@@ -23,5 +24,16 @@ namespace ArtigosCientificos.Api.Services.TokenHandlerService
             return await base.SendAsync(request, cancellationToken);
         }
 
+        private string? GetTokenFromCookies()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+
+            if (httpContext?.Request.Cookies.TryGetValue("AuthToken", out var token) == true)
+            {
+                return token;
+            }
+
+            return null;
+        }
     }
 }

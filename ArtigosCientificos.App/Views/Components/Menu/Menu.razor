@@ -1,0 +1,24 @@
+﻿@using ArtigosCientificos.App.Services.AuthService
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+@if (!loggedIn)
+{
+    <!-- Not logged in -->
+    <div>
+        <a class="navbar-brand" href="/Login/Index">Login</a>
+        <a class="navbar-brand" href="/Register/Index">Register</a>
+    </div>
+}
+
+@if (loggedIn)
+{
+    <!-- Logged in -->
+    <div>
+        <p class="navbar-brand">@username</p>
+        <button class="button" type="button" @onclick="@(() => Logout)">Logout</button>
+    </div>
+
+}
+
+
