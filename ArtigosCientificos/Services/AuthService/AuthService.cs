@@ -117,9 +117,9 @@ namespace ArtigosCientificos.Api.Services.AuthService
             var token = await _context.UserTokens
                 .Include(t => t.User)
                 .Include(t => t.User.Role)
-                .Where(t => t.UserId == t.User.Id && t.Expired >= DateTime.UtcNow)  // Ensure token hasn't expired
-                .OrderByDescending(t => t.Created)  // Order by creation date to get the most recent token
-                .FirstOrDefaultAsync();  // Fetch the first token after sorting
+                .Where(t => t.UserId == t.User.Id && t.Expired >= DateTime.UtcNow)  
+                .OrderByDescending(t => t.Created) 
+                .FirstOrDefaultAsync();  
 
             
             if (token == null || token.Expired <= DateTime.UtcNow)
@@ -127,15 +127,12 @@ namespace ArtigosCientificos.Api.Services.AuthService
                 return new BadRequestObjectResult("Invalid or expired refresh token.");
             }
 
-            // Generate a new JWT and refresh token
             var newJwtToken = _jwt.CreateToken(token.User);
             var newRefreshToken = _jwt.GenerateRefreshToken();
 
-            // Store the new refresh token (likely in a separate table or column)
             await SetRefreshToken(token.User, newRefreshToken);
 
-            // Return the new JWT token as a string
-            return new OkObjectResult(newJwtToken);  // Adjust this if you need to return both JWT and refresh token.
+            return new OkObjectResult(newJwtToken);
         }
 
 

@@ -16,6 +16,36 @@ namespace ArtigosCientificos.App.Services.ApiService
             _client = httpClient;
         }
 
+        public async Task<T> GetTAsync<T>(string url)
+        {
+            try
+            {
+                var response = await _client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseData = await response.Content.ReadAsStringAsync();
+                    var json = JsonSerializer.Deserialize<T>(responseData, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    return json;
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                }
+                return default;
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new ApplicationException("An error occurred while communicating with the server.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An error occurred.", ex);
+            }
+        }
+
 
         public async Task<(T? Data, HttpStatusCode StatusCode)> PostAsync<T>(string url, object data)
         {

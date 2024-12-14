@@ -27,7 +27,6 @@ namespace ArtigosCientificos.App.Services.RegisterService
                     Email = registerDTO.Email
                 };
 
-                // Use the enhanced PostAsync to get data and status code
                 var (user, statusCode) = await this._apiService.PostAsync<UserDTO>(this._configServer.GetRegisterUrl(), userDto);
 
                 // Handle the status code
