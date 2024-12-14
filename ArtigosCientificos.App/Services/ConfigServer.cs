@@ -12,5 +12,10 @@
         {
             return "Auth/register";
         }
+
+        public string GetUsersUrl()
+        {
+            return "Auth/users";
+        }
     }
 }
