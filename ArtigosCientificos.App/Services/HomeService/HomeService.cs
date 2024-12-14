@@ -17,10 +17,6 @@ namespace ArtigosCientificos.App.Services.HomeService
         {
 
             List<User> users = await this._apiService.GetTAsync<List<User>>(this._configServer.GetUsersUrl());
-            foreach (var user in users)
-            {
-                Console.WriteLine(user.Username);
-            }
             return users;
         }
     }
