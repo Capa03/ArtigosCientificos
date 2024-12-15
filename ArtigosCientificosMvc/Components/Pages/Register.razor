@@ -1,0 +1,46 @@
+﻿@page "/register"
+@using ArtigosCientificosMvc.Service.Register
+@rendermode InteractiveServer
+@inject IRegisterService registerService
+@inject NavigationManager Navigation
+
+<PageTitle>Register</PageTitle>
+
+<div>
+    <div>
+        <h2>Register</h2>
+
+        <EditForm Model="@userDTO" OnValidSubmit="@OnRegister" FormName="Register">
+            <div class="form-group m-3">
+                <label for="username">Username: </label>
+                <InputText id="username" @bind-Value="@userDTO.Username"></InputText>
+            </div>
+
+            <div class="form-group m-3">
+                <label for="password">Email: </label>
+                <InputText id="email" @bind-Value="@userDTO.Email"></InputText>
+            </div>
+
+            <div class="form-group m-3">
+                <label for="password">Password: </label>
+                <InputText id="password" @bind-Value="@userDTO.Password"></InputText>
+            </div>
+
+            <div class="form-group m-3">
+                <label for="confirmPassword">Confirm Password: </label>
+                <InputText id="password" @bind-Value="@userDTO.ConfirmPassword"></InputText>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+        </EditForm>
+
+        <div>
+            Already have an account?
+            <a href="/Login">Sign in</a>
+        </div>
+    </div>
+</div>
+
+

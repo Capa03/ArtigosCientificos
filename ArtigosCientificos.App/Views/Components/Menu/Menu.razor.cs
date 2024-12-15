@@ -21,13 +21,5 @@ namespace ArtigosCientificos.App.Views.Components.Menu
                 username = AuthService.GetUsername();
             }
         }
-
-        public void Logout()
-        {
-            AuthService.clearToken();
-            CheckIfLoggedIn();
-            StateHasChanged();
-            Navigation.NavigateTo("/Login/Index", true);
-        }
     }
 }

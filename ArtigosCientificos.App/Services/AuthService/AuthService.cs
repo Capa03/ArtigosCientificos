@@ -53,6 +53,7 @@ namespace ArtigosCientificos.App.Services.AuthService
             if (httpContext?.Request.Cookies.TryGetValue("AuthToken", out var token) == true)
             {
                 httpContext.Response.Cookies.Delete("AuthToken");
+
             }
         }
 
