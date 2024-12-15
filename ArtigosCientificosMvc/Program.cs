@@ -4,6 +4,7 @@ using ArtigosCientificosMvc.Service.Api;
 using ArtigosCientificosMvc.Service.Home;
 using ArtigosCientificosMvc.Service.Login;
 using ArtigosCientificosMvc.Service.Register;
+using ArtigosCientificosMvc.Service.Token;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +18,8 @@ builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddSingleton<ConfigServer>();
-builder.Services.AddScoped<RequestHandler>();
+builder.Services.AddScoped<TokenManager>();
+
 builder.Services.AddHttpContextAccessor();
 
 
@@ -25,7 +27,6 @@ builder.Services.AddHttpClient<ApiService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7267/api/");
 })
-.AddHttpMessageHandler<RequestHandler>()
 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
 {
     ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true

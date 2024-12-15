@@ -1,10 +1,11 @@
 ﻿@page "/login"
 @using ArtigosCientificosMvc.Service.Login
+@using ArtigosCientificosMvc.Service.Token
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @rendermode InteractiveServer
 @inject ILoginService loginService
 @inject NavigationManager Navigation
-@inject ProtectedLocalStorage LocalStorage
+@inject TokenManager TokenManager
 
 
 <PageTitle>Login</PageTitle>

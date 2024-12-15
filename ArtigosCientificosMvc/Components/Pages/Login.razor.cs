@@ -20,7 +20,7 @@ namespace ArtigosCientificosMvc.Components.Pages
                     this.ErrorMessage = "Invalid Credentials.";
                     return;
                 }
-                await LocalStorage.SetAsync("token", loginRequest.Value);
+                await this.TokenManager.SetTokenAsync(loginRequest.Value);
                 Navigation.NavigateTo("Home");
             }
             else
