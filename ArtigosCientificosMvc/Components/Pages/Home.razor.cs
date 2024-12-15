@@ -4,14 +4,15 @@ namespace ArtigosCientificosMvc.Components.Pages
 {
     partial class Home
     {
-        List<User> users = new List<User>();
+        private List<User> users;
 
-        protected async override void OnInitialized()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            base.OnInitialized();
-            this.users = await this.homeService.GetUsers();
-            
+            if (firstRender)
+            {
+                users = await homeService.getUsers();
+                StateHasChanged();
+            }
         }
-
     }
 }

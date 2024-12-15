@@ -15,9 +15,17 @@ namespace ArtigosCientificosMvc.Service.Home
             _apiService = apiService;
         }
 
-        public async Task<List<User>> GetUsers()
+        public async Task<List<User>> getUsers()
         {
-            return await this._apiService.GetTAsync<List<User>>(this._configServer.GetUsersUrl());
+            var result = await _apiService.GetTAsync<List<User>>(_configServer.GetUsersUrl());
+
+            foreach (var user in result)
+            {
+                Console.WriteLine(user.Username);
+            }
+
+            return result;
         }
+
     }
 }

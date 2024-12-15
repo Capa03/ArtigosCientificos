@@ -2,6 +2,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using ArtigosCientificosMvc.Models.User;
 using ArtigosCientificosMvc.Service.Token;
 using Microsoft.AspNetCore.Components;
 
@@ -18,6 +19,14 @@ namespace ArtigosCientificosMvc.Service.Api
             _client = client;
             _tokenManager = tokenManager;
         }
+
+        public async Task<List<User>> testUser()
+        {
+            var token = await _tokenManager.GetTokenAsync();
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            return await this._client.GetFromJsonAsync<List<User>>("Auth/user");
+        }
+
 
         public async Task<T> GetTAsync<T>(string url)
         {
@@ -48,7 +57,7 @@ namespace ArtigosCientificosMvc.Service.Api
                 if (response.IsSuccessStatusCode)
                 {
                     var responseData = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Request successful with status code: " + response.Content.ToString());
+
                     return JsonSerializer.Deserialize<T>(responseData, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 }
                 else
