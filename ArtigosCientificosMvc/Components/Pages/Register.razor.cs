@@ -5,16 +5,32 @@ namespace ArtigosCientificosMvc.Components.Pages
     partial class Register
     {
         UserDTO userDTO = new UserDTO();
+        string? ErrorMessage { get; set; }
+        private string passwordInputType = "password";
 
         async Task OnRegister()
         {
-            string response = await this.registerService.Register(userDTO);
+            ErrorMessage = null;
+            var result = await this.registerService.Register(userDTO);
 
-
-            if (response == "User registered successfully.")
-            {
-                Navigation.NavigateTo("login");
+            if (result.Success)
+            {  
+                Navigation.NavigateTo("Login");
             }
+            else
+            {
+                ErrorMessage = result.Message;
+            }
+
+            StateHasChanged();
         }
+
+
+        private void TogglePasswordVisibility()
+        {
+            
+            passwordInputType = passwordInputType == "password" ? "text" : "password";
+        }
+
     }
 }

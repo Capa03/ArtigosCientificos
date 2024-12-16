@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using ArtigosCientificosMvc.Models.Login;
+using ArtigosCientificosMvc.Models.Register;
 using ArtigosCientificosMvc.Service.Api;
 
 namespace ArtigosCientificosMvc.Service.Register
@@ -13,11 +14,11 @@ namespace ArtigosCientificosMvc.Service.Register
             this._apiService = apiService;
             _configServer = configServer;
         }
-        public async Task<string> Register(UserDTO registerDTO)
+        public async Task<RegisterResult> Register(UserDTO registerDTO)
         {
             try
             {
-                UserDTO userDto = new UserDTO
+                var userDto = new UserDTO
                 {
                     Username = registerDTO.Username,
                     Password = registerDTO.Password,
@@ -26,22 +27,37 @@ namespace ArtigosCientificosMvc.Service.Register
 
                 var (user, statusCode) = await this._apiService.PostAsync<UserDTO>(this._configServer.GetRegisterUrl(), userDto);
 
-                // Handle the status code
                 if (statusCode == HttpStatusCode.BadRequest)
                 {
-                    return "User already exists.";
+                    return new RegisterResult
+                    {
+                        Success = false,
+                        Message = "User already exists."
+                    };
                 }
 
                 if (statusCode == HttpStatusCode.OK && user != null)
                 {
-                    return "User registered successfully.";
+                    return new RegisterResult
+                    {
+                        Success = true,
+                        Message = "User registered successfully."
+                    };
                 }
 
-                return "An unexpected error occurred.";
+                return new RegisterResult
+                {
+                    Success = false,
+                    Message = "An unexpected error occurred."
+                };
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException)
             {
-                return "An error occurred while registering. Please try again later.";
+                return new RegisterResult
+                {
+                    Success = false,
+                    Message = "An error occurred while registering. Please try again later."
+                };
             }
         }
     }

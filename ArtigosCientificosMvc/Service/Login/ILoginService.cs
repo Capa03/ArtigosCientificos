@@ -4,6 +4,6 @@ namespace ArtigosCientificosMvc.Service.Login
 {
     public interface ILoginService
     {
-        Task<LoginRequest> Login(UserDTO userDTO);
+        Task<LoginResult> Login(UserDTO userDTO);
     }
 }

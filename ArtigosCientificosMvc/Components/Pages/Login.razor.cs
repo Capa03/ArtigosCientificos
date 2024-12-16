@@ -12,20 +12,14 @@ namespace ArtigosCientificosMvc.Components.Pages
         {
             ErrorMessage = null;
 
-            LoginRequest? loginRequest = await this.loginService.Login(userDTO);
-            if (loginRequest != null)
+            LoginResult loginRequest = await this.loginService.Login(userDTO);
+            if (loginRequest.Success)
             {
-                if (loginRequest.StatusCode != 200)
-                {
-                    this.ErrorMessage = "Invalid Credentials.";
-                    return;
-                }
-                await this.TokenManager.SetTokenAsync(loginRequest.Value);
                 Navigation.NavigateTo("Home", true);
             }
             else
             {
-                this.ErrorMessage = "Login failed. Please try again.";
+                this.ErrorMessage = loginRequest.Message;
             }
         }
     }

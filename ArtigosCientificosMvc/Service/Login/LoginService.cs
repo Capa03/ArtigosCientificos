@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using ArtigosCientificosMvc.Models.Login;
 using ArtigosCientificosMvc.Service.Api;
+using ArtigosCientificosMvc.Service.Token;
 using Microsoft.AspNetCore.Http;
 
 namespace ArtigosCientificosMvc.Service.Login
@@ -9,15 +10,15 @@ namespace ArtigosCientificosMvc.Service.Login
     {
         private readonly ConfigServer _configServer;
         private readonly ApiService _apiService;
-
-        public LoginService(ConfigServer configServer, ApiService apiService)
+        private readonly TokenManager _tokenManager;
+        public LoginService(ConfigServer configServer, ApiService apiService, TokenManager tokenManager)
         {
             this._configServer = configServer;
             this._apiService = apiService;
-
+            this._tokenManager = tokenManager;
         }
 
-        public async Task<LoginRequest> Login(UserDTO userDTO)
+        public async Task<LoginResult> Login(UserDTO userDTO)
         {
             try
             {
@@ -25,18 +26,32 @@ namespace ArtigosCientificosMvc.Service.Login
 
                 if (statusCode == HttpStatusCode.Unauthorized)
                 {
-                    throw new HttpRequestException("Invalid login credentials. Please check your username and password.");
+                    return new LoginResult { Success = false, Message = "Invalid login credentials. Please check your username and password." };
                 }
                 else if (statusCode == HttpStatusCode.BadRequest)
                 {
-                    throw new HttpRequestException("Bad request. Please ensure all required fields are filled correctly.");
+                    return new LoginResult
+                    {
+                        Success = false,
+                        Message = "Bad request. Please ensure all required fields are filled correctly."
+                    };
                 }
                 else if (loginRequest == null)
                 {
-                    throw new InvalidOperationException("Login request failed. The server returned a null or empty response.");
+                    return new LoginResult
+                    {
+                        Success = false,
+                        Message = "Login request failed. The server returned a null or empty response."
+                    };
                 }
 
-                return loginRequest;
+                await this._tokenManager.SetTokenAsync(loginRequest.Value);
+
+                return new LoginResult
+                {
+                    Success = true,
+                    Message = "User registered successfully."
+                };
             }
             catch (HttpRequestException ex)
             {

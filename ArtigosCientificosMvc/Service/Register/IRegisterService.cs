@@ -1,9 +1,10 @@
 ﻿using ArtigosCientificosMvc.Models.Login;
+using ArtigosCientificosMvc.Models.Register;
 
 namespace ArtigosCientificosMvc.Service.Register
 {
     public interface IRegisterService
     {
-        Task<string> Register(UserDTO userDTO);
+        Task<RegisterResult> Register(UserDTO registerDTO);
     }
 }
