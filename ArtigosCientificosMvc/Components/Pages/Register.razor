@@ -6,59 +6,65 @@
 
 <PageTitle>Register</PageTitle>
 
-<div>
-	<div>
-		<h2>Register</h2>
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header text-center">
+                    <h3>Register</h3>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="@userDTO" OnValidSubmit="@OnRegister" FormName="Register">
+                        <DataAnnotationsValidator />
 
-		<EditForm Model="@userDTO" OnValidSubmit="@OnRegister" FormName="Register">
-			<DataAnnotationsValidator />
+                        <!-- Username Field -->
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <InputText id="username" class="form-control" @bind-Value="@userDTO.Username" placeholder="Enter your username" />
+                            <ValidationMessage For="@(() => userDTO.Username)" />
+                        </div>
 
-			<div class="form-group m-3">
-				<label for="username">Username: </label>
-				<InputText id="username" @bind-Value="@userDTO.Username"></InputText>
-				<ValidationMessage For="@(() => userDTO.Username)" />
-			</div>
+                        <!-- Email Field -->
+                        <div class="form-group mt-3">
+                            <label for="email">Email</label>
+                            <InputText id="email" class="form-control" @bind-Value="@userDTO.Email" placeholder="Enter your email" />
+                            <ValidationMessage For="@(() => userDTO.Email)" />
+                        </div>
 
-			<div class="form-group m-3">
-				<label for="password">Email: </label>
-				<InputText id="email" @bind-Value="@userDTO.Email"></InputText>
-				<ValidationMessage For="@(() => userDTO.Email)" />
-			</div>
+                        <!-- Password Field -->
+                        <div class="form-group mt-3">
+                            <label for="password">Password</label>
+                            <InputText id="password" class="form-control" @bind-Value="@userDTO.Password" placeholder="Enter your password" type="@passwordInputType" />
+                            <ValidationMessage For="@(() => userDTO.Password)" />
+                        </div>
 
-			<div class="form-group m-3">
-				<label for="password">Password: </label>
-				<InputText id="password"
-						   @bind-Value="@userDTO.Password"
-						   type="@passwordInputType" />
-				<ValidationMessage For="@(() => userDTO.Password)" />
-			</div>
+                        <!-- Confirm Password Field -->
+                        <div class="form-group mt-3">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <InputText id="confirmPassword" class="form-control" @bind-Value="@userDTO.ConfirmPassword" placeholder="Confirm your password" type="@passwordInputType" />
+                            <button type="button" class="btn btn-link p-0" @onclick="TogglePasswordVisibility">Show/Hide</button>
+                            <ValidationMessage For="@(() => userDTO.ConfirmPassword)" />
+                        </div>
 
-			<div class="form-group m-3">
-				<label for="confirmPassword">Confirm Password: </label>
-				<InputText id="confirmPassword"
-						   @bind-Value="@userDTO.ConfirmPassword"
-						   type="@passwordInputType" />
-				<button type="button" @onclick="TogglePasswordVisibility">Show/Hide</button>
-				<ValidationMessage For="@(() => userDTO.ConfirmPassword)" />
-			</div>
+                        <!-- Submit Button -->
+                        <div class="form-group text-center mt-4">
+                            <button type="submit" class="btn btn-primary w-100">Register</button>
+                        </div>
+                    </EditForm>
+                </div>
 
-			<div class="form-group">
-				<button type="submit" class="btn btn-primary">Register</button>
-			</div>
-		</EditForm>
+                <div class="card-footer text-center">
+                    <p>Already have an account? <a href="/Login">Sign in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-		<div>
-			Already have an account?
-			<a href="/Login">Sign in</a>
-		</div>
-	</div>
-
-	@if (!string.IsNullOrEmpty(ErrorMessage))
-	{
-		<div class="alert alert-danger" role="alert">
-			@ErrorMessage
-		</div>
-	}
+    <!-- Error Message -->
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger mt-4" role="alert">
+            @ErrorMessage
+        </div>
+    }
 </div>
-
-
