@@ -5,6 +5,9 @@ using ArtigosCientificosMvc.Service.Home;
 using ArtigosCientificosMvc.Service.Login;
 using ArtigosCientificosMvc.Service.Register;
 using ArtigosCientificosMvc.Service.Token;
+using Blazorise;
+using Blazorise.Bootstrap5;
+using Blazorise.Icons.FontAwesome;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +25,13 @@ builder.Services.AddScoped<TokenManager>();
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services
+    .AddBlazorise(options =>
+    {
+        options.Immediate = true;
+    })
+    .AddBootstrap5Providers()
+    .AddFontAwesomeIcons();
 
 builder.Services.AddHttpClient<ApiService>(client =>
 {

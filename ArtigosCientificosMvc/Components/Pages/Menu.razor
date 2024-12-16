@@ -1,4 +1,5 @@
 ﻿@using ArtigosCientificosMvc.Service.Token
+@using Blazorise
 @rendermode InteractiveServer
 
 @inject TokenManager TokenManager
@@ -16,10 +17,27 @@
 @if (loggedIn)
 {
     <!-- Logged in -->
-    <div>
-        <p class="navbar-brand">@username</p>
-		<button onclick="@Logout">Logout</button>
-    </div>
+<Dropdown>
+    <DropdownToggle>
+        <img src="/assets/man.png" alt="Avatar" class="rounded-circle" style="width: 30px; height: 30px; margin-right: 8px;" />
+        @username
+    </DropdownToggle>
+    <DropdownMenu>
+        <DropdownItem>
+            <a href="/Profile">Profile</a>
+        </DropdownItem>
+        <DropdownItem>
+            <a href="/Settings">Settings</a>
+        </DropdownItem>
+        <DropdownItem>
+            <hr class="dropdown-divider" />
+        </DropdownItem>
+        <DropdownItem>
+            <a @onclick="Logout">Logout</a>
+        </DropdownItem>
+    </DropdownMenu>
+</Dropdown>
+
 }
 
 

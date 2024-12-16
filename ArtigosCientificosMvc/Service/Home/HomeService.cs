@@ -19,11 +19,6 @@ namespace ArtigosCientificosMvc.Service.Home
         {
             var result = await _apiService.GetTAsync<List<User>>(_configServer.GetUsersUrl());
 
-            foreach (var user in result)
-            {
-                Console.WriteLine(user.Username);
-            }
-
             return result;
         }
 

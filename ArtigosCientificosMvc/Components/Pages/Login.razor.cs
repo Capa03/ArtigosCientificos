@@ -1,4 +1,5 @@
 ﻿using ArtigosCientificosMvc.Models.Login;
+using ArtigosCientificosMvc.Service.Token;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArtigosCientificosMvc.Components.Pages
@@ -7,6 +8,15 @@ namespace ArtigosCientificosMvc.Components.Pages
     {
         UserDTO userDTO = new UserDTO();
         string? ErrorMessage { get; set; }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                //await this.TokenManager.RemoveTokenAsync();
+                StateHasChanged();
+            }
+        }
 
         async Task OnLogin()
         {
