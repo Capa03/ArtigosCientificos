@@ -53,7 +53,6 @@ namespace ArtigosCientificosMvc.Service.Api
                     }
                 }
 
-                // If the response was successful, deserialize the content
                 if (response.IsSuccessStatusCode)
                 {
                     var responseData = await response.Content.ReadAsStringAsync();

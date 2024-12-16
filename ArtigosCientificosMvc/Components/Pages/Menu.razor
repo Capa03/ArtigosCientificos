@@ -1,0 +1,25 @@
+﻿@using ArtigosCientificosMvc.Service.Token
+@rendermode InteractiveServer
+
+@inject TokenManager TokenManager
+@inject NavigationManager Navigation
+
+@if (!loggedIn)
+{
+    <!-- Not logged in -->
+    <div>
+        <a class="navbar-brand" href="/Login">Login</a>
+        <a class="navbar-brand" href="/Register">Register</a>
+    </div>
+}
+
+@if (loggedIn)
+{
+    <!-- Logged in -->
+    <div>
+        <p class="navbar-brand">@username</p>
+		<button onclick="@Logout">Logout</button>
+    </div>
+}
+
+

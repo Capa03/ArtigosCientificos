@@ -21,7 +21,7 @@ namespace ArtigosCientificosMvc.Components.Pages
                     return;
                 }
                 await this.TokenManager.SetTokenAsync(loginRequest.Value);
-                Navigation.NavigateTo("Home");
+                Navigation.NavigateTo("Home", true);
             }
             else
             {
