@@ -1,6 +1,7 @@
-﻿using System.Text.Json;
+﻿
 using ArtigosCientificos.App.Models.Login;
 using ArtigosCientificos.App.Models.User;
+using ArtigosCientificos.App.Services.AuthService;
 using ArtigosCientificos.App.Services.LoginService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,15 +11,17 @@ namespace ArtigosCientificos.App.Controllers.Login
     {
 
         private readonly ILoginService _loginService;
-        public LoginController(ILoginService loginService)
+        private readonly IAuthService _authService;
+        public LoginController(ILoginService loginService, IAuthService authService)
         {
             this._loginService = loginService;
+            this._authService = authService;
         }
 
         [HttpGet]
-
         public IActionResult Index()
         {
+            this._authService.clearToken();
             return View();
         }
 
@@ -41,7 +44,7 @@ namespace ArtigosCientificos.App.Controllers.Login
                     Response.Cookies.Append("AuthToken", user.Value, new CookieOptions
                     {
                         HttpOnly = true,
-                        Secure = true, // Use only in HTTPS
+                        Secure = true, 
                     });
 
                     return RedirectToAction("Index", "Home");

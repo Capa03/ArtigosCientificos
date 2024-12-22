@@ -1,9 +1,11 @@
 using ArtigosCientificos.Api.Services.TokenHandlerService;
 using ArtigosCientificos.App.Services;
 using ArtigosCientificos.App.Services.ApiService;
+using ArtigosCientificos.App.Services.AuthService;
 using ArtigosCientificos.App.Services.HomeService;
 using ArtigosCientificos.App.Services.LoginService;
 using ArtigosCientificos.App.Services.RegisterService;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +15,13 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddSingleton<ConfigServer>();
 builder.Services.AddScoped<AuthTokenHandler>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();; 
 
 
 builder.Services.AddHttpClient<ApiService>(client =>
@@ -49,6 +55,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Login}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
 app.Run();

@@ -1,0 +1,43 @@
+﻿@using ArtigosCientificosMvc.Service.Token
+@using Blazorise
+@rendermode InteractiveServer
+
+@inject TokenManager TokenManager
+@inject NavigationManager Navigation
+
+@if (!loggedIn)
+{
+    <!-- Not logged in -->
+    <div>
+        <a class="navbar-brand" href="/Login">Login</a>
+        <a class="navbar-brand" href="/Register">Register</a>
+    </div>
+}
+
+@if (loggedIn)
+{
+    <!-- Logged in -->
+<Dropdown>
+    <DropdownToggle>
+        <img src="/assets/man.png" alt="Avatar" class="rounded-circle" style="width: 30px; height: 30px; margin-right: 8px;" />
+        @username
+    </DropdownToggle>
+    <DropdownMenu>
+        <DropdownItem>
+            <a href="/Profile">Profile</a>
+        </DropdownItem>
+        <DropdownItem>
+            <a href="/Settings">Settings</a>
+        </DropdownItem>
+        <DropdownItem>
+            <hr class="dropdown-divider" />
+        </DropdownItem>
+        <DropdownItem>
+            <a @onclick="Logout">Logout</a>
+        </DropdownItem>
+    </DropdownMenu>
+</Dropdown>
+
+}
+
+

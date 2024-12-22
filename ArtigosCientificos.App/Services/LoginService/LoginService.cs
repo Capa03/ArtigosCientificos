@@ -28,8 +28,6 @@ namespace ArtigosCientificos.App.Services.LoginService
         {
             try
             {
-
-           
                 var (loginRequest, statusCode) = await this._apiService.PostAsync<LoginRequest>(this._configServer.GetLoginUrl(), userDTO);
 
                 if (statusCode == HttpStatusCode.Unauthorized)
@@ -52,6 +50,5 @@ namespace ArtigosCientificos.App.Services.LoginService
                 throw new ApplicationException("An unexpected error occurred during login.", ex);
             }
         }
-
     }
 }

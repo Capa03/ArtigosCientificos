@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35514.174 d17.12
+VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtigosCientificos.Api", "ArtigosCientificos\ArtigosCientificos.Api.csproj", "{9F0012DA-20F1-486D-A69F-402FD837E491}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtigosCientificos.App", "ArtigosCientificos.App\ArtigosCientificos.App.csproj", "{BE2600E4-C9A1-4566-A5B1-385E89390F7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtigosCientificosMvc", "ArtigosCientificosMvc\ArtigosCientificosMvc.csproj", "{3D6F0632-2175-4700-85B1-7E73761FF326}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{BE2600E4-C9A1-4566-A5B1-385E89390F7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE2600E4-C9A1-4566-A5B1-385E89390F7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE2600E4-C9A1-4566-A5B1-385E89390F7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D6F0632-2175-4700-85B1-7E73761FF326}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D6F0632-2175-4700-85B1-7E73761FF326}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D6F0632-2175-4700-85B1-7E73761FF326}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D6F0632-2175-4700-85B1-7E73761FF326}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
