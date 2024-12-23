@@ -40,12 +40,12 @@ namespace ArtigosCientificos.Api.Controllers
         {
             ObjectResult objectResult = await _authService.Register(userDTO);
 
-            if(objectResult.StatusCode == (int) HttpStatusCode.BadRequest)
+            if (objectResult.StatusCode == (int)HttpStatusCode.BadRequest)
             {
                 return BadRequest(objectResult.Value);
             }
 
-            if(objectResult.StatusCode == (int) HttpStatusCode.NotFound)
+            if (objectResult.StatusCode == (int)HttpStatusCode.NotFound)
             {
                 return NotFound(objectResult.Value);
             }
@@ -67,7 +67,7 @@ namespace ArtigosCientificos.Api.Controllers
 
             ObjectResult objectResult = await _authService.GetAllUsers();
 
-            if (objectResult.StatusCode == (int) HttpStatusCode.NotFound)
+            if (objectResult.StatusCode == (int)HttpStatusCode.NotFound)
             {
                 return NotFound(objectResult.Value);
             }
@@ -88,7 +88,7 @@ namespace ArtigosCientificos.Api.Controllers
         {
             ObjectResult result = await _authService.Login(userDTO);
 
-            if (result.StatusCode == (int) HttpStatusCode.Unauthorized)
+            if (result.StatusCode == (int)HttpStatusCode.Unauthorized)
             {
                 return Unauthorized(result.Value);
             }
