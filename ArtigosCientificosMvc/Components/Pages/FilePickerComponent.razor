@@ -1,0 +1,47 @@
+﻿@using System.IO
+@using System.Net.Http.Headers
+@using ArtigosCientificosMvc.Service.Api
+@using System.Net
+@inject ApiService apiService
+<Field>
+    <FilePicker Multiple Upload="OnFileUpload" ShowMode="FilePickerShowMode.List" />
+</Field>
+
+<p>@message</p>
+
+@code {
+    
+
+    private string message = "";
+
+    async Task OnFileUpload(FileUploadEventArgs e)
+    {
+        try
+        {
+            var fileContent = new StreamContent(e.File.OpenReadStream(long.MaxValue));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(e.File.Type);
+
+            using var content = new MultipartFormDataContent();
+            content.Add(fileContent, "file", e.File.Name);
+
+            var response = await apiService.PostAsync<MultipartFormDataContent>("/api/file/upload", content);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                message = "File uploaded successfully!";
+            }
+            else
+            {
+                message = $"Failed to upload file.";
+            }
+        }
+        catch (Exception exc)
+        {
+            message = $"Error uploading file: {exc.Message}";
+        }
+        finally
+        {
+            this.StateHasChanged();
+        }
+    }
+}

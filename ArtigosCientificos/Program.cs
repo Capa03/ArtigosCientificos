@@ -3,6 +3,7 @@
 using System.Text;
 using ArtigosCientificos.Api.Data;
 using ArtigosCientificos.Api.Services.AuthService;
+using ArtigosCientificos.Api.Services.File;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ using Swashbuckle.AspNetCore.Filters;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IAuthService, AuthService>();
-
+builder.Services.AddScoped<IFileService, FileService>();
 
 // Add services to the container.
 
