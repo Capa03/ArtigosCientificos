@@ -15,7 +15,7 @@ public class FileController : Controller
     }
 
     [HttpPost("upload")]
-    [Authorize(Roles = "Researcher")]
+    //[Authorize(Roles = "Researcher")]
     public async Task<IActionResult> UploadFile(IFormFile file)
     {
         if (file == null || file.Length == 0)

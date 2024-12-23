@@ -1,47 +1,62 @@
-﻿@using System.IO
-@using System.Net.Http.Headers
-@using ArtigosCientificosMvc.Service.Api
-@using System.Net
-@inject ApiService apiService
-<Field>
-    <FilePicker Multiple Upload="OnFileUpload" ShowMode="FilePickerShowMode.List" />
-</Field>
+﻿@inject HttpClient Http
+@inject NavigationManager Navigation
 
-<p>@message</p>
+<h3>File Upload</h3>
+
+<InputFile OnChange="HandleFileSelected" />
+<p>@statusMessage</p>
+
+@if (uploading)
+{
+    <p>Uploading...</p>
+}
 
 @code {
-    
+    private string statusMessage = string.Empty;
+    private bool uploading = false;
 
-    private string message = "";
-
-    async Task OnFileUpload(FileUploadEventArgs e)
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
         try
         {
-            var fileContent = new StreamContent(e.File.OpenReadStream(long.MaxValue));
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue(e.File.Type);
+            uploading = true;
+
+            var file = e.File;
+            if (file == null)
+            {
+                statusMessage = "No file selected.";
+                return;
+            }
+
+            if (file.ContentType != "application/pdf")
+            {
+                statusMessage = "Only PDF files are allowed.";
+                return;
+            }
 
             using var content = new MultipartFormDataContent();
-            content.Add(fileContent, "file", e.File.Name);
+            using var fileContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 100 * 1024 * 1024));
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+            content.Add(fileContent, "file", file.Name);
 
-            var response = await apiService.PostAsync<MultipartFormDataContent>("/api/file/upload", content);
+            var response = await Http.PostAsync("https://localhost:7267/api/File/upload", content);
 
-            if (response.StatusCode == HttpStatusCode.OK)
+            if (response.IsSuccessStatusCode)
             {
-                message = "File uploaded successfully!";
+                statusMessage = "File uploaded successfully!";
             }
             else
             {
-                message = $"Failed to upload file.";
+                statusMessage = "Failed to upload file. Please try again.";
             }
         }
-        catch (Exception exc)
+        catch (Exception ex)
         {
-            message = $"Error uploading file: {exc.Message}";
+            statusMessage = $"An error occurred: {ex.Message}";
         }
         finally
         {
-            this.StateHasChanged();
+            uploading = false;
         }
     }
 }
