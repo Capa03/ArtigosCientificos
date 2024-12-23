@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ArtigosCientificos.Api.Models.User;
 using ArtigosCientificos.Api.Models.Token;
 using ArtigosCientificos.Api.Models.Role;
+using System.Text.Json;
 
 
 namespace ArtigosCientificos.Api.Services.AuthService
@@ -84,21 +85,21 @@ namespace ArtigosCientificos.Api.Services.AuthService
         /// </summary>
         /// <param name="userDTO">The data transfer object containing the user's login credentials.</param>
         /// <returns>A JWT token and a refresh token, or an error if the credentials are invalid.</returns>
-        public async Task<ActionResult<string>> Login(UserDTO userDTO)
+        public async Task<ObjectResult> Login(UserDTO userDTO)
         {
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Username == userDTO.Username);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(userDTO.Password, user.PasswordHash))
-                return (new BadRequestObjectResult("Invalid username or password."));
+                return (new UnauthorizedObjectResult("Invalid username or password."));
 
             var jwtToken = _jwt.CreateToken(user);
 
             var refreshToken = _jwt.GenerateRefreshToken();
             await SetRefreshToken(user, refreshToken);
 
-            return new OkObjectResult(jwtToken);
+            return new OkObjectResult(JsonSerializer.Serialize(jwtToken));
         }
 
         /// <summary>

@@ -26,7 +26,7 @@ namespace ArtigosCientificosMvc.Service.Login
         {
             try
             {
-                var (loginRequest, statusCode) = await _apiService.PostAsync<LoginRequest>(_configServer.GetLoginUrl(), userDTO);
+                var (token, statusCode) = await _apiService.PostAsync<string>(_configServer.GetLoginUrl(), userDTO);
 
                 if (statusCode == HttpStatusCode.Unauthorized)
                 {
@@ -42,7 +42,7 @@ namespace ArtigosCientificosMvc.Service.Login
                         Message = "Bad request. Please ensure all required fields are filled correctly."
                     };
                 }
-                else if (loginRequest == null)
+                else if (token == null)
                 {
                     _logger.LogError("Login request failed for username: {Username}, received null response.", userDTO.Username);
                     return new LoginResult
@@ -52,10 +52,10 @@ namespace ArtigosCientificosMvc.Service.Login
                     };
                 }
 
-                _logger.LogInformation("User logged in successfully. Token: {Token}", loginRequest.Value);
+                _logger.LogInformation("User logged in successfully. Token: {Token}", token);
 
                 
-                await _tokenManager.SetTokenAsync(loginRequest.Value);
+                await _tokenManager.SetTokenAsync(token);
 
                 return new LoginResult
                 {

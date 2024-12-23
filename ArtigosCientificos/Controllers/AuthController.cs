@@ -1,4 +1,6 @@
-﻿using ArtigosCientificos.Api.Models.User;
+﻿using System.Net;
+using System.Text.Json;
+using ArtigosCientificos.Api.Models.User;
 using ArtigosCientificos.Api.Services.AuthService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -62,11 +64,16 @@ namespace ArtigosCientificos.Api.Controllers
         /// <response code="200">Returns the authenticated user and sets a refresh token cookie.</response>
         /// <response code="400">If the login credentials are invalid.</response>
         [HttpPost("login")]
-        public async Task<ActionResult<User>> Login(UserDTO userDTO)
+        public async Task<ObjectResult> Login(UserDTO userDTO)
         {
-            var result = await _authService.Login(userDTO);
+            ObjectResult result = await _authService.Login(userDTO);
 
-            return Ok(result.Result);
+            if (result.StatusCode == (int) HttpStatusCode.Unauthorized)
+            {
+                return Unauthorized(result.Value);
+            }
+
+            return Ok(result.Value);
         }
 
         /// <summary>
@@ -75,14 +82,10 @@ namespace ArtigosCientificos.Api.Controllers
         /// <returns>A new authentication token.</returns>
         /// <response code="200">Returns a new authentication token and updates the refresh token cookie.</response>
         /// <response code="400">If the refresh token is invalid or missing.</response>
-
         [HttpPost("refresh-token")]
         public async Task<ActionResult<string>> RefreshToken()
         {
             return await _authService.RefreshToken();
         }
-
-
     }
-
 }
