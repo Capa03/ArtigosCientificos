@@ -38,7 +38,19 @@ namespace ArtigosCientificos.Api.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserDTO userDTO)
         {
-            return await _authService.Register(userDTO);
+            ObjectResult objectResult = await _authService.Register(userDTO);
+
+            if(objectResult.StatusCode == (int) HttpStatusCode.BadRequest)
+            {
+                return BadRequest(objectResult.Value);
+            }
+
+            if(objectResult.StatusCode == (int) HttpStatusCode.NotFound)
+            {
+                return NotFound(objectResult.Value);
+            }
+
+            return Ok(objectResult.Value);
         }
 
         /// <summary>
@@ -52,7 +64,15 @@ namespace ArtigosCientificos.Api.Controllers
         [Authorize(Roles = "Researcher")]
         public async Task<ActionResult<List<User>>> GetAllUsers()
         {
-            return await _authService.GetAllUsers();
+
+            ObjectResult objectResult = await _authService.GetAllUsers();
+
+            if (objectResult.StatusCode == (int) HttpStatusCode.NotFound)
+            {
+                return NotFound(objectResult.Value);
+            }
+
+            return Ok(objectResult.Value);
         }
 
 
@@ -85,6 +105,13 @@ namespace ArtigosCientificos.Api.Controllers
         [HttpPost("refresh-token")]
         public async Task<ActionResult<string>> RefreshToken()
         {
+            ObjectResult objectResult = await _authService.RefreshToken();
+
+            if (objectResult.StatusCode == (int)HttpStatusCode.BadRequest)
+            {
+                return BadRequest(objectResult.Value);
+            }
+
             return await _authService.RefreshToken();
         }
     }

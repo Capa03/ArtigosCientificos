@@ -6,12 +6,12 @@ namespace ArtigosCientificos.Api.Services.AuthService
 {
     public interface IAuthService
     {
-        Task<ActionResult<User>> Register(UserDTO userDTO);
+        Task<ObjectResult> Register(UserDTO userDTO);
         Task<ObjectResult> Login(UserDTO userDTO);
-        Task<ActionResult<string>> RefreshToken();
+        Task<ObjectResult> RefreshToken();
         Task<UserToken> SetRefreshToken(User user, UserToken refreshToken);
 
 
-        Task<ActionResult<List<User>>> GetAllUsers();
+        Task<ObjectResult> GetAllUsers();
     }
 }
