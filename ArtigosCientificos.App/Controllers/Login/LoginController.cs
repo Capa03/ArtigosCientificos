@@ -44,7 +44,7 @@ namespace ArtigosCientificos.App.Controllers.Login
                     Response.Cookies.Append("AuthToken", user.Value, new CookieOptions
                     {
                         HttpOnly = true,
-                        Secure = true, 
+                        Secure = true,
                     });
 
                     return RedirectToAction("Index", "Home");

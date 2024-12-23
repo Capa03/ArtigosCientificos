@@ -14,7 +14,7 @@ namespace ArtigosCientificosMvc.Components.Pages
             var result = await this.registerService.Register(userDTO);
 
             if (result.Success)
-            {  
+            {
                 Navigation.NavigateTo("Login");
             }
             else
@@ -28,7 +28,7 @@ namespace ArtigosCientificosMvc.Components.Pages
 
         private void TogglePasswordVisibility()
         {
-            
+
             passwordInputType = passwordInputType == "password" ? "text" : "password";
         }
 

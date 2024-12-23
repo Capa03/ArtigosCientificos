@@ -13,7 +13,7 @@ namespace ArtigosCientificosMvc.Components.Pages
         {
             if (firstRender)
             {
-                //await this.TokenManager.RemoveTokenAsync();
+                await this.TokenManager.RemoveTokenAsync();
                 StateHasChanged();
             }
         }

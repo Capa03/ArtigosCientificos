@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ArtigosCientificos.Api.Models.User;
 using ArtigosCientificos.Api.Models.Token;
 using ArtigosCientificos.Api.Models.Role;
+using System.Text.Json;
 
 
 namespace ArtigosCientificos.Api.Services.AuthService
@@ -42,11 +43,18 @@ namespace ArtigosCientificos.Api.Services.AuthService
         /// </summary>
         /// <returns>A list of users with their associated roles and tokens.</returns>
 
-        public async Task<ActionResult<List<User>>> GetAllUsers()
+        public async Task<ObjectResult> GetAllUsers()
         {
-            return await _context.Users
+            List<User> users = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.Token).ToListAsync();
+
+            if (users == null)
+            {
+                return new NotFoundObjectResult("No users found.");
+            }
+
+            return new OkObjectResult(users);
         }
 
         /// <summary>
@@ -54,14 +62,14 @@ namespace ArtigosCientificos.Api.Services.AuthService
         /// </summary>
         /// <param name="userDTO">The data transfer object containing the user's registration details.</param>
         /// <returns>The newly created user object or an error if the username already exists.</returns>
-        public async Task<ActionResult<User>> Register(UserDTO userDTO)
+        public async Task<ObjectResult> Register(UserDTO userDTO)
         {
             if (await _context.Users.AnyAsync(u => u.Username == userDTO.Username))
                 return new BadRequestObjectResult("User already exists.");
 
             var role = await _context.UserRoles.FirstOrDefaultAsync(role => role.Id == (int)Role.RESEARCHER + 1);
             if (role == null)
-                return new BadRequestObjectResult("Role 'Researcher' does not exist.");
+                return new NotFoundObjectResult("Role 'Researcher' does not exist.");
 
             var user = new User
             {
@@ -84,21 +92,21 @@ namespace ArtigosCientificos.Api.Services.AuthService
         /// </summary>
         /// <param name="userDTO">The data transfer object containing the user's login credentials.</param>
         /// <returns>A JWT token and a refresh token, or an error if the credentials are invalid.</returns>
-        public async Task<ActionResult<string>> Login(UserDTO userDTO)
+        public async Task<ObjectResult> Login(UserDTO userDTO)
         {
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Username == userDTO.Username);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(userDTO.Password, user.PasswordHash))
-                return (new BadRequestObjectResult("Invalid username or password."));
+                return (new UnauthorizedObjectResult("Invalid username or password."));
 
             var jwtToken = _jwt.CreateToken(user);
 
             var refreshToken = _jwt.GenerateRefreshToken();
             await SetRefreshToken(user, refreshToken);
 
-            return new OkObjectResult(jwtToken);
+            return new OkObjectResult(JsonSerializer.Serialize(jwtToken));
         }
 
         /// <summary>
@@ -111,17 +119,17 @@ namespace ArtigosCientificos.Api.Services.AuthService
         /// </summary>
         /// <param name="currentRefreshToken">The current refresh token provided by the client.</param>
         /// <returns>A new JWT token and a new refresh token, or an error if the provided refresh token is invalid or expired.</returns>
-        public async Task<ActionResult<string>> RefreshToken()
+        public async Task<ObjectResult> RefreshToken()
         {
-            
+
             var token = await _context.UserTokens
                 .Include(t => t.User)
                 .Include(t => t.User.Role)
-                .Where(t => t.UserId == t.User.Id && t.Expired >= DateTime.UtcNow)  
-                .OrderByDescending(t => t.Created) 
-                .FirstOrDefaultAsync();  
+                .Where(t => t.UserId == t.User.Id && t.Expired >= DateTime.UtcNow)
+                .OrderByDescending(t => t.Created)
+                .FirstOrDefaultAsync();
 
-            
+
             if (token == null || token.Expired <= DateTime.UtcNow)
             {
                 return new BadRequestObjectResult("Invalid or expired refresh token.");
