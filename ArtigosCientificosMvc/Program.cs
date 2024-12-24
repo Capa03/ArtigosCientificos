@@ -17,6 +17,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddScoped<ApiService>();
+builder.Services.AddScoped<Lazy<ApiService>>(sp => new Lazy<ApiService>(() => sp.GetRequiredService<ApiService>()));
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();

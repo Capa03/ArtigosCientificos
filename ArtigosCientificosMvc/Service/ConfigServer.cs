@@ -14,10 +14,9 @@
         {
             return this._baseUrl + "Auth/register";
         }
-
         public string GetUsersUrl()
         {
-            return this._baseUrl + "Auth/users";
+            return this._baseUrl + "Author/users/";
         }
     }
 }

@@ -54,29 +54,6 @@ namespace ArtigosCientificos.Api.Controllers
         }
 
         /// <summary>
-        /// Retrieves a list of all users. Requires authorization.
-        /// </summary>
-        /// <returns>A list of registered users.</returns>
-        /// <response code="200">Returns the list of users.</response>
-        /// <response code="401">If the user is not authorized.</response>
-        /// 
-        [HttpGet("users")]
-        [Authorize(Roles = "Researcher")]
-        public async Task<ActionResult<List<User>>> GetAllUsers()
-        {
-
-            ObjectResult objectResult = await _authService.GetAllUsers();
-
-            if (objectResult.StatusCode == (int)HttpStatusCode.NotFound)
-            {
-                return NotFound(objectResult.Value);
-            }
-
-            return Ok(objectResult.Value);
-        }
-
-
-        /// <summary>
         /// Authenticates a user and generates a refresh token.
         /// </summary>
         /// <param name="userDTO">The data transfer object containing user login credentials.</param>

@@ -42,7 +42,7 @@ namespace ArtigosCientificos.Api.Services.JWTService
             
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Username)
+                new Claim(ClaimTypes.Name, user.Id.ToString())
             };
 
             

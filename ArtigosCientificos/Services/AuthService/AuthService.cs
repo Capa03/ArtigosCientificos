@@ -39,25 +39,6 @@ namespace ArtigosCientificos.Api.Services.AuthService
         }
 
         /// <summary>
-        /// Retrieves all users from the database along with their roles and tokens.
-        /// </summary>
-        /// <returns>A list of users with their associated roles and tokens.</returns>
-
-        public async Task<ObjectResult> GetAllUsers()
-        {
-            List<User> users = await _context.Users
-                .Include(u => u.Role)
-                .Include(u => u.Token).ToListAsync();
-
-            if (users == null)
-            {
-                return new NotFoundObjectResult("No users found.");
-            }
-
-            return new OkObjectResult(users);
-        }
-
-        /// <summary>
         /// Registers a new user with the role of 'Researcher'.
         /// </summary>
         /// <param name="userDTO">The data transfer object containing the user's registration details.</param>

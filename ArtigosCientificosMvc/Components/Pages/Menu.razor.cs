@@ -1,4 +1,6 @@
-﻿namespace ArtigosCientificosMvc.Components.Pages
+﻿using ArtigosCientificosMvc.Models.User;
+
+namespace ArtigosCientificosMvc.Components.Pages
 {
     partial class Menu
     {
@@ -9,6 +11,7 @@
         {
             if (firstRender)
             {
+                
                 await this.CheckIfLoggedIn();
                 StateHasChanged();
             }
@@ -16,12 +19,27 @@
 
         private async Task CheckIfLoggedIn()
         {
-            loggedIn = await TokenManager.IsUserAuthenticated();
-            if (loggedIn)
+            try
             {
-                username = await TokenManager.GetUsername();
+                loggedIn = await TokenManager.IsUserAuthenticated();
+                if (loggedIn)
+                {
+                    User user = await TokenManager.GetUser();
+                    username = user.Username;
+                }
+                else
+                {
+                    await TokenManager.RemoveTokenAsync();
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Log or handle the pre-rendering error
+                Console.WriteLine($"Interop call failed during pre-rendering: {ex.Message}");
             }
         }
+
+
 
         async Task Logout()
         {
