@@ -1,16 +1,27 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using ArtigosCientificosMvc.Models.User;
+using ArtigosCientificosMvc.Service.Api;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace ArtigosCientificosMvc.Service.Token
 {
+
+    public enum Response
+    {
+        NOT_FOUND_ID = 0,
+        ERROR = -1
+    }
+
     public class TokenManager
     {
         private readonly ProtectedLocalStorage _protectedLocalStorage;
-
-        
-        public TokenManager(ProtectedLocalStorage protectedLocalStorage)
+        private readonly Lazy<ApiService> _apiService;
+        private readonly ConfigServer _configServer;
+        public TokenManager(ProtectedLocalStorage protectedLocalStorage, Lazy<ApiService> apiService, ConfigServer configServer)
         {
             _protectedLocalStorage = protectedLocalStorage;
+            _apiService = apiService;
+            _configServer = configServer;
         }
 
 
@@ -19,14 +30,14 @@ namespace ArtigosCientificosMvc.Service.Token
             await _protectedLocalStorage.SetAsync("auth_token", token);
         }
 
-        
+
         public async Task<string> GetTokenAsync()
         {
             var result = await _protectedLocalStorage.GetAsync<string>("auth_token");
             return result.Success ? result.Value : null;
         }
 
-        
+
         public async Task RemoveTokenAsync()
         {
             await _protectedLocalStorage.DeleteAsync("auth_token");
@@ -38,21 +49,33 @@ namespace ArtigosCientificosMvc.Service.Token
             return !string.IsNullOrEmpty(token);
         }
 
-        public async Task<string> GetUsername()
+        public async Task<User> GetUser()
         {
 
+            User user = await _apiService.Value.GetTAsync<User>($"{this._configServer.GetUsersUrl()}{await GetUserId()}");
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return user;
+        }
+
+        public async Task<int> GetUserId()
+        {
             var token = await GetTokenAsync();
 
             if (!string.IsNullOrEmpty(token))
             {
-                var username = ReadClaim(token, "name");
-                if (string.IsNullOrWhiteSpace(username))
+                var id = ReadClaim(token, "name");
+                if (string.IsNullOrWhiteSpace(id))
                 {
-                    return "Unknown User";
+                    return (int)Response.NOT_FOUND_ID;
                 }
-                return username;
+                return int.Parse(id);
             }
-            return null;
+            return (int)Response.ERROR;
         }
 
         private string? ReadClaim(string token, string claimType)

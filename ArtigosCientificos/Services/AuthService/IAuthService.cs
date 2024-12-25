@@ -11,7 +11,5 @@ namespace ArtigosCientificos.Api.Services.AuthService
         Task<ObjectResult> RefreshToken();
         Task<UserToken> SetRefreshToken(User user, UserToken refreshToken);
 
-
-        Task<ObjectResult> GetAllUsers();
     }
 }

@@ -2,7 +2,9 @@
 
 using System.Text;
 using ArtigosCientificos.Api.Data;
+using ArtigosCientificos.Api.Services.Author;
 using ArtigosCientificos.Api.Services.AuthService;
+using ArtigosCientificos.Api.Services.File;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +15,8 @@ using Swashbuckle.AspNetCore.Filters;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IAuthService, AuthService>();
-
+builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
 
 // Add services to the container.
 
@@ -94,7 +97,8 @@ builder.Services.AddCors(options =>
     {
         builder.WithOrigins("https://localhost:7109")
                .AllowAnyHeader()
-               .AllowAnyMethod();
+               .AllowAnyMethod()
+               .AllowAnyOrigin();
     });
 });
 

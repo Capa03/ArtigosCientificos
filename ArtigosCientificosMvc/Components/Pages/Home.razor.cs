@@ -8,11 +8,13 @@ namespace ArtigosCientificosMvc.Components.Pages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+
             if (firstRender)
             {
                 users = await homeService.getUsers();
                 StateHasChanged();
             }
+
         }
     }
 }
