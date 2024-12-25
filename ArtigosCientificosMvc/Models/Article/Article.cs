@@ -16,13 +16,10 @@ namespace ArtigosCientificosMvc.Models.Article
         [StringLength(200, ErrorMessage = "Keywords must be less than 200 characters.")]
         public string Keywords { get; set; }
 
-        [Required(ErrorMessage = "File is required.")]
         public string File { get; set; }
 
         public string Status { get; set; } = "PENDING";
 
-        [Required(ErrorMessage = "User ID is required.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Invalid User ID.")]
         public int UserId { get; set; }
     }
 }
