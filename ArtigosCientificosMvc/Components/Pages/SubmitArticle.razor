@@ -17,7 +17,7 @@
                     <h3>Submit Article</h3>
                 </div>
                 <div class="card-body">
-                    <EditForm Model="@article" OnSubmit="@OnSubmit" FormName="SubmitArticle">
+                    <EditForm Model="@article" OnValidSubmit="@OnSubmit" FormName="SubmitArticle">
                         <DataAnnotationsValidator />
 
                         <div class="form-group">
@@ -35,7 +35,7 @@
                             <InputText id="keywords" class="form-control" @bind-Value="@article.Keywords" placeholder="Enter Article Keywords" />
                             <ValidationMessage For="@(() => article.Keywords)" />
                         </div>
-                        <FilePickerComponent OnFileSelected="HandleFileSelected" />
+                        <FilePickerComponent OnFileSelected="HandleFileSelected"/>
 
                         <div class="form-group text-center mt-4">
                             <button type="submit" class="btn btn-primary w-100">Submit</button>
@@ -66,6 +66,8 @@
     async Task OnSubmit()
     {
         ErrorMessage = null;
+
+        // Validate the file selection here
         if (string.IsNullOrEmpty(selectedFileName))
         {
             ErrorMessage = "Please select a file before submitting.";
@@ -86,4 +88,5 @@
             ErrorMessage = articleResult.Message;
         }
     }
+
 }

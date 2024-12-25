@@ -12,16 +12,6 @@
 			<InputFile id="fileInput" OnChange="HandleFileSelected" class="form-control" />
 		</div>
 
-		@if (selectedFileName != null)
-		{
-			<div class="mt-3">
-				<p><strong>Selected File:</strong> @selectedFileName</p>
-				<p><strong>File Size:</strong> @selectedFileSize KB</p>
-				<button class="btn btn-primary" @onclick="UploadFile" disabled="@uploading">Confirm Upload</button>
-			</div>
-		}
-
-
 		@if (uploading)
 		{
 			<div class="mb-3 mt-3">
@@ -32,13 +22,13 @@
 			</div>
 		}
 
-
 		<p class="mt-3">
 			<span class="text-success" style="display: @(successMessage != null ? "block" : "none")">@successMessage</span>
 			<span class="text-danger" style="display: @(errorMessage != null ? "block" : "none")">@errorMessage</span>
 		</p>
 	</div>
 </div>
+
 
 @code {
 	[Parameter]
@@ -71,6 +61,9 @@
 			selectedFileSize = file.Size / 1024; // Convert to KB
 			successMessage = null;
 			errorMessage = null;
+
+			// Start the upload immediately after file selection
+			await UploadFile();
 		}
 		else
 		{
@@ -106,6 +99,7 @@
 				await Task.Delay(100);
 				progress = i;
 			}
+
 			Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 			var response = await Http.PostAsync("https://localhost:7267/api/File/upload", content);
 
@@ -130,4 +124,5 @@
 			uploading = false;
 		}
 	}
+
 }
