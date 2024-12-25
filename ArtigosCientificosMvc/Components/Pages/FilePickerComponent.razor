@@ -5,11 +5,11 @@
 @inject TokenManager TokenManager
 
 <div class="container mt-4">
-	<h3 class="text-primary">Submit Article</h3>
 	<div class="card shadow p-4">
 		<div class="mb-3">
 			<label for="fileInput" class="form-label">Select a PDF file to upload:</label>
 			<InputFile id="fileInput" OnChange="HandleFileSelected" class="form-control" />
+			<hint>Max file size: 100 MB</hint>
 		</div>
 
 		@if (uploading)
