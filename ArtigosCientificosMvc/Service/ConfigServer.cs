@@ -18,5 +18,10 @@
         {
             return this._baseUrl + "Author/users/";
         }
+
+        public string GetArticlesCreateUrl()
+        {
+            return this._baseUrl + "Article/articles/";
+        }
     }
 }

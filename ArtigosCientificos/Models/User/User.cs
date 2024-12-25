@@ -23,5 +23,7 @@ namespace ArtigosCientificos.Api.Models.User
         public List<UserRole>? Role { get; set; } = new();
 
         public List<UserToken> Token { get; set; } = new();
+
+        public List<Article.Article> Articles { get; set; } = new();
     }
 }

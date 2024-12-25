@@ -22,6 +22,52 @@ namespace ArtigosCientificos.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ArtigosCientificos.Api.Models.Article.Article", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Abstract")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedAt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("File")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Keywords")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedAt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Articles");
+                });
+
             modelBuilder.Entity("ArtigosCientificos.Api.Models.Role.UserRole", b =>
                 {
                     b.Property<int>("Id")
@@ -121,6 +167,17 @@ namespace ArtigosCientificos.Api.Migrations
                     b.ToTable("UserUserRole");
                 });
 
+            modelBuilder.Entity("ArtigosCientificos.Api.Models.Article.Article", b =>
+                {
+                    b.HasOne("ArtigosCientificos.Api.Models.User.User", "User")
+                        .WithMany("Articles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ArtigosCientificos.Api.Models.Token.UserToken", b =>
                 {
                     b.HasOne("ArtigosCientificos.Api.Models.User.User", "User")
@@ -149,6 +206,8 @@ namespace ArtigosCientificos.Api.Migrations
 
             modelBuilder.Entity("ArtigosCientificos.Api.Models.User.User", b =>
                 {
+                    b.Navigation("Articles");
+
                     b.Navigation("Token");
                 });
 #pragma warning restore 612, 618

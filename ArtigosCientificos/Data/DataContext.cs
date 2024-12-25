@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using ArtigosCientificos.Api.Models.Article;
 using ArtigosCientificos.Api.Models.Role;
 using ArtigosCientificos.Api.Models.Token;
 using ArtigosCientificos.Api.Models.User;
@@ -14,6 +15,7 @@ namespace ArtigosCientificos.Api.Data
         public DbSet<User>? Users { get; set; }
         public DbSet<UserRole>? UserRoles { get; set; }
         public DbSet<UserToken>? UserTokens { get; set; }
+        public DbSet<Article>? Articles { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
