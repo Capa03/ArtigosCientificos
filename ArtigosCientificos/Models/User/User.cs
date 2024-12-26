@@ -25,5 +25,6 @@ namespace ArtigosCientificos.Api.Models.User
         public List<UserToken> Token { get; set; } = new();
 
         public List<Article.Article> Articles { get; set; } = new();
+        public List<Review.Review> Reviews { get; set; } = new();
     }
 }

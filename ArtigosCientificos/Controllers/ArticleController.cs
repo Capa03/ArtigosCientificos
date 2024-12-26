@@ -41,5 +41,16 @@ namespace ArtigosCientificos.Api.Controllers
             }
             return Ok(result.Value);
         }
+
+        [HttpGet("articles/last")]
+        public async Task<IActionResult> GetLastArticle()
+        {
+            ObjectResult article = await _articleService.GetLastArticle();
+            if (article.StatusCode == (int)HttpStatusCode.NotFound)
+            {
+                return NotFound(article.Value);
+            }
+            return Ok(article.Value);
+        }
     }
 }

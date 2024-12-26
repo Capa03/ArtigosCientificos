@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
 using ArtigosCientificos.Api.Data;
 using ArtigosCientificos.Api.Models.Article;
+using ArtigosCientificos.Api.Models.Review;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -23,7 +24,6 @@ namespace ArtigosCientificos.Api.Services.Articles
                 Abstract = articleDTO.Abstract,
                 Keywords = articleDTO.Keywords,
                 File = articleDTO.File,
-                Status = articleDTO.Status,
                 UserId = articleDTO.UserId
             };
             var result = await _context.Articles.AddAsync(article);
@@ -46,6 +46,18 @@ namespace ArtigosCientificos.Api.Services.Articles
             }
 
             return new OkObjectResult(articles);
+        }
+
+        public async Task<ObjectResult> GetLastArticle()
+        {
+            Article article = _context.Articles.OrderByDescending(a => a.Id).FirstOrDefault();
+
+            if (article == null)
+            {
+                return new NotFoundObjectResult("No articles found");
+            }
+
+            return new OkObjectResult(article);
         }
     }
 }

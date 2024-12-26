@@ -8,7 +8,6 @@ namespace ArtigosCientificos.Api.Models.Article
         public string Abstract { get; set; }
         public string Keywords { get; set; }
         public string File { get; set; }
-        public string Status { get; set; }
         public int UserId { get; set; }
     }
 }
