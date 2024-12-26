@@ -77,6 +77,8 @@ namespace ArtigosCientificos.Api.Services.AuthService
         {
             var user = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.Articles)
+                .Include(u => u.Token)
                 .FirstOrDefaultAsync(u => u.Username == userDTO.Username);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(userDTO.Password, user.PasswordHash))

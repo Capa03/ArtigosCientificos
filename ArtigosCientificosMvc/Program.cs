@@ -1,6 +1,7 @@
 using ArtigosCientificosMvc.Components;
 using ArtigosCientificosMvc.Service;
 using ArtigosCientificosMvc.Service.Api;
+using ArtigosCientificosMvc.Service.Articles;
 using ArtigosCientificosMvc.Service.Home;
 using ArtigosCientificosMvc.Service.Login;
 using ArtigosCientificosMvc.Service.Register;
@@ -21,6 +22,7 @@ builder.Services.AddScoped<Lazy<ApiService>>(sp => new Lazy<ApiService>(() => sp
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
+builder.Services.AddScoped<IArticleService, ArticleService>();
 builder.Services.AddSingleton<ConfigServer>();
 builder.Services.AddScoped<TokenManager>();
 

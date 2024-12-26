@@ -2,6 +2,7 @@
 
 using System.Text;
 using ArtigosCientificos.Api.Data;
+using ArtigosCientificos.Api.Services.Articles;
 using ArtigosCientificos.Api.Services.Author;
 using ArtigosCientificos.Api.Services.AuthService;
 using ArtigosCientificos.Api.Services.File;
@@ -17,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IArticleService, ArticleService>();
 
 // Add services to the container.
 
