@@ -53,35 +53,25 @@
 						<Label for="reviewFeedback">Provide Feedback:</Label>
 						<textarea class="form-control" id="reviewFeedback" rows="3" @bind="Feedback"></textarea>
 					</div>
-
-					if (@article.Status != "ACCEPTED")
-					{
-						<!-- Action Buttons -->
-						<div class="d-flex gap-2">
-							<Button Color="Color.Success" @onclick="AcceptReview">Accept</Button>
-							<Button Color="Color.Danger" @onclick="RejectReview">Reject</Button>
-						</div>
-					}
 				}
 			</CardBody>
-			<CardFooter>
+			<CardFooter class="d-flex justify-content-between">
 				<Button Color="Color.Primary" @onclick="NavigateBack">Back</Button>
+				<div class="d-flex gap-2 ms-auto">
+					<Button Color="Color.Success" @onclick="AcceptReview">Accept</Button>
+					<Button Color="Color.Danger" @onclick="RejectReview">Reject</Button>
+				</div>
 			</CardFooter>
+
+
+
+			<!-- Action Buttons -->
 		</Card>
 
-		<!-- Alerts for Actions -->
-		@if (ShowAcceptAlert)
-		{
-			<Alert Color="Color.Success" IsDismissable="true">
-				The article has been <strong>Accepted</strong>.
-			</Alert>
-		}
-		@if (ShowRejectAlert)
-		{
-			<Alert Color="Color.Danger" IsDismissable="true">
-				The article has been <strong>Rejected</strong>.
-			</Alert>
-		}
+		<!-- Toast Container -->
+		<Div Position="Position.Relative" Width="Width.Is100" Height="Height.Rem(5)">
+			@toast
+		</Div>
 	</div>
 </Layout>
 
@@ -93,9 +83,7 @@
 	private bool IsLoading = true;
 	private string ErrorMessage;
 	private string Feedback = string.Empty;
-
-	private bool ShowAcceptAlert = false;
-	private bool ShowRejectAlert = false;
+	private RenderFragment toast;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -135,16 +123,14 @@
 		try
 		{
 			await ReviewService.UpdateReview(article.ReviewId, new ReviewPutDTO { Description = Feedback, Status = "ACCEPTED" });
-
-			ShowAcceptAlert = true;
-			ShowRejectAlert = false;
+			toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "The article has been accepted.");
 			Feedback = string.Empty;
+			await LoadReview();
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"Error accepting review: {ex.Message}");
-			ShowAcceptAlert = false;
-			ShowRejectAlert = false;
+			// Show error toast
+			toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "Error:" + ex.Message);
 		}
 		finally
 		{
@@ -158,20 +144,35 @@
 		{
 			await ReviewService.UpdateReview(article.ReviewId, new ReviewPutDTO { Description = Feedback, Status = "REJECTED" });
 
-			ShowRejectAlert = true;
-			ShowAcceptAlert = false;
+			// Show success toast
+			toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "The article has been rejected:");
 			Feedback = string.Empty;
+			await LoadReview();
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"Error rejecting review: {ex.Message}");
-			ShowRejectAlert = false;
-			ShowAcceptAlert = false;
+			// Show error toast
+			toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "Error:" + ex.Message);
 		}
 		finally
 		{
 			StateHasChanged();
 		}
 	}
+
+	private RenderFragment ToastRenderFragment(ToasterPlacement placement, string message) => __builder =>
+	{
+		<Toaster Placement="@placement" PlacementStrategy="ToasterPlacementStrategy.Absolute">
+			<Toast Visible Autohide="true" AutohideDelay="5000">
+				<ToastHeader>
+					<Strong Margin="Margin.IsAuto.FromEnd">@article.Title</Strong>
+					<CloseButton />
+				</ToastHeader>
+				<ToastBody>
+					@message
+				</ToastBody>
+			</Toast>
+		</Toaster>
+	};
 
 }
