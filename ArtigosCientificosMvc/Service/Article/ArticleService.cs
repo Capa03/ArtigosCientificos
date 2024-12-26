@@ -21,12 +21,6 @@ namespace ArtigosCientificosMvc.Service.Articles
         {
             int UserId = await tokenManager.GetUserId();
             article.UserId = UserId;
-            Console.WriteLine("ArticleService.Create: article Title " + article.Title);
-            Console.WriteLine("ArticleService.Create: article Abstract " + article.Abstract);
-            Console.WriteLine("ArticleService.Create: article Keywords " + article.Keywords);
-            Console.WriteLine("ArticleService.Create: article UserId " + article.UserId);
-            Console.WriteLine("ArticleService.Create: article File " + article.File);
-            Console.WriteLine("ArticleService.Create: article Status " + article.Status);
             try
             {
                 var (data, statusCode) = await apiService.PostAsync<Article>(this.configServer.GetArticlesCreateUrl(), article);
