@@ -1,4 +1,6 @@
-﻿namespace ArtigosCientificosMvc.Service
+﻿using ArtigosCientificosMvc.Components;
+
+namespace ArtigosCientificosMvc.Service
 {
     public class ConfigServer
     {
@@ -22,6 +24,21 @@
         public string GetArticlesCreateUrl()
         {
             return this._baseUrl + "Article/articles/";
+        }
+
+        public string GetReviewsUrl(string status)
+        {
+            return this._baseUrl + "Review/status/" + status;
+        }
+
+        public string GetReviewsByIdUrl(int id)
+        {
+            return this._baseUrl + "Review/" + id;
+        }
+
+        public string PUTReviewsByIdUrl(int id)
+        {
+            return this._baseUrl + "Review/" + id;
         }
     }
 }

@@ -1,0 +1,177 @@
+﻿@page "/review/{id:int}"
+@using ArtigosCientificosMvc.Models.Review
+@using ArtigosCientificosMvc.Service.Review
+@inject IReviewService ReviewService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Review Details</PageTitle>
+
+<Layout>
+	<div class="container mt-4">
+		<Card>
+			<CardHeader>
+				<Heading Size="HeadingSize.Is3">Review Details</Heading>
+			</CardHeader>
+			<CardBody>
+				@if (IsLoading)
+				{
+					<Skeleton>
+						<SkeletonItem ColumnSize="ColumnSize.Is6" />
+					</Skeleton>
+				}
+				else if (!string.IsNullOrEmpty(ErrorMessage))
+				{
+					<Alert Color="Color.Danger" IsDismissable="true">
+						<strong>Error:</strong> @ErrorMessage
+					</Alert>
+				}
+				else
+				{
+					<dl class="row">
+						<dt class="col-sm-3">Article Title</dt>
+						<dd class="col-sm-9">@article.Title</dd>
+
+						<dt class="col-sm-3">Article Abstract</dt>
+						<dd class="col-sm-9">@article.Abstract</dd>
+
+						<dt class="col-sm-3">Status</dt>
+						<dd class="col-sm-9">
+							<span class="badge
+                                @(article.Status == "PENDING" ? "bg-warning" :
+                                  article.Status == "ACCEPTED" ? "bg-success" : "bg-danger")">
+								@article.Status
+							</span>
+						</dd>
+
+						<dt class="col-sm-3">Keywords</dt>
+						<dd class="col-sm-9">@article.Keywords</dd>
+					</dl>
+
+					<!-- Text Box for Additional Feedback -->
+					<div class="mb-3">
+						<Label for="reviewFeedback">Provide Feedback:</Label>
+						<textarea class="form-control" id="reviewFeedback" rows="3" @bind="Feedback"></textarea>
+					</div>
+
+					if (@article.Status != "ACCEPTED")
+					{
+						<!-- Action Buttons -->
+						<div class="d-flex gap-2">
+							<Button Color="Color.Success" @onclick="AcceptReview">Accept</Button>
+							<Button Color="Color.Danger" @onclick="RejectReview">Reject</Button>
+						</div>
+					}
+				}
+			</CardBody>
+			<CardFooter>
+				<Button Color="Color.Primary" @onclick="NavigateBack">Back</Button>
+			</CardFooter>
+		</Card>
+
+		<!-- Alerts for Actions -->
+		@if (ShowAcceptAlert)
+		{
+			<Alert Color="Color.Success" IsDismissable="true">
+				The article has been <strong>Accepted</strong>.
+			</Alert>
+		}
+		@if (ShowRejectAlert)
+		{
+			<Alert Color="Color.Danger" IsDismissable="true">
+				The article has been <strong>Rejected</strong>.
+			</Alert>
+		}
+	</div>
+</Layout>
+
+@code {
+	[Parameter]
+	public int id { get; set; } // Match the route parameter
+
+	private ReviewWithArticleDTO article = new();
+	private bool IsLoading = true;
+	private string ErrorMessage;
+	private string Feedback = string.Empty;
+
+	private bool ShowAcceptAlert = false;
+	private bool ShowRejectAlert = false;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await LoadReview();
+			StateHasChanged();
+		}
+	}
+
+	private async Task LoadReview()
+	{
+		try
+		{
+			IsLoading = true;
+			ErrorMessage = null;
+
+			article = await ReviewService.GetReviewById(id);
+		}
+		catch (Exception ex)
+		{
+			ErrorMessage = $"Failed to load review details: {ex.Message}";
+		}
+		finally
+		{
+			IsLoading = false; // Stop loading
+		}
+	}
+
+	private void NavigateBack()
+	{
+		NavigationManager.NavigateTo("/review-list");
+	}
+
+	private async Task AcceptReview()
+	{
+		try
+		{
+			await ReviewService.UpdateReview(article.ReviewId, new ReviewPutDTO { Description = Feedback, Status = "ACCEPTED" });
+
+			ShowAcceptAlert = true;
+			ShowRejectAlert = false;
+			Feedback = string.Empty;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error accepting review: {ex.Message}");
+			ShowAcceptAlert = false;
+			ShowRejectAlert = false;
+		}
+		finally
+		{
+			StateHasChanged();
+		}
+	}
+
+	private async Task RejectReview()
+	{
+		try
+		{
+			await ReviewService.UpdateReview(article.ReviewId, new ReviewPutDTO { Description = Feedback, Status = "REJECTED" });
+
+			ShowRejectAlert = true;
+			ShowAcceptAlert = false;
+			Feedback = string.Empty;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error rejecting review: {ex.Message}");
+			ShowRejectAlert = false;
+			ShowAcceptAlert = false;
+		}
+		finally
+		{
+			StateHasChanged();
+		}
+	}
+
+}

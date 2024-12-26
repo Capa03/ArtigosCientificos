@@ -55,11 +55,12 @@ namespace ArtigosCientificos.Api.Controllers
             return Ok(review.Value);
         }
 
-        // Route: GET api/Review/pending
-        [HttpGet("pending")]
-        public async Task<IActionResult> GetPendingReview()
+        // Route: GET api/Review/status
+        [HttpGet("status/{Status}")]
+        [Authorize(Roles = "Reviewer")]
+        public async Task<IActionResult> GetReviewByStatus(string Status)
         {
-            ObjectResult review = await reviewService.GetPendingReview();
+            ObjectResult review = await reviewService.GetReviewByStatus(Status);
             if (review.StatusCode == (int)HttpStatusCode.NotFound)
             {
                 return NotFound("No pending reviews found");

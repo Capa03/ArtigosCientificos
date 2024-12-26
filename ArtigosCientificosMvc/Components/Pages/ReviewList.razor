@@ -1,0 +1,155 @@
+﻿@page "/review-list"
+@using ArtigosCientificosMvc.Models.Review
+@using ArtigosCientificosMvc.Service.Review
+@using Microsoft.AspNetCore.Mvc
+@inject IReviewService ReviewService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h3>Review List</h3>
+<PageTitle>Review List</PageTitle>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+	<div class="alert alert-danger">
+		@ErrorMessage
+	</div>
+}
+
+<Table>
+	<TableHeader ThemeContrast="ThemeContrast.Dark">
+		<TableRow>
+			<TableHeaderCell>Title</TableHeaderCell>
+			<TableHeaderCell>Status</TableHeaderCell>
+			<TableHeaderCell>Action</TableHeaderCell>
+		</TableRow>
+	</TableHeader>
+	<TableBody>
+		<!-- PENDING Reviews -->
+		@if (Pending != null && Pending.Any())
+		{
+			<TableRowGroup Title="PENDING" Expanded="true">
+				@foreach (var review in Pending)
+				{
+					<TableRow>
+						<TableRowCell>@review.Title</TableRowCell>
+						<TableRowCell>@review.Status</TableRowCell>
+						<TableRowCell>
+							<Button Clicked="() => goToReview(review.ReviewId)" Color="Color.Success">Review</Button>
+						</TableRowCell>
+					</TableRow>
+				}
+			</TableRowGroup>
+		}
+		else
+		{
+			<TableRowGroup Title="PENDING" Expanded="false">
+				<TableRow>
+					<TableRowCell colspan="2">No pending reviews</TableRowCell>
+				</TableRow>
+			</TableRowGroup>
+		}
+
+		<!-- ACCEPTED Reviews -->
+		@if (Accepted != null && Accepted.Any())
+		{
+			<TableRowGroup Title="ACCEPTED" Expanded="true">
+				@foreach (var review in Accepted)
+				{
+					<TableRow>
+						<TableRowCell>@review.Title</TableRowCell>
+						<TableRowCell>@review.Status</TableRowCell>
+						<TableRowCell>
+							<Button Color="Color.Warning">Edit Review</Button>
+						</TableRowCell>
+					</TableRow>
+				}
+			</TableRowGroup>
+		}
+		else
+		{
+			<TableRowGroup Title="ACCEPTED" Expanded="false">
+				<TableRow>
+					<TableRowCell colspan="2">No accepted reviews</TableRowCell>
+				</TableRow>
+			</TableRowGroup>
+		}
+
+		<!-- REJECTED Reviews -->
+		@if (Rejected != null && Rejected.Any())
+		{
+			<TableRowGroup Title="REJECTED" Expanded="true">
+				@foreach (var review in Rejected)
+				{
+					<TableRow>
+						<TableRowCell>@review.Title</TableRowCell>
+						<TableRowCell>@review.Status</TableRowCell>
+						<TableRowCell>
+							<Button Color="Color.Warning">Edit Review</Button>
+						</TableRowCell>
+					</TableRow>
+				}
+			</TableRowGroup>
+		}
+		else
+		{
+			<TableRowGroup Title="REJECTED" Expanded="false">
+				<TableRow>
+					<TableRowCell colspan="2">No rejected reviews</TableRowCell>
+
+				</TableRow>
+			</TableRowGroup>
+		}
+	</TableBody>
+</Table>
+
+@code {
+	private List<ReviewWithArticleDTO> Pending { get; set; }
+	private List<ReviewWithArticleDTO> Accepted { get; set; }
+	private List<ReviewWithArticleDTO> Rejected { get; set; }
+	private string ErrorMessage { get; set; }
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await LoadReviews();
+			StateHasChanged();
+		}
+	}
+
+	void goToReview(int id)
+	{
+		NavigationManager.NavigateTo($"/review/{id}");
+	}
+
+	private async Task LoadReviews()
+	{
+		try
+		{
+			ErrorMessage = null;
+
+			Pending = await FetchReviewsByStatus("PENDING");
+			Accepted = await FetchReviewsByStatus("ACCEPTED");
+			Rejected = await FetchReviewsByStatus("REJECTED");
+		}
+		catch (Exception ex)
+		{
+			ErrorMessage = $"Failed to load reviews: {ex.Message}";
+		}
+	}
+
+	private async Task<List<ReviewWithArticleDTO>> FetchReviewsByStatus(string status)
+	{
+		try
+		{
+			List<ReviewWithArticleDTO> result = await ReviewService.GetAllReviewsByStatus(status);
+			return result;
+		}
+		catch (Exception ex)
+		{
+			ErrorMessage = $"Error fetching reviews with status '{status}': {ex.Message}";
+			return new List<ReviewWithArticleDTO>(); 
+		}
+	}
+}

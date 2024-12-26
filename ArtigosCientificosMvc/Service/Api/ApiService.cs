@@ -20,14 +20,6 @@ namespace ArtigosCientificosMvc.Service.Api
             _tokenManager = tokenManager;
         }
 
-        public async Task<List<User>> testUser()
-        {
-            var token = await _tokenManager.GetTokenAsync();
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            return await this._client.GetFromJsonAsync<List<User>>("Auth/user");
-        }
-
-
         public async Task<T> GetTAsync<T>(string url)
         {
             var token = await _tokenManager.GetTokenAsync();
@@ -115,6 +107,48 @@ namespace ArtigosCientificosMvc.Service.Api
                 throw new ApplicationException("An error occurred.", ex);
             }
         }
+
+        public async Task<(T? Data, HttpStatusCode StatusCode)> PutTAsync<T>(string url, object data)
+        {
+            var jsonData = JsonSerializer.Serialize(data);
+            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+            var token = await _tokenManager.GetTokenAsync();
+
+            try
+            {
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var response = await _client.PutAsync(url, content);
+
+                var statusCode = response.StatusCode;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseData = await response.Content.ReadAsStringAsync();
+                    var json = JsonSerializer.Deserialize<T>(responseData, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    return (json, statusCode);
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    // Optionally log or process the error content
+                    Console.WriteLine($"Error in PUT: {response.StatusCode}, Content: {errorContent}");
+                }
+
+                return (default, statusCode);
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new ApplicationException("An error occurred while communicating with the server.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An error occurred.", ex);
+            }
+        }
+
     }
 
 }

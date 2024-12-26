@@ -10,6 +10,6 @@ namespace ArtigosCientificos.Api.Services.Reviews
 
         Task<ObjectResult> GetReviewById(int id);
         Task<ObjectResult> UpdateReview(int id, ReviewPutDTO review);
-        Task<ObjectResult> GetPendingReview();
+        Task<ObjectResult> GetReviewByStatus(string Status);
     }
 }

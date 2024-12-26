@@ -18,7 +18,6 @@ namespace ArtigosCientificosMvc.Service.Home
         public async Task<List<User>> getUsers()
         {
             var result = await _apiService.GetTAsync<List<User>>(_configServer.GetUsersUrl());
-
             return result;
         }
 

@@ -13,7 +13,6 @@ namespace ArtigosCientificos.Api.Services.Reviews
         {
             _context = context;
         }
-
         public async Task<ObjectResult> CreateReview(ReviewDTO reviewDTO)
         {
             Review review = new Review
@@ -46,28 +45,67 @@ namespace ArtigosCientificos.Api.Services.Reviews
             return new OkObjectResult(reviews);
         }
 
-        public async Task<ObjectResult> GetPendingReview()
+        public async Task<ObjectResult> GetReviewByStatus(string status)
         {
-            List<Review> reviews = _context.Reviews.Where(r => r.Status == "PENDING").ToList();
+            // Fetch reviews and their associated articles in a single query
+            var reviewsWithArticles = await _context.Reviews
+                .Where(r => r.Status == status)
+                .AsSplitQuery() // This will split the query to load the Reviews and Articles separately
+                .Join(
+                    _context.Articles,
+                    review => review.ArticleId,
+                    article => article.Id,
+                    (review, article) => new ReviewWithArticleDTO
+                    {
+                        ReviewId = review.Id,
+                        Status = review.Status,
+                        ArticleId = article.Id,
+                        Title = article.Title,
+                        Abstract = article.Abstract,
+                        Keywords = article.Keywords,
+                        File = article.File
+                    })
+                .ToListAsync();
 
-            if (reviews.Count == 0)
+            // Check if no reviews and articles were found
+            if (!reviewsWithArticles.Any())
             {
-                return new NotFoundObjectResult("No pending reviews found");
+                return new NotFoundObjectResult($"No reviews with status '{status}' found.");
             }
 
-            return new OkObjectResult(reviews);
+            return new OkObjectResult(reviewsWithArticles);
         }
 
         public async Task<ObjectResult> GetReviewById(int id)
         {
-            Review review = _context.Reviews.FirstOrDefault(r => r.Id == id);
-            if (review == null)
-            {
-                return new NotFoundObjectResult("Review not found");
-            }
-            return new OkObjectResult(review);
+            // Fetch a single review with its associated article
+            var reviewWithArticle = await _context.Reviews
+                .Where(r => r.Id == id)
+                .Join(
+                    _context.Articles,
+                    review => review.ArticleId,
+                    article => article.Id,
+                    (review, article) => new ReviewWithArticleDTO
+                    {
+                        ReviewId = review.Id,
+                        Status = review.Status,
+                        ArticleId = article.Id,
+                        Title = article.Title,
+                        Abstract = article.Abstract,
+                        Keywords = article.Keywords,
+                        File = article.File
+                    })
+                .FirstOrDefaultAsync();
 
+            // Check if no review with the given ID was found
+            if (reviewWithArticle == null)
+            {
+                return new NotFoundObjectResult($"No review with ID '{id}' found.");
+            }
+
+            return new OkObjectResult(reviewWithArticle);
         }
+
 
         public async Task<ObjectResult> UpdateReview(int id, ReviewPutDTO review)
         {
