@@ -1,7 +1,9 @@
 ﻿using System.Net;
 using ArtigosCientificos.Api.Models.Review;
 using ArtigosCientificos.Api.Services.Reviews;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArtigosCientificos.Api.Controllers
@@ -21,60 +23,61 @@ namespace ArtigosCientificos.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllReviews()
         {
-            var reviews = await reviewService.GetAllReviews();
+            ObjectResult reviews = await reviewService.GetAllReviews();
             if (reviews.StatusCode == (int)HttpStatusCode.NotFound)
             {
-                return NotFound("No reviews found");
+                return NotFound(reviews.Value);
             }
-            return Ok(reviews);
+            return Ok(reviews.Value);
         }
 
         // Route: POST api/Review
         [HttpPost]
         public async Task<IActionResult> CreateReview(ReviewDTO review)
         {
-            var result = await reviewService.CreateReview(review);
-            if (result.StatusCode == (int)HttpStatusCode.BadRequest)
+            ObjectResult reviews = await reviewService.CreateReview(review);
+            if (reviews.StatusCode == (int)HttpStatusCode.BadRequest)
             {
-                return BadRequest("Error creating review");
+                return BadRequest(reviews.Value);
             }
-            return Ok(result);
+            return Ok(reviews.Value);
         }
 
         // Route: GET api/Review/{id}
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetReviewById(int id)
         {
-            var review = await reviewService.GetReviewById(id);
+            ObjectResult review = await reviewService.GetReviewById(id);
             if (review.StatusCode == (int)HttpStatusCode.NotFound)
             {
                 return NotFound("Review not found");
             }
-            return Ok(review);
+            return Ok(review.Value);
         }
 
         // Route: GET api/Review/pending
         [HttpGet("pending")]
         public async Task<IActionResult> GetPendingReview()
         {
-            var review = await reviewService.GetPendingReview();
+            ObjectResult review = await reviewService.GetPendingReview();
             if (review.StatusCode == (int)HttpStatusCode.NotFound)
             {
                 return NotFound("No pending reviews found");
             }
-            return Ok(review);
+            return Ok(review.Value);
         }
 
         // Route: PUT api/Review/{id}
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateReview(int id, ReviewDTO review)
+        [Authorize(Roles = "Reviewer")]
+        public async Task<IActionResult> UpdateReview(int id, ReviewPutDTO review)
         {
-            var result = await reviewService.UpdateReview(id, review);
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            ObjectResult reviews = await reviewService.UpdateReview(id, review);
+            if (reviews.StatusCode == (int)HttpStatusCode.NotFound)
             {
-                return NotFound("Review not found");
+                return NotFound(reviews.Value);
             }
-            return Ok(result);
+            return Ok(reviews.Value);
         }
     }
 }

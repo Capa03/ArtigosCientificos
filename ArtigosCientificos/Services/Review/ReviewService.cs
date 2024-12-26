@@ -69,7 +69,7 @@ namespace ArtigosCientificos.Api.Services.Reviews
 
         }
 
-        public async Task<ObjectResult> UpdateReview(int id, ReviewDTO review)
+        public async Task<ObjectResult> UpdateReview(int id, ReviewPutDTO review)
         {
             Review reviewToUpdate = _context.Reviews.FirstOrDefault(r => r.Id == id);
             if (reviewToUpdate == null)

@@ -9,7 +9,7 @@ namespace ArtigosCientificos.Api.Services.Reviews
         Task<ObjectResult> CreateReview(ReviewDTO review);
 
         Task<ObjectResult> GetReviewById(int id);
-        Task<ObjectResult> UpdateReview(int id, ReviewDTO review);
+        Task<ObjectResult> UpdateReview(int id, ReviewPutDTO review);
         Task<ObjectResult> GetPendingReview();
     }
 }

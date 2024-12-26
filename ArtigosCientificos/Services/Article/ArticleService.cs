@@ -31,7 +31,17 @@ namespace ArtigosCientificos.Api.Services.Articles
             {
                 return new BadRequestObjectResult("Error creating article");
             }
+            await _context.SaveChangesAsync();
 
+            //Article createdArticle = _context.Articles.OrderByDescending(a => a.Id).FirstOrDefault();
+
+            Review review = new Review
+            {
+                ArticleId = article.Id,
+                UserId = article.UserId,
+            };
+
+            await _context.Reviews.AddAsync(review);
             await _context.SaveChangesAsync();
             return new OkObjectResult(article);
         }
