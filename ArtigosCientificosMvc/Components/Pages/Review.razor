@@ -8,171 +8,209 @@
 <PageTitle>Review Details</PageTitle>
 
 <Layout>
-	<div class="container mt-4">
-		<Card>
-			<CardHeader>
-				<Heading Size="HeadingSize.Is3">Review Details</Heading>
-			</CardHeader>
-			<CardBody>
-				@if (IsLoading)
-				{
-					<Skeleton>
-						<SkeletonItem ColumnSize="ColumnSize.Is6" />
-					</Skeleton>
-				}
-				else if (!string.IsNullOrEmpty(ErrorMessage))
-				{
-					<Alert Color="Color.Danger" IsDismissable="true">
-						<strong>Error:</strong> @ErrorMessage
-					</Alert>
-				}
-				else
-				{
-					<dl class="row">
-						<dt class="col-sm-3">Article Title</dt>
-						<dd class="col-sm-9">@article.Title</dd>
+    <div class="container mt-4">
+        <Card>
+            <CardHeader>
+                <Heading Size="HeadingSize.Is3">Review Details</Heading>
+            </CardHeader>
+            <CardBody>
+                @if (IsLoading)
+                {
+                    <Skeleton>
+                        <SkeletonItem ColumnSize="ColumnSize.Is6" />
+                    </Skeleton>
+                }
+                else if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <Alert Color="Color.Danger" IsDismissable="true">
+                        <strong>Error:</strong> @ErrorMessage
+                    </Alert>
+                }
+                else
+                {
+                    <dl class="row">
+                        <dt class="col-sm-3">Article Title</dt>
+                        <dd class="col-sm-9">@article.Title</dd>
 
-						<dt class="col-sm-3">Article Abstract</dt>
-						<dd class="col-sm-9">@article.Abstract</dd>
+                        <dt class="col-sm-3">Article Abstract</dt>
+                        <dd class="col-sm-9">@article.Abstract</dd>
 
-						<dt class="col-sm-3">Status</dt>
-						<dd class="col-sm-9">
-							<span class="badge
+                        <dt class="col-sm-3">Status</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge
                                 @(article.Status == "PENDING" ? "bg-warning" :
                                   article.Status == "ACCEPTED" ? "bg-success" : "bg-danger")">
-								@article.Status
-							</span>
-						</dd>
+                                @article.Status
+                            </span>
+                        </dd>
 
-						<dt class="col-sm-3">Keywords</dt>
-						<dd class="col-sm-9">@article.Keywords</dd>
-					</dl>
+                        <dt class="col-sm-3">Keywords</dt>
+                        <dd class="col-sm-9">@article.Keywords</dd>
+                    </dl>
 
-					<!-- Text Box for Additional Feedback -->
-					<div class="mb-3">
-						<Label for="reviewFeedback">Provide Feedback:</Label>
-						<textarea class="form-control" id="reviewFeedback" rows="3" @bind="Feedback"></textarea>
-					</div>
-				}
-			</CardBody>
-			<CardFooter class="d-flex justify-content-between">
-				<Button Color="Color.Primary" @onclick="NavigateBack">Back</Button>
-				<div class="d-flex gap-2 ms-auto">
-					<Button Color="Color.Success" @onclick="AcceptReview">Accept</Button>
-					<Button Color="Color.Danger" @onclick="RejectReview">Reject</Button>
-				</div>
-			</CardFooter>
+                    <!-- Text Box for Additional Feedback -->
+                    <div class="mb-3">
+                        <Label for="reviewFeedback">Provide Feedback:</Label>
+                        <textarea class="form-control" id="reviewFeedback" rows="3" @bind="Feedback">@article.Description</textarea>
+                    </div>
+                    <Button Color="Color.Primary">
+                        <a href="@($"https://localhost:7267/api/File/download/{article.File}")" target="_blank" class="text-white text-decoration-none">
+                            Download
+                        </a>
+                    </Button>
 
+                }
+            </CardBody>
+            <CardFooter class="d-flex justify-content-between">
+                <Button Color="Color.Primary" @onclick="NavigateBack">Back</Button>
+                <div class="d-flex gap-2 ms-auto">
+                    <Button Color="Color.Success" @onclick="ShowAcceptConfirmation">Accept</Button>
+                    <Button Color="Color.Danger" @onclick="ShowRejectConfirmation">Reject</Button>
+                </div>
+            </CardFooter>
+        </Card>
 
+        <!-- Toast Container -->
+        <Div Position="Position.Relative" Width="Width.Is100" Height="Height.Rem(20)">
+            @toast
+        </Div>
 
-			<!-- Action Buttons -->
-		</Card>
+        <!-- Modal Confirmation for Accept/Reject -->
+        <div class="modal fade @((IsModalVisible ? "show" : ""))" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true" style="display: @(IsModalVisible ? "block" : "none")">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel">Confirm Action</h5>
+                        <button type="button" class="btn-close" aria-label="Close" @onclick="CancelAction"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to <strong>@ConfirmationAction</strong> this article?</p>
+                        <p><strong>Article Title:</strong> @article.Title</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CancelAction">Cancel</button>
+                        @if (ConfirmationAction == "Accept")
+                        {
+                        <button type="button" class="btn btn-success" @onclick="ConfirmAction">@ConfirmationAction</button>
 
-		<!-- Toast Container -->
-		<Div Position="Position.Relative" Width="Width.Is100" Height="Height.Rem(5)">
-			@toast
-		</Div>
-	</div>
+                        }
+                        @if (ConfirmationAction == "Reject")
+                        {
+                            <button type="button" class="btn btn-danger" @onclick="ConfirmAction">@ConfirmationAction</button>
+
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </Layout>
 
 @code {
-	[Parameter]
-	public int id { get; set; } // Match the route parameter
+    [Parameter]
+    public int id { get; set; } // Match the route parameter
 
-	private ReviewWithArticleDTO article = new();
-	private bool IsLoading = true;
-	private string ErrorMessage;
-	private string Feedback = string.Empty;
-	private RenderFragment toast;
+    private ReviewWithArticleDTO article = new();
+    private bool IsLoading = true;
+    private string ErrorMessage;
+    private string Feedback = string.Empty;
+    private RenderFragment toast;
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (firstRender)
-		{
-			await LoadReview();
-			StateHasChanged();
-		}
-	}
+    private bool IsModalVisible = false;
+    private string ConfirmationAction;
 
-	private async Task LoadReview()
-	{
-		try
-		{
-			IsLoading = true;
-			ErrorMessage = null;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadReview();
+            StateHasChanged();
+        }
+    }
 
-			article = await ReviewService.GetReviewById(id);
-		}
-		catch (Exception ex)
-		{
-			ErrorMessage = $"Failed to load review details: {ex.Message}";
-		}
-		finally
-		{
-			IsLoading = false; // Stop loading
-		}
-	}
+    private async Task LoadReview()
+    {
+        try
+        {
+            IsLoading = true;
+            ErrorMessage = null;
 
-	private void NavigateBack()
-	{
-		NavigationManager.NavigateTo("/review-list");
-	}
+            article = await ReviewService.GetReviewById(id);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Failed to load review details: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false; // Stop loading
+        }
+    }
 
-	private async Task AcceptReview()
-	{
-		try
-		{
-			await ReviewService.UpdateReview(article.ReviewId, new ReviewPutDTO { Description = Feedback, Status = "ACCEPTED" });
-			toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "The article has been accepted.");
-			Feedback = string.Empty;
-			await LoadReview();
-		}
-		catch (Exception ex)
-		{
-			// Show error toast
-			toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "Error:" + ex.Message);
-		}
-		finally
-		{
-			StateHasChanged();
-		}
-	}
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/review-list");
+    }
 
-	private async Task RejectReview()
-	{
-		try
-		{
-			await ReviewService.UpdateReview(article.ReviewId, new ReviewPutDTO { Description = Feedback, Status = "REJECTED" });
+    private void ShowAcceptConfirmation()
+    {
+        ConfirmationAction = "Accept";
+        IsModalVisible = true;
+    }
 
-			// Show success toast
-			toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "The article has been rejected:");
-			Feedback = string.Empty;
-			await LoadReview();
-		}
-		catch (Exception ex)
-		{
-			// Show error toast
-			toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "Error:" + ex.Message);
-		}
-		finally
-		{
-			StateHasChanged();
-		}
-	}
+    private void ShowRejectConfirmation()
+    {
+        ConfirmationAction = "Reject";
+        IsModalVisible = true;
+    }
 
-	private RenderFragment ToastRenderFragment(ToasterPlacement placement, string message) => __builder =>
-	{
-		<Toaster Placement="@placement" PlacementStrategy="ToasterPlacementStrategy.Absolute">
-			<Toast Visible Autohide="true" AutohideDelay="5000">
-				<ToastHeader>
-					<Strong Margin="Margin.IsAuto.FromEnd">@article.Title</Strong>
-					<CloseButton />
-				</ToastHeader>
-				<ToastBody>
-					@message
-				</ToastBody>
-			</Toast>
-		</Toaster>
-	};
+    private async Task ConfirmAction()
+    {
+        try
+        {
+            if (ConfirmationAction == "Accept")
+            {
+                await ReviewService.UpdateReview(article.ReviewId, new ReviewPutDTO { Description = Feedback, Status = "ACCEPTED" });
+                toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "The article has been accepted.");
+            }
+            else if (ConfirmationAction == "Reject")
+            {
+                await ReviewService.UpdateReview(article.ReviewId, new ReviewPutDTO { Description = Feedback, Status = "REJECTED" });
+                toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "The article has been rejected.");
+            }
 
+            //Feedback = string.Empty;
+            await LoadReview();
+            IsModalVisible = false; // Close the modal after action
+        }
+        catch (Exception ex)
+        {
+            toast = ToastRenderFragment(ToasterPlacement.BottomEnd, "Error: " + ex.Message);
+            IsModalVisible = false; // Close modal on error
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void CancelAction()
+    {
+        IsModalVisible = false; // Close the modal
+    }
+
+    private RenderFragment ToastRenderFragment(ToasterPlacement placement, string message) => __builder =>
+    {
+        <Toaster Placement="@placement" PlacementStrategy="ToasterPlacementStrategy.Absolute">
+            <Toast Visible Autohide="true" AutohideDelay="5000">
+                <ToastHeader>
+                    <Strong Margin="Margin.IsAuto.FromEnd">@article.Title</Strong>
+                    <CloseButton />
+                </ToastHeader>
+                <ToastBody>
+                    @message
+                </ToastBody>
+            </Toast>
+        </Toaster>
+    };
 }

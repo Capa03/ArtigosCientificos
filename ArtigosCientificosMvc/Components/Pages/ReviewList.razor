@@ -60,7 +60,7 @@
 						<TableRowCell>@review.Title</TableRowCell>
 						<TableRowCell>@review.Status</TableRowCell>
 						<TableRowCell>
-							<Button Color="Color.Warning">Edit Review</Button>
+							<Button Clicked="() => goToReview(review.ReviewId)" Color="Color.Warning">Edit Review</Button>
 						</TableRowCell>
 					</TableRow>
 				}

@@ -63,6 +63,7 @@ namespace ArtigosCientificos.Api.Services.Reviews
                         Title = article.Title,
                         Abstract = article.Abstract,
                         Keywords = article.Keywords,
+                        Description = article.Reviews.FirstOrDefault(r => r.Id == review.Id).Description,
                         File = article.File
                     })
                 .ToListAsync();
@@ -93,6 +94,7 @@ namespace ArtigosCientificos.Api.Services.Reviews
                         Title = article.Title,
                         Abstract = article.Abstract,
                         Keywords = article.Keywords,
+                        Description = article.Reviews.FirstOrDefault(r => r.Id == review.Id).Description,
                         File = article.File
                     })
                 .FirstOrDefaultAsync();
