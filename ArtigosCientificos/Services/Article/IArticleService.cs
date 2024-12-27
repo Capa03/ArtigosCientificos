@@ -8,5 +8,7 @@ namespace ArtigosCientificos.Api.Services.Articles
         Task<ObjectResult> GetAllArticles();
         Task<ObjectResult> CreateArticle(ArticleDTO article);
         Task<ObjectResult> GetLastArticle();
+
+        Task<ObjectResult> GetAcceptedArticles();
     }
 }

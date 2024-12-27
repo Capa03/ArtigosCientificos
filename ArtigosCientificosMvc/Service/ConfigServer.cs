@@ -40,5 +40,10 @@ namespace ArtigosCientificosMvc.Service
         {
             return this._baseUrl + "Review/" + id;
         }
+
+        public string GetAcceptedArticlesUrl()
+        {
+            return this._baseUrl + "Article/articles/accepted";
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Data.Entity;
-using ArtigosCientificos.Api.Data;
+﻿using ArtigosCientificos.Api.Data;
 using ArtigosCientificos.Api.Models.Article;
 using ArtigosCientificos.Api.Models.Review;
 using Microsoft.AspNetCore.Mvc;
@@ -45,6 +44,22 @@ namespace ArtigosCientificos.Api.Services.Articles
             await _context.SaveChangesAsync();
             return new OkObjectResult(article);
         }
+
+        public async Task<ObjectResult> GetAcceptedArticles()
+        {
+            var articles = _context.Articles
+                .Where(a => a.Reviews.Any(r => r.Status == "ACCEPTED"))
+                .ToList();  
+
+            if (articles.Count == 0)
+            {
+                return new NotFoundObjectResult("No articles found with 'ACCEPTED' reviews.");
+            }
+
+            return new OkObjectResult(articles);
+        }
+
+
 
         public async Task<ObjectResult> GetAllArticles()
         {

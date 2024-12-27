@@ -52,5 +52,16 @@ namespace ArtigosCientificos.Api.Controllers
             }
             return Ok(article.Value);
         }
+
+        [HttpGet("articles/accepted")]
+        public async Task<IActionResult> GetAcceptedArticles()
+        {
+            ObjectResult articles = await _articleService.GetAcceptedArticles();
+            if (articles.StatusCode == (int)HttpStatusCode.NotFound)
+            {
+                return NotFound(articles.Value);
+            }
+            return Ok(articles.Value);
+        }
     }
 }

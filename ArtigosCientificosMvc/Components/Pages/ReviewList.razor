@@ -87,7 +87,7 @@
                             <div>@review.Title</div>
                             <div>
                                 <span class="badge bg-danger">@review.Status</span>
-                                <Button class="btn btn-warning btn-sm ms-2">Edit Review</Button>
+                                <Button class="btn btn-warning btn-sm ms-2" @onclick="() => goToReview(review.ReviewId)">Edit Review</Button>
                             </div>
                         </li>
                     }
