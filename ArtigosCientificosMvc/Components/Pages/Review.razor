@@ -71,43 +71,46 @@
 		</Card>
 
 		<br />
-		<Card>
-			<CardHeader>
-				<Heading Size="HeadingSize.Is3">Last Feedback: </Heading>
+		<Card class="mb-4">
+			<CardHeader class="bg-primary text-white">
+				<Heading Size="HeadingSize.Is3">Last Feedback:</Heading>
 			</CardHeader>
 
 			@if (article?.Description != null && article.Description.Any())
 			{
 				@foreach (var review in article.Description)
 				{
-		
-						<CardBody>
-							@if (IsLoading)
-							{
-								<Skeleton>
-									<SkeletonItem ColumnSize="ColumnSize.Is6" />
-								</Skeleton>
-							}
-							else
-							{
-								<p>@review.Description</p>
-							}
-						</CardBody>
-					
+					<CardBody class="border rounded shadow-sm mb-3 p-3">
+						@if (IsLoading)
+						{
+							<Skeleton>
+								<SkeletonItem ColumnSize="ColumnSize.Is6" />
+							</Skeleton>
+						}
+						else
+						{
+							<div class="d-flex justify-content-between">
+								<div>
+									<p class="font-weight-bold">@review.Description</p>
+									<small class="text-muted">
+										Submitted on: @review.CreatedAt.ToString("MMMM dd, yyyy")
+									</small>
+								</div>
+							</div>
+						}
+					</CardBody>
 				}
 			}
 			else
 			{
-				<CardBody>
-					<p>No feedback available.</p>
+				<CardBody class="text-center">
+					<p class="text-muted">No feedback available.</p>
 				</CardBody>
 			}
 		</Card>
 
-
-
 		<!-- Toast Container -->
-		<Div Position="Position.Relative" Width="Width.Is100" Height="Height.Rem(20)">
+		<Div Position="Position.Relative" Width="Width.Is100" Height="Height.Rem(5)">
 			@toast
 		</Div>
 

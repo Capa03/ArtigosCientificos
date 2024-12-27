@@ -11,6 +11,5 @@ namespace ArtigosCientificos.Api.Services.Reviews
         Task<ObjectResult> GetReviewById(int id);
         Task<ObjectResult> UpdateReview(int id, ReviewPutDTO review);
         Task<ObjectResult> GetReviewByStatus(string Status);
-        Task<ObjectResult> GetDescriptionsFromReview(int reviewId);
     }
 }
