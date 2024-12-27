@@ -41,7 +41,7 @@ public class FileController : Controller
     [HttpGet("download/{fileName}")]
     public async Task<IActionResult> DownloadFile(string fileName)
     {
-        var sanitizedFileName = Path.GetFileName(fileName); // Prevent directory traversal
+        var sanitizedFileName = Path.GetFileName(fileName); 
         ObjectResult objectResult = await _fileService.DownloadFile(sanitizedFileName);
 
         if (objectResult.StatusCode == (int)HttpStatusCode.NotFound)

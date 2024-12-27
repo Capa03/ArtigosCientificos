@@ -9,6 +9,7 @@ public class ReviewService : IReviewService
 {
     private readonly ApiService apiService;
     private readonly ConfigServer configServer;
+    private readonly ILogger<ReviewService> _logger;
 
     public ReviewService(ApiService apiService, ConfigServer configServer)
     {
@@ -20,7 +21,6 @@ public class ReviewService : IReviewService
     {
         try
         {
-            // Get the reviews and the associated articles by joining them on ArticleId
             List<ReviewWithArticleDTO> reviewsWithArticles = await this.apiService.GetTAsync<List<ReviewWithArticleDTO>>(configServer.GetReviewsUrl(Status));
 
             if (reviewsWithArticles == null || !reviewsWithArticles.Any())
@@ -32,7 +32,7 @@ public class ReviewService : IReviewService
         }
         catch (Exception ex)
         {
-            // Log the error or rethrow to be handled by the caller
+            this._logger.LogError($"Error fetching reviews with status '{Status}': {ex.Message}", ex);
             throw new Exception($"Error fetching reviews with status '{Status}': {ex.Message}", ex);
         }
     }
@@ -42,7 +42,6 @@ public class ReviewService : IReviewService
         try
         {
             ReviewWithArticleDTO review = await this.apiService.GetTAsync<ReviewWithArticleDTO>(configServer.GetReviewsByIdUrl(id));
-            Console.WriteLine("REVIEW COUNTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" + review.Description.Count);
             if (review == null)
             {
                 return null;
@@ -52,7 +51,7 @@ public class ReviewService : IReviewService
         }
         catch (Exception ex)
         {
-            // Log the error or rethrow to be handled by the caller
+            this._logger.LogError($"Error fetching review with id '{id}': {ex.Message}", ex);
             throw new Exception($"Error fetching review with id '{id}': {ex.Message}", ex);
         }
     }

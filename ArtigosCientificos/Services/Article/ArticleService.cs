@@ -32,8 +32,6 @@ namespace ArtigosCientificos.Api.Services.Articles
             }
             await _context.SaveChangesAsync();
 
-            //Article createdArticle = _context.Articles.OrderByDescending(a => a.Id).FirstOrDefault();
-
             Review review = new Review
             {
                 ArticleId = article.Id,
@@ -49,7 +47,7 @@ namespace ArtigosCientificos.Api.Services.Articles
         {
             var articles = _context.Articles
                 .Where(a => a.Reviews.Any(r => r.Status == "ACCEPTED"))
-                .ToList();  
+                .ToList();
 
             if (articles.Count == 0)
             {
@@ -73,16 +71,5 @@ namespace ArtigosCientificos.Api.Services.Articles
             return new OkObjectResult(articles);
         }
 
-        public async Task<ObjectResult> GetLastArticle()
-        {
-            Article article = _context.Articles.OrderByDescending(a => a.Id).FirstOrDefault();
-
-            if (article == null)
-            {
-                return new NotFoundObjectResult("No articles found");
-            }
-
-            return new OkObjectResult(article);
-        }
     }
 }

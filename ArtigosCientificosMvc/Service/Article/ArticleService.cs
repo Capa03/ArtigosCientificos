@@ -19,7 +19,7 @@ namespace ArtigosCientificosMvc.Service.Articles
 
         public async Task<ArticleResult> Create(Article article)
         {
-            int UserId = await tokenManager.GetUserId();
+            int UserId = await tokenManager.GetUserIdAsync();
             article.UserId = UserId;
             try
             {
