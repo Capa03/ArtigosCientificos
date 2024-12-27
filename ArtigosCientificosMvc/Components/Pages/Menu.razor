@@ -19,27 +19,34 @@
 @if (loggedIn)
 {
     <!-- Logged in -->
-<Dropdown>
-    <DropdownToggle>
-        <img src="/assets/man.png" alt="Avatar" class="rounded-circle" style="width: 30px; height: 30px; margin-right: 8px;" />
-        @username
-    </DropdownToggle>
-    <DropdownMenu>
-        <DropdownItem>
-            <a href="/Profile">Profile</a>
-        </DropdownItem>
-        <DropdownItem>
-                <a href="/submitarticle">Submit Article</a>
-        </DropdownItem>
-        <DropdownItem>
-            <hr class="dropdown-divider" />
-        </DropdownItem>
-        <DropdownItem>
-            <a @onclick="Logout">Logout</a>
-        </DropdownItem>
-    </DropdownMenu>
-</Dropdown>
+    <Dropdown>
+        <DropdownToggle>
+            <img src="/assets/man.png" alt="Avatar" class="rounded-circle" style="width: 30px; height: 30px; margin-right: 8px;" />
+            @username
+        </DropdownToggle>
+        <DropdownMenu>
+            @if (userRole == "Researcher")
+            {
+                <DropdownItem>
+                    <a href="/submitarticle">Submit Article</a>
+                </DropdownItem>
+            }
 
+            @if (userRole == "Reviewer")
+            {
+                <DropdownItem>
+                    <a href="/review-list">Review</a>
+                </DropdownItem>
+            }
+
+            <DropdownItem>
+                <hr class="dropdown-divider" />
+            </DropdownItem>
+            <DropdownItem>
+                <a @onclick="Logout">Logout</a>
+            </DropdownItem>
+        </DropdownMenu>
+    </Dropdown>
 }
 
 

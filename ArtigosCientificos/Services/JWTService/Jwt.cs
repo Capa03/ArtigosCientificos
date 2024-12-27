@@ -39,23 +39,23 @@ namespace ArtigosCientificos.Api.Services.JWTService
         /// </remarks>
         public string CreateToken(User user)
         {
-            
+
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Id.ToString())
             };
 
-            
+
             if (user.Role != null && user.Role.Any())
             {
                 claims.AddRange(user.Role.Select(role => new Claim(ClaimTypes.Role, role.Name)));
             }
 
-            
+
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("AppSettings:Token").Value!));
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-            
+
             JwtSecurityToken token = new JwtSecurityToken(
                 issuer: configuration.GetSection("AppSettings:Issuer").Value,
                 audience: configuration.GetSection("AppSettings:Audience").Value,

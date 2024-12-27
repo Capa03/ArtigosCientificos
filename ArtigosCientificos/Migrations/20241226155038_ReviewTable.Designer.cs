@@ -4,6 +4,7 @@ using ArtigosCientificos.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ArtigosCientificos.Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241226155038_ReviewTable")]
+    partial class ReviewTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,6 +49,10 @@ namespace ArtigosCientificos.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -75,6 +82,10 @@ namespace ArtigosCientificos.Api.Migrations
                     b.Property<int>("ArticleId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -91,32 +102,7 @@ namespace ArtigosCientificos.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews");
-                });
-
-            modelBuilder.Entity("ArtigosCientificos.Api.Models.Review.ReviewDescription", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ReviewId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReviewId");
-
-                    b.ToTable("ReviewDescriptions");
+                    b.ToTable("Review");
                 });
 
             modelBuilder.Entity("ArtigosCientificos.Api.Models.Role.UserRole", b =>
@@ -248,17 +234,6 @@ namespace ArtigosCientificos.Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ArtigosCientificos.Api.Models.Review.ReviewDescription", b =>
-                {
-                    b.HasOne("ArtigosCientificos.Api.Models.Review.Review", "Review")
-                        .WithMany("Description")
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Review");
-                });
-
             modelBuilder.Entity("ArtigosCientificos.Api.Models.Token.UserToken", b =>
                 {
                     b.HasOne("ArtigosCientificos.Api.Models.User.User", "User")
@@ -288,11 +263,6 @@ namespace ArtigosCientificos.Api.Migrations
             modelBuilder.Entity("ArtigosCientificos.Api.Models.Article.Article", b =>
                 {
                     b.Navigation("Reviews");
-                });
-
-            modelBuilder.Entity("ArtigosCientificos.Api.Models.Review.Review", b =>
-                {
-                    b.Navigation("Description");
                 });
 
             modelBuilder.Entity("ArtigosCientificos.Api.Models.User.User", b =>

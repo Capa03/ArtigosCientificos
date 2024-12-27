@@ -1,22 +1,38 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using ArtigosCientificosMvc.Models.User;
 using ArtigosCientificosMvc.Service.Api;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace ArtigosCientificosMvc.Service.Token
 {
-
+    /// <summary>
+    /// Enum representing possible responses for token-related operations.
+    /// </summary>
     public enum Response
     {
         NOT_FOUND_ID = 0,
         ERROR = -1
     }
 
+    /// <summary>
+    /// Manages authentication tokens, user data retrieval, and claim processing.
+    /// </summary>
     public class TokenManager
     {
+        private const string AuthTokenKey = "auth_token";
+        private const string BaseClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/";
+
         private readonly ProtectedLocalStorage _protectedLocalStorage;
         private readonly Lazy<ApiService> _apiService;
         private readonly ConfigServer _configServer;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TokenManager"/> class.
+        /// </summary>
+        /// <param name="protectedLocalStorage">The local storage service for storing tokens.</param>
+        /// <param name="apiService">Lazy-initialized API service for making HTTP requests.</param>
+        /// <param name="configServer">Configuration server containing API endpoint URLs.</param>
         public TokenManager(ProtectedLocalStorage protectedLocalStorage, Lazy<ApiService> apiService, ConfigServer configServer)
         {
             _protectedLocalStorage = protectedLocalStorage;
@@ -24,89 +40,136 @@ namespace ArtigosCientificosMvc.Service.Token
             _configServer = configServer;
         }
 
-
+        /// <summary>
+        /// Stores the authentication token in local storage.
+        /// </summary>
+        /// <param name="token">The token to store.</param>
         public async Task SetTokenAsync(string token)
         {
-            await _protectedLocalStorage.SetAsync("auth_token", token);
+            await _protectedLocalStorage.SetAsync(AuthTokenKey, token);
         }
 
-
-        public async Task<string> GetTokenAsync()
+        /// <summary>
+        /// Retrieves the authentication token from local storage.
+        /// </summary>
+        /// <returns>The stored token, or null if not found.</returns>
+        public async Task<string?> GetTokenAsync()
         {
-            var result = await _protectedLocalStorage.GetAsync<string>("auth_token");
+            var result = await _protectedLocalStorage.GetAsync<string>(AuthTokenKey);
             return result.Success ? result.Value : null;
         }
 
-
-        public async Task RemoveTokenAsync()
-        {
-            await _protectedLocalStorage.DeleteAsync("auth_token");
+        /// <summary>
+        /// Removes the authentication token from local storage.
+        /// </summary>
+        public async Task RemoveTokenAsync() { 
+            await _protectedLocalStorage.DeleteAsync(AuthTokenKey);
         }
 
+        /// <summary>
+        /// Checks if the user is authenticated by verifying token existence.
+        /// </summary>
+        /// <returns>True if the user has a token; otherwise, false.</returns>
         public async Task<bool> IsUserAuthenticated()
         {
-            var token = await GetTokenAsync();
-            return !string.IsNullOrEmpty(token);
+            return !string.IsNullOrEmpty(await GetTokenAsync());
         }
 
-        public async Task<User> GetUser()
+        /// <summary>
+        /// Retrieves the currently authenticated user's details.
+        /// </summary>
+        /// <returns>The authenticated user's details, or null if unavailable.</returns>
+        public async Task<User?> GetUserAsync()
         {
+            try
+            {
+                var userId = await GetUserIdAsync();
+                if (userId <= 0)
+                {
+                    return null;
+                }
 
-            User user = await _apiService.Value.GetTAsync<User>($"{this._configServer.GetUsersUrl()}{await GetUserId()}");
-
-            if (user == null)
+                return await _apiService.Value.GetTAsync<User>($"{_configServer.GetUsersUrl()}{userId}");
+            }
+            catch
             {
                 return null;
             }
-
-            return user;
         }
 
-        public async Task<int> GetUserId()
+        /// <summary>
+        /// Refreshes the authentication token by calling the API.
+        /// </summary>
+        /// <returns>The new token, or null if the refresh operation fails.</returns>
+        public async Task<string?> RefreshTokenAsync()
+        {
+            return await _apiService.Value.GetTAsync<string>(_configServer.RefreshTokenUrl());
+        }
+
+        /// <summary>
+        /// Retrieves the user ID from the authentication token.
+        /// </summary>
+        /// <returns>The user ID, or a response code indicating an error.</returns>
+        public async Task<int> GetUserIdAsync()
         {
             var token = await GetTokenAsync();
-
-            if (!string.IsNullOrEmpty(token))
+            if (string.IsNullOrEmpty(token))
             {
-                var id = ReadClaim(token, "name");
-                if (string.IsNullOrWhiteSpace(id))
-                {
-                    return (int)Response.NOT_FOUND_ID;
-                }
-                return int.Parse(id);
+                return (int)Response.ERROR;
             }
-            return (int)Response.ERROR;
+
+            var userIdClaim = ReadClaim(token, ClaimTypes.Name);
+            if (string.IsNullOrWhiteSpace(userIdClaim))
+            {
+                return (int)Response.NOT_FOUND_ID;
+            }
+
+            return int.TryParse(userIdClaim, out var userId) ? userId : (int)Response.ERROR;
         }
 
+        /// <summary>
+        /// Extracts a specific claim from the JWT token.
+        /// </summary>
+        /// <param name="token">The JWT token.</param>
+        /// <param name="claimType">The type of claim to extract.</param>
+        /// <returns>The value of the claim, or null if the claim is not found.</returns>
+        /// <exception cref="ArgumentException">Thrown if the token is null or invalid.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if an error occurs while reading the claim.</exception>
         private string? ReadClaim(string token, string claimType)
         {
-            string BASE_CLAIM = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/";
-
             if (string.IsNullOrWhiteSpace(token))
             {
                 throw new ArgumentException("Token cannot be null or empty.", nameof(token));
             }
 
-            var handler = new JwtSecurityTokenHandler();
-
             try
             {
-                var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
-
-                if (jwtToken == null)
+                var handler = new JwtSecurityTokenHandler();
+                if (handler.ReadToken(token) is not JwtSecurityToken jwtToken)
                 {
                     throw new ArgumentException("Invalid JWT token format.", nameof(token));
                 }
 
-
-                var claim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == claimType || claim.Type == BASE_CLAIM + claimType);
-
-                return claim?.Value;
+                return jwtToken.Claims
+                    .FirstOrDefault(claim => claim.Type == claimType || claim.Type == BaseClaim + claimType)
+                    ?.Value;
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException("An error occurred while reading the claim.", ex);
             }
         }
+
+        public async Task<string?> GetUserRoleAsync()
+        {
+            var token = await GetTokenAsync();
+            if (string.IsNullOrEmpty(token))
+            {
+                return null;
+            }
+            Console.WriteLine("ROLEEEEE" + ReadClaim(token, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"));
+            return ReadClaim(token, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
+        }
+
     }
 }

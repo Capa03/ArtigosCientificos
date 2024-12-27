@@ -6,6 +6,7 @@ using ArtigosCientificos.Api.Services.Articles;
 using ArtigosCientificos.Api.Services.Author;
 using ArtigosCientificos.Api.Services.AuthService;
 using ArtigosCientificos.Api.Services.File;
+using ArtigosCientificos.Api.Services.Reviews;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 // Add services to the container.
 

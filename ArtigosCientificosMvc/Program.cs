@@ -5,6 +5,7 @@ using ArtigosCientificosMvc.Service.Articles;
 using ArtigosCientificosMvc.Service.Home;
 using ArtigosCientificosMvc.Service.Login;
 using ArtigosCientificosMvc.Service.Register;
+using ArtigosCientificosMvc.Service.Review;
 using ArtigosCientificosMvc.Service.Token;
 using Blazorise;
 using Blazorise.Bootstrap5;
@@ -23,6 +24,7 @@ builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddSingleton<ConfigServer>();
 builder.Services.AddScoped<TokenManager>();
 

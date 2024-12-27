@@ -8,19 +8,15 @@ namespace ArtigosCientificos.Api.Services.File
         {
             try
             {
-                // Define the file path
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", fileName);
 
-                // Check if the file exists
                 if (!System.IO.File.Exists(filePath))
                 {
                     return new NotFoundObjectResult("File not found.");
                 }
 
-                // Read the file content
                 var fileBytes = System.IO.File.ReadAllBytes(filePath);
 
-                // Return the file as a downloadable content
                 return new OkObjectResult(new { FileBytes = fileBytes, FileName = fileName });
             }
             catch (Exception ex)
@@ -36,19 +32,15 @@ namespace ArtigosCientificos.Api.Services.File
         {
             try
             {
-                // Define the path to save the file
                 var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
 
-                // Ensure the directory exists
                 if (!Directory.Exists(uploadPath))
                 {
                     Directory.CreateDirectory(uploadPath);
                 }
 
-                // Create a unique file name
                 var filePath = Path.Combine(uploadPath, file.FileName);
 
-                // Save the file
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);

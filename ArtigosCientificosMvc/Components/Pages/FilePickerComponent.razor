@@ -110,8 +110,10 @@
 				selectedFileName = null;
 				selectedFileSize = 0;
 			}
-			else
+			else if ((int)response.StatusCode == StatusCodes.Status403Forbidden)
 			{
+				errorMessage = "The user is not Authorized to Upload Files.";
+			} else {
 				errorMessage = "Failed to upload file. Please try again.";
 			}
 		}

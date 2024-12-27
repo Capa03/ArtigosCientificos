@@ -12,7 +12,6 @@ namespace ArtigosCientificos.Api.Models.Article
         public string Abstract { get; set; }
         public string Keywords { get; set; }
         public string File { get; set; }
-        public string Status { get; set; }
         [DataType(DataType.Date)]
         public string CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now).ToString();
         [DataType(DataType.Date)]
@@ -20,5 +19,8 @@ namespace ArtigosCientificos.Api.Models.Article
         public int UserId { get; set; }
         [JsonIgnore]
         public User.User User { get; set; }
+        
+        [JsonIgnore]
+        public List<Review.Review> Reviews { get; set; }
     }
 }

@@ -7,6 +7,7 @@ namespace ArtigosCientificosMvc.Components.Pages
 
         private bool loggedIn = false;
         private string username = string.Empty;
+        private string? userRole;
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -24,7 +25,8 @@ namespace ArtigosCientificosMvc.Components.Pages
                 loggedIn = await TokenManager.IsUserAuthenticated();
                 if (loggedIn)
                 {
-                    User user = await TokenManager.GetUser();
+                    userRole = await TokenManager.GetUserRoleAsync();
+                    User user = await TokenManager.GetUserAsync();
                     username = user.Username;
                 }
                 else
