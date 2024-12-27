@@ -1,118 +1,158 @@
 ﻿@page "/review-list"
 @using ArtigosCientificosMvc.Models.Review
 @using ArtigosCientificosMvc.Service.Review
+@using ArtigosCientificosMvc.Service.Token
 @using Microsoft.AspNetCore.Mvc
 @inject IReviewService ReviewService
 @inject NavigationManager NavigationManager
+@inject TokenManager tokenManager
 @rendermode InteractiveServer
 
-<PageTitle>Review List</PageTitle>
-
-@if (!string.IsNullOrEmpty(ErrorMessage))
+@if (isLoading)
 {
-    <div class="alert alert-danger">
-        @ErrorMessage
+    <Skeleton Animation="SkeletonAnimation.Wave">
+        <SkeletonItem ColumnSize="ColumnSize.Is7" />
+        <SkeletonItem ColumnSize="ColumnSize.Is4" />
+        <SkeletonItem ColumnSize="ColumnSize.Is4" />
+        <SkeletonItem ColumnSize="ColumnSize.Is6" />
+        <SkeletonItem ColumnSize="ColumnSize.Is8" />
+    </Skeleton>
+}
+else if (role == "Reviewer")
+{
+    <PageTitle>Review List</PageTitle>
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            @ErrorMessage
+        </div>
+    }
+
+    <div class="container">
+        <!-- PENDING Reviews -->
+        <div class="card mb-3">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">PENDING</h5>
+            </div>
+            <div class="card-body">
+                @if (Pending != null && Pending.Any())
+                {
+                    <ul class="list-group">
+                        @foreach (var review in Pending)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>@review.Title</div>
+                                <div>
+                                    <span class="badge bg-warning">@review.Status</span>
+                                    <Button class="btn btn-success btn-sm ms-2" @onclick="() => goToReview(review.ReviewId)">Review</Button>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No pending reviews.</p>
+                }
+            </div>
+        </div>
+
+        <!-- ACCEPTED Reviews -->
+        <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">ACCEPTED</h5>
+            </div>
+            <div class="card-body">
+                @if (Accepted != null && Accepted.Any())
+                {
+                    <ul class="list-group">
+                        @foreach (var review in Accepted)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>@review.Title</div>
+                                <div>
+                                    <span class="badge bg-success">@review.Status</span>
+                                    <Button class="btn btn-warning btn-sm ms-2" @onclick="() => goToReview(review.ReviewId)">Edit Review</Button>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No accepted reviews.</p>
+                }
+            </div>
+        </div>
+
+        <!-- REJECTED Reviews -->
+        <div class="card mb-3">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">REJECTED</h5>
+            </div>
+            <div class="card-body">
+                @if (Rejected != null && Rejected.Any())
+                {
+                    <ul class="list-group">
+                        @foreach (var review in Rejected)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>@review.Title</div>
+                                <div>
+                                    <span class="badge bg-danger">@review.Status</span>
+                                    <Button class="btn btn-warning btn-sm ms-2" @onclick="() => goToReview(review.ReviewId)">Edit Review</Button>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No rejected reviews.</p>
+                }
+            </div>
+        </div>
     </div>
 }
-
-<div class="container">
-    <!-- PENDING Reviews -->
-    <div class="card mb-3">
-        <div class="card-header bg-warning text-white">
-            <h5 class="mb-0">PENDING</h5>
-        </div>
-        <div class="card-body">
-            @if (Pending != null && Pending.Any())
-            {
-                <ul class="list-group">
-                    @foreach (var review in Pending)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>@review.Title</div>
-                            <div>
-                                <span class="badge bg-warning">@review.Status</span>
-                                <Button class="btn btn-success btn-sm ms-2" @onclick="() => goToReview(review.ReviewId)">Review</Button>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p>No pending reviews.</p>
-            }
-        </div>
-    </div>
-
-    <!-- ACCEPTED Reviews -->
-    <div class="card mb-3">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0">ACCEPTED</h5>
-        </div>
-        <div class="card-body">
-            @if (Accepted != null && Accepted.Any())
-            {
-                <ul class="list-group">
-                    @foreach (var review in Accepted)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>@review.Title</div>
-                            <div>
-                                <span class="badge bg-success">@review.Status</span>
-                                <Button class="btn btn-warning btn-sm ms-2" @onclick="() => goToReview(review.ReviewId)">Edit Review</Button>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p>No accepted reviews.</p>
-            }
-        </div>
-    </div>
-
-    <!-- REJECTED Reviews -->
-    <div class="card mb-3">
-        <div class="card-header bg-danger text-white">
-            <h5 class="mb-0">REJECTED</h5>
-        </div>
-        <div class="card-body">
-            @if (Rejected != null && Rejected.Any())
-            {
-                <ul class="list-group">
-                    @foreach (var review in Rejected)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>@review.Title</div>
-                            <div>
-                                <span class="badge bg-danger">@review.Status</span>
-                                <Button class="btn btn-warning btn-sm ms-2" @onclick="() => goToReview(review.ReviewId)">Edit Review</Button>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p>No rejected reviews.</p>
-            }
-        </div>
-    </div>
-</div>
+else
+{
+    NavigationManager.NavigateTo("/unauthorized");
+}
 
 @code {
     private List<ReviewWithArticleDTO> Pending { get; set; }
     private List<ReviewWithArticleDTO> Accepted { get; set; }
     private List<ReviewWithArticleDTO> Rejected { get; set; }
     private string ErrorMessage { get; set; }
+    private string role = "";
+    private bool isLoading = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await LoadReviews();
-            StateHasChanged();
+            try
+            {
+                role = await tokenManager.GetUserRoleAsync();
+                if (role != "Reviewer")
+                {
+                    NavigationManager.NavigateTo("/unauthorized");
+                }
+                else
+                {
+                    await LoadReviews();
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error: {ex.Message}";
+            }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
         }
     }
 
@@ -151,3 +191,4 @@
         }
     }
 }
+

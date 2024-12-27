@@ -159,5 +159,17 @@ namespace ArtigosCientificosMvc.Service.Token
                 throw new InvalidOperationException("An error occurred while reading the claim.", ex);
             }
         }
+
+        public async Task<string?> GetUserRoleAsync()
+        {
+            var token = await GetTokenAsync();
+            if (string.IsNullOrEmpty(token))
+            {
+                return null;
+            }
+            Console.WriteLine("ROLEEEEE" + ReadClaim(token, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"));
+            return ReadClaim(token, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
+        }
+
     }
 }

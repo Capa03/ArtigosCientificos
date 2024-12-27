@@ -1,149 +1,168 @@
 ﻿@page "/review/{id:int}"
 @using ArtigosCientificosMvc.Models.Review
 @using ArtigosCientificosMvc.Service.Review
+@using ArtigosCientificosMvc.Service.Token
 @inject IReviewService ReviewService
 @inject NavigationManager NavigationManager
+@inject TokenManager tokenManager
 @rendermode InteractiveServer
 
-<PageTitle>Review Details</PageTitle>
+@if (isLoading)
+{
+	<Skeleton Animation="SkeletonAnimation.Wave">
+    <SkeletonItem ColumnSize="ColumnSize.Is7" />
+    <SkeletonItem ColumnSize="ColumnSize.Is4" />
+    <SkeletonItem ColumnSize="ColumnSize.Is4" />
+    <SkeletonItem ColumnSize="ColumnSize.Is6" />
+    <SkeletonItem ColumnSize="ColumnSize.Is8" />
+</Skeleton>
+}
+else if (role == "Reviewer")
+{
+	<PageTitle>Review Details</PageTitle>
 
-<Layout>
-	<div class="container mt-4">
-		<Card>
-			<CardHeader>
-				<Heading Size="HeadingSize.Is3">Review Details</Heading>
-			</CardHeader>
-			<CardBody>
-				@if (IsLoading)
+	<Layout>
+		<div class="container mt-4">
+			<Card>
+				<CardHeader>
+					<Heading Size="HeadingSize.Is3">Review Details</Heading>
+				</CardHeader>
+				<CardBody>
+					@if (IsLoading)
+					{
+						<Skeleton>
+							<SkeletonItem ColumnSize="ColumnSize.Is6" />
+						</Skeleton>
+					}
+					else if (!string.IsNullOrEmpty(ErrorMessage))
+					{
+						<Alert Color="Color.Danger" IsDismissable="true">
+							<strong>Error:</strong> @ErrorMessage
+						</Alert>
+					}
+					else
+					{
+						<dl class="row">
+							<dt class="col-sm-3">Article Title</dt>
+							<dd class="col-sm-9">@article.Title</dd>
+
+							<dt class="col-sm-3">Article Abstract</dt>
+							<dd class="col-sm-9">@article.Abstract</dd>
+
+							<dt class="col-sm-3">Status</dt>
+							<dd class="col-sm-9">
+								<span class="badge
+                                @(article.Status == "PENDING" ? "bg-warning" :
+                                  article.Status == "ACCEPTED" ? "bg-success" : "bg-danger")">
+									@article.Status
+								</span>
+							</dd>
+
+							<dt class="col-sm-3">Keywords</dt>
+							<dd class="col-sm-9">@article.Keywords</dd>
+						</dl>
+
+						<!-- Text Box for Additional Feedback -->
+						<div class="mb-3">
+							<Label for="reviewFeedback">Provide Feedback:</Label>
+							<textarea class="form-control" id="reviewFeedback" rows="3" @bind="Feedback">@article.Description</textarea>
+						</div>
+						<Button Color="Color.Secondary">
+							<a href="@($"https://localhost:7267/api/File/download/{article.File}")" target="_blank" class="text-white text-decoration-none">
+								Download
+							</a>
+						</Button>
+
+					}
+				</CardBody>
+				<CardFooter class="d-flex justify-content-between">
+					<Button Color="Color.Primary" @onclick="NavigateBack">Back</Button>
+					<div class="d-flex gap-2 ms-auto">
+						<Button Color="Color.Success" @onclick="ShowAcceptConfirmation">Accept</Button>
+						<Button Color="Color.Danger" @onclick="ShowRejectConfirmation">Reject</Button>
+					</div>
+				</CardFooter>
+			</Card>
+
+			<br />
+			<Card class="mb-4">
+				<CardHeader class="bg-primary text-white">
+					<Heading Size="HeadingSize.Is3">Last Feedback:</Heading>
+				</CardHeader>
+
+				@if (article?.Description != null && article.Description.Any())
 				{
-					<Skeleton>
-						<SkeletonItem ColumnSize="ColumnSize.Is6" />
-					</Skeleton>
-				}
-				else if (!string.IsNullOrEmpty(ErrorMessage))
-				{
-					<Alert Color="Color.Danger" IsDismissable="true">
-						<strong>Error:</strong> @ErrorMessage
-					</Alert>
+					@foreach (var review in article.Description)
+					{
+						<CardBody class="border rounded shadow-sm mb-3 p-3">
+							@if (IsLoading)
+							{
+								<Skeleton>
+									<SkeletonItem ColumnSize="ColumnSize.Is6" />
+								</Skeleton>
+							}
+							else
+							{
+								<div class="d-flex justify-content-between">
+									<div>
+										<p class="font-weight-bold">@review.Description</p>
+										<small class="text-muted">
+											Submitted on: @review.CreatedAt.ToString("MMMM dd, yyyy")
+										</small>
+									</div>
+								</div>
+							}
+						</CardBody>
+					}
 				}
 				else
 				{
-					<dl class="row">
-						<dt class="col-sm-3">Article Title</dt>
-						<dd class="col-sm-9">@article.Title</dd>
-
-						<dt class="col-sm-3">Article Abstract</dt>
-						<dd class="col-sm-9">@article.Abstract</dd>
-
-						<dt class="col-sm-3">Status</dt>
-						<dd class="col-sm-9">
-							<span class="badge
-                                @(article.Status == "PENDING" ? "bg-warning" :
-                                  article.Status == "ACCEPTED" ? "bg-success" : "bg-danger")">
-								@article.Status
-							</span>
-						</dd>
-
-						<dt class="col-sm-3">Keywords</dt>
-						<dd class="col-sm-9">@article.Keywords</dd>
-					</dl>
-
-					<!-- Text Box for Additional Feedback -->
-					<div class="mb-3">
-						<Label for="reviewFeedback">Provide Feedback:</Label>
-						<textarea class="form-control" id="reviewFeedback" rows="3" @bind="Feedback">@article.Description</textarea>
-					</div>
-					<Button Color="Color.Secondary">
-						<a href="@($"https://localhost:7267/api/File/download/{article.File}")" target="_blank" class="text-white text-decoration-none">
-							Download
-						</a>
-					</Button>
-
-				}
-			</CardBody>
-			<CardFooter class="d-flex justify-content-between">
-				<Button Color="Color.Primary" @onclick="NavigateBack">Back</Button>
-				<div class="d-flex gap-2 ms-auto">
-					<Button Color="Color.Success" @onclick="ShowAcceptConfirmation">Accept</Button>
-					<Button Color="Color.Danger" @onclick="ShowRejectConfirmation">Reject</Button>
-				</div>
-			</CardFooter>
-		</Card>
-
-		<br />
-		<Card class="mb-4">
-			<CardHeader class="bg-primary text-white">
-				<Heading Size="HeadingSize.Is3">Last Feedback:</Heading>
-			</CardHeader>
-
-			@if (article?.Description != null && article.Description.Any())
-			{
-				@foreach (var review in article.Description)
-				{
-					<CardBody class="border rounded shadow-sm mb-3 p-3">
-						@if (IsLoading)
-						{
-							<Skeleton>
-								<SkeletonItem ColumnSize="ColumnSize.Is6" />
-							</Skeleton>
-						}
-						else
-						{
-							<div class="d-flex justify-content-between">
-								<div>
-									<p class="font-weight-bold">@review.Description</p>
-									<small class="text-muted">
-										Submitted on: @review.CreatedAt.ToString("MMMM dd, yyyy")
-									</small>
-								</div>
-							</div>
-						}
+					<CardBody class="text-center">
+						<p class="text-muted">No feedback available.</p>
 					</CardBody>
 				}
-			}
-			else
-			{
-				<CardBody class="text-center">
-					<p class="text-muted">No feedback available.</p>
-				</CardBody>
-			}
-		</Card>
+			</Card>
 
-		<!-- Toast Container -->
-		<Div Position="Position.Relative" Width="Width.Is100" Height="Height.Rem(5)">
-			@toast
-		</Div>
+			<!-- Toast Container -->
+			<Div Position="Position.Relative" Width="Width.Is100" Height="Height.Rem(5)">
+				@toast
+			</Div>
 
-		<!-- Modal Confirmation for Accept/Reject -->
-		<div class="modal fade @((IsModalVisible ? "show" : ""))" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true" style="display: @(IsModalVisible ? "block" : "none")">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="modalLabel">Confirm Action</h5>
-						<button type="button" class="btn-close" aria-label="Close" @onclick="CancelAction"></button>
-					</div>
-					<div class="modal-body">
-						<p>Are you sure you want to <strong>@ConfirmationAction</strong> this article?</p>
-						<p><strong>Article Title:</strong> @article.Title</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" @onclick="CancelAction">Cancel</button>
-						@if (ConfirmationAction == "Accept")
-						{
-							<button type="button" class="btn btn-success" @onclick="ConfirmAction">@ConfirmationAction</button>
+			<!-- Modal Confirmation for Accept/Reject -->
+			<div class="modal fade @((IsModalVisible ? "show" : ""))" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true" style="display: @(IsModalVisible ? "block" : "none")">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="modalLabel">Confirm Action</h5>
+							<button type="button" class="btn-close" aria-label="Close" @onclick="CancelAction"></button>
+						</div>
+						<div class="modal-body">
+							<p>Are you sure you want to <strong>@ConfirmationAction</strong> this article?</p>
+							<p><strong>Article Title:</strong> @article.Title</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" @onclick="CancelAction">Cancel</button>
+							@if (ConfirmationAction == "Accept")
+							{
+								<button type="button" class="btn btn-success" @onclick="ConfirmAction">@ConfirmationAction</button>
 
-						}
-						@if (ConfirmationAction == "Reject")
-						{
-							<button type="button" class="btn btn-danger" @onclick="ConfirmAction">@ConfirmationAction</button>
+							}
+							@if (ConfirmationAction == "Reject")
+							{
+								<button type="button" class="btn btn-danger" @onclick="ConfirmAction">@ConfirmationAction</button>
 
-						}
+							}
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-</Layout>
+	</Layout>
+}
+else
+{
+	NavigationManager.NavigateTo("/unauthorized");
+}
 
 @code {
 	[Parameter]
@@ -158,12 +177,34 @@
 	private bool IsModalVisible = false;
 	private string ConfirmationAction;
 
+	private string role = "";
+	private bool isLoading = true;
+
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
 		{
-			await LoadReview();
-			StateHasChanged();
+			try
+			{
+				role = await tokenManager.GetUserRoleAsync();
+				if (role != "Reviewer")
+				{
+					NavigationManager.NavigateTo("/unauthorized");
+				}
+				else
+				{
+					await LoadReview();
+				}
+			}
+			catch (Exception ex)
+			{
+				ErrorMessage = $"Error: {ex.Message}";
+			}
+			finally
+			{
+				isLoading = false;
+				StateHasChanged();
+			}
 		}
 	}
 

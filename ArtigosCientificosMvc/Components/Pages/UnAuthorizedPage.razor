@@ -1,0 +1,28 @@
+﻿@page "/unauthorized"
+
+<PageTitle>Unauthorized</PageTitle>
+
+<div class="d-flex align-items-center justify-content-center vh-100">
+    <div class="card text-center shadow-sm" style="max-width: 400px; width: 100%;">
+        <div class="card-header bg-danger text-white">
+            <h4>Access Denied</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Unauthorized Access</h5>
+            <p class="card-text">
+                Your account does not have permission to access this page.<br />
+                Please contact your administrator if you believe this is an error.
+            </p>
+            <a href="/Home" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Go Back to Home
+            </a>
+        </div>
+        <div class="card-footer text-muted">
+            <small>&copy; 2024 Your Application</small>
+        </div>
+    </div>
+</div>
+
+@code {
+
+}
