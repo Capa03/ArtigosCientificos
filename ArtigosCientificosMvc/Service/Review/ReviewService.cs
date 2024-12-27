@@ -11,10 +11,11 @@ public class ReviewService : IReviewService
     private readonly ConfigServer configServer;
     private readonly ILogger<ReviewService> _logger;
 
-    public ReviewService(ApiService apiService, ConfigServer configServer)
+    public ReviewService(ApiService apiService, ConfigServer configServer, ILogger<ReviewService> logger)
     {
         this.apiService = apiService;
         this.configServer = configServer;
+        this._logger = logger;
     }
 
     public async Task<List<ReviewWithArticleDTO>> GetAllReviewsByStatus(string Status)
@@ -86,7 +87,6 @@ public class ReviewService : IReviewService
         }
         catch (Exception ex)
         {
-            // Log or return an error response
             return new ObjectResult(new { Message = $"Error updating review with id '{id}': {ex.Message}" })
             {
                 StatusCode = (int)HttpStatusCode.InternalServerError
