@@ -7,6 +7,6 @@ namespace ArtigosCientificos.Api.Models.Review
         public int UserId { get; set; }
         public int ArticleId { get; set; }
         public string Status { get; set; } = "PENDING";
-        public string Description { get; set; }
+        public List<ReviewDescription> Description { get; set; }
     }
 }

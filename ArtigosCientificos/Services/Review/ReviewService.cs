@@ -35,7 +35,7 @@ namespace ArtigosCientificos.Api.Services.Reviews
 
         public async Task<ObjectResult> GetAllReviews()
         {
-            List<Review> reviews = _context.Reviews.ToList();
+            List<Review> reviews = _context.Reviews.Include(r => r.Description).ToList();
 
             if (reviews.Count == 0)
             {
@@ -117,9 +117,26 @@ namespace ArtigosCientificos.Api.Services.Reviews
                 return new NotFoundObjectResult("Review not found");
             }
 
+            ReviewDescription reviewDescription = new ReviewDescription
+            {
+                ReviewId = id,
+                Description = review.Description
+            };
+            if (!string.IsNullOrEmpty(review.Description))
+            {
+                await _context.ReviewDescriptions.AddAsync(reviewDescription);
+                await _context.SaveChangesAsync();
+            }
+            // Add a new review description
+
             _context.Entry(reviewToUpdate).CurrentValues.SetValues(review);
             await _context.SaveChangesAsync();
             return new OkObjectResult(reviewToUpdate);
+        }
+
+        public Task<ObjectResult> GetDescriptionsFromReview(int reviewId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

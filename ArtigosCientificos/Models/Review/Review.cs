@@ -16,7 +16,7 @@ namespace ArtigosCientificos.Api.Models.Review
         [JsonIgnore]
         public Article.Article Article { get; set; }
         public string Status { get; set; } = "PENDING";
-        public string Description { get; set; } = "";
+        public List<ReviewDescription> Description { get; set; } = new List<ReviewDescription>();
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

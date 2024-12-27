@@ -80,5 +80,16 @@ namespace ArtigosCientificos.Api.Controllers
             }
             return Ok(reviews.Value);
         }
+
+        [HttpGet("Descriptions/{id:int}")]
+        public async Task<IActionResult> GetDescriptionsFromReview(int id)
+        {
+            ObjectResult descriptions = await reviewService.GetDescriptionsFromReview(id);
+            if (descriptions.StatusCode == (int)HttpStatusCode.NotFound)
+            {
+                return NotFound(descriptions.Value);
+            }
+            return Ok(descriptions.Value);
+        }
     }
 }

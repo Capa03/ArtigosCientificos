@@ -19,7 +19,7 @@ namespace ArtigosCientificos.Api.Data
         public DbSet<Article>? Articles { get; set; }
         public DbSet<Review>? Reviews { get; set; }
 
-
+        public DbSet<ReviewDescription>? ReviewDescriptions { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

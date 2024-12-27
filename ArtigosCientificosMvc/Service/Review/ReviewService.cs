@@ -42,7 +42,7 @@ public class ReviewService : IReviewService
         try
         {
             ReviewWithArticleDTO review = await this.apiService.GetTAsync<ReviewWithArticleDTO>(configServer.GetReviewsByIdUrl(id));
-
+            Console.WriteLine("REVIEW COUNTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" + review.Description.Count);
             if (review == null)
             {
                 return null;

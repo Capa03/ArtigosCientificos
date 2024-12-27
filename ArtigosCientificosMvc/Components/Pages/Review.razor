@@ -75,25 +75,35 @@
 			<CardHeader>
 				<Heading Size="HeadingSize.Is3">Last Feedback: </Heading>
 			</CardHeader>
-			<CardBody>
-				@if (IsLoading)
+
+			@if (article?.Description != null && article.Description.Any())
+			{
+				@foreach (var review in article.Description)
 				{
-					<Skeleton>
-						<SkeletonItem ColumnSize="ColumnSize.Is6" />
-					</Skeleton>
+		
+						<CardBody>
+							@if (IsLoading)
+							{
+								<Skeleton>
+									<SkeletonItem ColumnSize="ColumnSize.Is6" />
+								</Skeleton>
+							}
+							else
+							{
+								<p>@review.Description</p>
+							}
+						</CardBody>
+					
 				}
-				else if (string.IsNullOrEmpty(article.Description))
-				{
-					<Alert Color="Color.Danger" IsDismissable="true">
-						<strong>Error:</strong> This article doesn't have feedback yet.
-					</Alert>
-				}
-				else
-				{
-					<p>@article.Description</p> 
-				}
-			</CardBody>
+			}
+			else
+			{
+				<CardBody>
+					<p>No feedback available.</p>
+				</CardBody>
+			}
 		</Card>
+
 
 
 		<!-- Toast Container -->
