@@ -1,0 +1,50 @@
+﻿
+<Bar Breakpoint="Breakpoint.Desktop"
+     Background="Background.Light"
+     ThemeContrast="ThemeContrast.Light">
+    <BarToggler />
+
+    <BarMenu>
+        <BarStart>
+            <div class="searchBarr">
+            <BarItem>
+                    <TextEdit Placeholder="Search..." />
+            </BarItem>
+            </div>
+            
+
+            <BarItem>
+                <BarLink>
+                    <Icon Name="IconName.Search"></Icon>
+                </BarLink>
+            </BarItem>
+            <BarItem>
+                <BarDropdown>
+                    <BarDropdownToggle>Filters</BarDropdownToggle>
+
+
+                    <BarDropdownMenu>
+                        
+                    </BarDropdownMenu>
+                </BarDropdown>
+            </BarItem>
+        </BarStart>
+        <BarEnd>
+            <BarItem>
+                <Button Color="Color.Primary">Login</Button>
+                <Button Color="Color.Secondary">Register</Button>
+            </BarItem>
+        </BarEnd>
+    </BarMenu>
+</Bar>
+
+
+
+@code {
+    Task OnButtonClicked()
+    {
+        
+
+        return Task.CompletedTask;
+    }
+}
