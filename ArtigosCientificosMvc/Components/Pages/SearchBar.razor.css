@@ -11,3 +11,47 @@
 .container{
     
 }
+
+.filter{
+    display: flex;
+    width: 100vw;
+    height: 30vh;
+    background-color: blue;
+}
+
+/* Full-Screen Overlay */
+.filters-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    z-index: 1050; /* Above other elements */
+    justify-content: center;
+    align-items: center;
+    color: #fff; /* White text for contrast */
+}
+
+/* Centered Content */
+.filters-content {
+    background-color: #fff; /* White background for the content */
+    color: #000; /* Black text for readability */
+    border-radius: 8px;
+    padding: 20px;
+    width: 80%; /* Adjust as needed */
+    max-width: 600px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+    /* Full-Screen Styling for Inputs */
+    .filters-content label {
+        display: block;
+        margin: 10px 0 5px;
+    }
+
+    .filters-content .form-control {
+        margin-bottom: 15px;
+    }
