@@ -15,6 +15,13 @@ namespace ArtigosCientificos.Api.Services.Articles
         Task<ObjectResult> GetAllArticles();
 
         /// <summary>
+        /// Retrieves a new specific Article in the system.
+        /// </summary>
+        /// <param name="article">The article details to be created.</param>
+        /// <returns>An <see cref="ObjectResult"/> indicating the outcome of the creation operation.</returns>
+        //Task<ObjectResult> GetArticles(int id);
+
+        /// <summary>
         /// Creates a new article in the system.
         /// </summary>
         /// <param name="article">The article details to be created.</param>

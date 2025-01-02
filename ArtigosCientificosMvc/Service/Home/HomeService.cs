@@ -39,5 +39,29 @@ namespace ArtigosCientificosMvc.Service.Home
                 return new List<Article>(); 
             }
         }
+
+
+        /*public async Task<Article> getArticle(int id)
+        {
+            try
+            {
+                Article article = await _apiService.GetTAsync<Article>(_configServer.GetArticleByIdUrl(id));
+
+                if (article == null)
+                {
+                    _logger.LogWarning("No article found.");
+                    return new Article();
+                }
+
+                return article;
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "Error occurred while fetching articles.");
+
+                return new Article();
+            }
+        }*/
     }
 }

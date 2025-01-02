@@ -1,0 +1,77 @@
+﻿@page "/Article/{id:int}"
+@using ArtigosCientificosMvc.Models.Article
+@using ArtigosCientificosMvc.Models
+@using ArtigosCientificosMvc.Service.Home
+@inject IHomeService homeService
+@rendermode InteractiveServer
+
+
+@if (isLoading)
+{
+    <div class="flex justify-center items-center">
+        <div class="spinner-border text-blue-500" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+}
+else if (articles == null || articles.Count == 0)
+{
+    <div class="text-center">
+        <p class="text-gray-500">No articles available.</p>
+    </div>
+}
+else
+{
+    @if (selectedArticle != null)
+    {
+        <div class="article-container">
+            <!-- Title -->
+            <div class="article-field">
+                <strong>Title:</strong>@selectedArticle.Title
+            </div>
+            <!-- Publish Date -->
+            <div class="article-field">
+                <strong>Publish Date:</strong> 2024-12-29
+            </div>
+            <!-- Author -->
+            <div class="article-field">
+                <strong>Author:</strong> John Doe
+            </div>
+            <!-- Abstract -->
+            <div class="article-field" style="height: 150px; overflow-y: auto;">
+                <strong>Abstract:</strong>@selectedArticle.Abstract
+            </div>
+            <!-- Buttons -->
+            <div class="article-buttons">
+                <button class="btn btn-secondary">Download</button>
+                <button class="btn btn-primary">Open PDF in Browser</button>
+            </div>
+        </div>
+    }
+
+}
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Article selectedArticle;
+
+    private List<Article> articles;
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            articles = await homeService.getArticles();
+            selectedArticle = articles.FirstOrDefault(a => a.Id == Id);
+            isLoading = false;
+            StateHasChanged();
+        }
+
+    }
+}

@@ -30,6 +30,19 @@ namespace ArtigosCientificos.Api.Controllers
             return Ok(articles.Value);
         }
 
+        /*[HttpGet("articles")]
+        public async Task<IActionResult> GetArticleById(int id)
+        {
+            ObjectResult article = await _articleService.GetArticleB();
+
+            if (articles.StatusCode == (int)HttpStatusCode.NotFound)
+            {
+                return NotFound(articles.Value);
+            }
+
+            return Ok(articles.Value);
+        }
+        */
         [HttpPost("articles")]
         [Authorize(Roles = "Researcher")]
         public async Task<IActionResult> CreateArticle(ArticleDTO article)

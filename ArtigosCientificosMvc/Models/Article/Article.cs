@@ -4,6 +4,8 @@ namespace ArtigosCientificosMvc.Models.Article
 {
     public class Article
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "Title is required.")]
         [StringLength(100, ErrorMessage = "Title must be less than 100 characters.")]
         public string Title { get; set; }

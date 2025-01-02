@@ -75,6 +75,12 @@ namespace ArtigosCientificosMvc.Service
             return this._baseUrl + "Review/" + id;
         }
 
+
+        /*public string GetArticleByIdUrl(int id)
+        {
+            return this._baseUrl + "Articles/" + id;
+        }*/
+
         /// <summary>
         /// Gets the URL for updating a specific review by its ID.
         /// </summary>

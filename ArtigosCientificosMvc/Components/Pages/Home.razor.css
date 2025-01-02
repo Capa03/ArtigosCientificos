@@ -1,0 +1,22 @@
+﻿.container {
+    max-width: 1200px; /* Limits content width for better layout */
+}
+
+/* Add a hover effect */
+.hover\:bg-gray-100:hover {
+    background-color: #f7fafc; /* Light gray background on hover */
+}
+
+/* Improve spacing */
+.px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.mt-6 {
+    margin-top: 1.5rem;
+}
+
+.space-y-6 > * + * {
+    margin-top: 1.5rem;
+}
