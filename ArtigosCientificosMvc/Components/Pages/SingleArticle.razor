@@ -3,6 +3,7 @@
 @using ArtigosCientificosMvc.Models
 @using ArtigosCientificosMvc.Service.Home
 @inject IHomeService homeService
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 
@@ -43,8 +44,17 @@ else
             </div>
             <!-- Buttons -->
             <div class="article-buttons">
-                <button class="btn btn-secondary">Download</button>
-                <button class="btn btn-primary">Open PDF in Browser</button>
+
+
+                <Button @onclick="()=>DownloadPDF(selectedArticle.File)" Color="Color.Primary">
+                    Download
+                </Button>
+
+                <Button Color="Color.Secondary">
+                    <a href="@($"https://localhost:7267/api/File/showPdf/{selectedArticle.File}")" target="_blank" class="text-white text-decoration-none">
+                        Open PDF in Browser
+                    </a>
+                </Button>
             </div>
         </div>
     }
@@ -73,5 +83,15 @@ else
             StateHasChanged();
         }
 
+    }
+
+    private void DownloadPDF(string fileName)
+    {
+        NavigationManager.NavigateTo($"https://localhost:7267/api/File/download/{fileName}");
+    }
+
+    private void OpenPdfInBrowser(string fileName)
+    {
+        NavigationManager.NavigateTo($"https://localhost:7267/api/File/showPdf/{fileName}");
     }
 }

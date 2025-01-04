@@ -24,6 +24,11 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 
 // Add services to the container.
 
+// Pdf Domain to Open PDF in the Browser
+builder.Services.AddHttpClient("PdfDomain", client => {
+    client.BaseAddress = new Uri("https://localhost:7267/");
+});
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -121,6 +126,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowSpecificOrigins");
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 
