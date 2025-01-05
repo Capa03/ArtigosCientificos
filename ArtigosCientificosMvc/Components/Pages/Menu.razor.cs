@@ -71,7 +71,7 @@ namespace ArtigosCientificosMvc.Components.Pages
             loggedIn = false;
             username = string.Empty;
             StateHasChanged();
-            Navigation.NavigateTo("Login");
+            Navigation.NavigateTo("Home");
         }
     }
 }
