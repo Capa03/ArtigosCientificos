@@ -52,6 +52,7 @@ namespace ArtigosCientificos.Api.Services.Reviews
                     article => article.Id,
                     (review, article) => new ReviewWithArticleDTO
                     {
+                        AuthorId = review.UserId,
                         ReviewId = review.Id,
                         Status = review.Status,
                         ArticleId = article.Id,
@@ -78,6 +79,7 @@ namespace ArtigosCientificos.Api.Services.Reviews
                     article => article.Id,
                     (review, article) => new ReviewWithArticleDTO
                     {
+                        AuthorId = review.UserId,
                         ReviewId = review.Id,
                         Status = review.Status,
                         ArticleId = article.Id,
