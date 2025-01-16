@@ -1,17 +1,34 @@
-﻿
-@using ArtigosCientificosMvc.Service.Token
+﻿@using ArtigosCientificosMvc.Service.Token
 @using Blazorise
 @rendermode InteractiveServer
 
 @inject TokenManager TokenManager
+@inject NavigationManager NavigationManager
 @inject NavigationManager Navigation
+
 
 
 @if (!loggedIn)
 {
-    <!-- Not logged in -->
 
-    <SearchBar></SearchBar>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/Home">Scientific Platform</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Not logged in -->
+            @if (!ShouldHideComponent && !ShouldHideComponent1)
+            {
+                <SearchBar></SearchBar>
+
+                <div class="input-group-append">
+                    <a class="btn btn-outline-secondary" href="/Login">Login</a>
+                </div>
+
+                <div class="input-group-append">
+                    <a class="btn btn-secundary" href="/Register">Register</a>
+                </div>
+            }
+        </div>
+    </nav>
     <!--
     <div>
         <a class="navbar-brand" href="/Login">Login</a>
@@ -52,4 +69,36 @@
     </Dropdown>
 }
 
+@code {
+    private bool ShouldHideComponent;
+    private bool ShouldHideComponent1;
+
+    protected override void OnInitialized()
+    {
+        // Set initial state
+        UpdateComponentVisibility();
+
+        // Subscribe to navigation changes
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        // Update visibility when the location changes
+        UpdateComponentVisibility();
+        StateHasChanged(); // Refresh the UI
+    }
+
+    private void UpdateComponentVisibility()
+    {
+        ShouldHideComponent = NavigationManager.Uri.Contains("/Login", StringComparison.OrdinalIgnoreCase);
+        ShouldHideComponent1 = NavigationManager.Uri.Contains("/Register", StringComparison.OrdinalIgnoreCase);
+    }
+
+    public void Dispose()
+    {
+        // Unsubscribe from navigation changes to avoid memory leaks
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}
 

@@ -1,6 +1,7 @@
 ﻿using ArtigosCientificos.Api.Data;
 using ArtigosCientificos.Api.Models.Article;
 using ArtigosCientificos.Api.Models.Review;
+using ArtigosCientificos.Api.Models.User;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -57,8 +58,6 @@ namespace ArtigosCientificos.Api.Services.Articles
             return new OkObjectResult(articles);
         }
 
-
-
         public async Task<ObjectResult> GetAllArticles()
         {
             List<Article> articles = _context.Articles.ToList();
@@ -69,6 +68,18 @@ namespace ArtigosCientificos.Api.Services.Articles
             }
 
             return new OkObjectResult(articles);
+        }
+
+        public async Task<ObjectResult> GetUsers()
+        {
+            List<User> users = _context.Users.ToList();
+
+            if (users.Count == 0)
+            {
+                return new NotFoundObjectResult("No articles found");
+            }
+
+            return new OkObjectResult(users);
         }
 
     }

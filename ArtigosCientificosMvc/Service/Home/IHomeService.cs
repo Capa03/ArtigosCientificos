@@ -1,4 +1,5 @@
 ﻿using ArtigosCientificosMvc.Models.Article;
+using ArtigosCientificosMvc.Models.User;
 
 namespace ArtigosCientificosMvc.Service.Home
 {
@@ -12,6 +13,7 @@ namespace ArtigosCientificosMvc.Service.Home
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation. The task result is a <see cref="List{Article}"/> containing the retrieved articles.</returns>
         Task<List<Article>> getArticles();
-        //Task<Article> getArticle(int id);
+
+        Task<List<User>> getUsers();
     }
 }

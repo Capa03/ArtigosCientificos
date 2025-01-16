@@ -25,8 +25,13 @@ namespace ArtigosCientificosMvc.Components.Pages
                 loggedIn = await TokenManager.IsUserAuthenticated();
                 if (loggedIn)
                 {
+                    
                     userRole = await TokenManager.GetUserRoleAsync();
                     User user = await TokenManager.GetUserAsync();
+                    if (user.Username == null)
+                    {
+                        await TokenManager.RemoveTokenAsync();
+                    }
                     username = user.Username;
                 }
                 else

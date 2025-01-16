@@ -1,4 +1,5 @@
 ﻿using ArtigosCientificosMvc.Models.Article;
+using ArtigosCientificosMvc.Models.User;
 using ArtigosCientificosMvc.Service.Api;
 using Microsoft.Extensions.Logging;
 
@@ -40,6 +41,28 @@ namespace ArtigosCientificosMvc.Service.Home
             }
         }
 
+        public async Task<List<User>> getUsers()
+        {
+            try
+            {
+                List<User> users = await _apiService.GetTAsync<List<User>>(_configServer.GetUsersArticleUrl());
+
+                if (users == null || !users.Any())
+                {
+                    _logger.LogWarning("No articles found.");
+                    return new List<User>();
+                }
+
+                return users;
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "Error occurred while fetching articles.");
+
+                return new List<User>();
+            }
+        }
 
         /*public async Task<Article> getArticle(int id)
         {

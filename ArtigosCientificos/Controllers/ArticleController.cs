@@ -4,6 +4,9 @@ using ArtigosCientificos.Api.Services.Articles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ArtigosCientificos.Api.Models.User;
+using ArtigosCientificos.Api.Services.Author;
+using ArtigosCientificos.Api.Services.AuthService;
 
 namespace ArtigosCientificos.Api.Controllers
 {
@@ -12,7 +15,8 @@ namespace ArtigosCientificos.Api.Controllers
     public class ArticleController : ControllerBase
     {
         private readonly IArticleService _articleService;
-        public ArticleController(IArticleService articleService)
+
+        public ArticleController(IArticleService articleService, IAuthorService authorService)
         {
             _articleService = articleService;
         }
@@ -28,6 +32,21 @@ namespace ArtigosCientificos.Api.Controllers
             }
 
             return Ok(articles.Value);
+        }
+
+        [HttpGet("users")]
+        //[Authorize]
+        public async Task<ActionResult<List<User>>> GetAllUsers()
+        {
+
+            ObjectResult objectResult = await _articleService.GetUsers();
+
+            if (objectResult.StatusCode == (int)HttpStatusCode.NotFound)
+            {
+                return NotFound(objectResult.Value);
+            }
+
+            return Ok(objectResult.Value);
         }
 
         /*[HttpGet("articles")]

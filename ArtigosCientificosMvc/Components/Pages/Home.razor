@@ -9,7 +9,65 @@
 <PageTitle>Home</PageTitle>
 
 <h1 class="text-center text-2xl font-semibold my-4">Published Articles</h1>
+<style>
+    .container {
+    max-width: 1200px; /* Limits content width for better layout */
+    }
 
+    /* Add a hover effect */
+    .hover\:bg-gray-100:hover {
+    background-color: #f7fafc; /* Light gray background on hover */
+    }
+
+    /* Improve spacing */
+    .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    }
+
+    .mt-6 {
+    margin-top: 1.5rem;
+    }
+
+    .space-y-6 > * + * {
+    margin-top: 1.5rem;
+    }
+
+    .card {
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+    max-width: 20000px !important;
+    }
+
+    .card h3 {
+    margin: 0 0 10px !important;
+    font-size: 18px !important;
+    }
+
+    .card p {
+    margin: 5px 0 !important;
+    color: #555 !important;
+    font-size: 14px !important;
+    }
+
+    .card a {
+    color: #007BFF !important;
+    text-decoration: none !important;
+    }
+
+    .card a:hover {
+    text-decoration: underline !important;
+    }
+
+    .card .meta {
+    margin-top: 10px !important;
+    font-size: 12px !important;
+    color: #777 !important;
+    }
+</style>
 @if (isLoading)
 {
     <div class="flex justify-center items-center">
@@ -26,31 +84,16 @@ else if (articles == null || articles.Count == 0)
 }
 else
 {
-    <div class="container mx-auto px-4 mt-6 space-y-6">
     @foreach (var article in articles)
     {
-            <a @onclick="() => NavigateToDetails(article.Id)" class="block">
-            <div class="w-full bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 hover:bg-gray-100">
-                <div class="p-6">
-                    <!-- Article Title -->
-                    <h2 class="text-2xl font-bold text-blue-600 truncate mb-4">@article.Title</h2>
-                    
-                    <!-- Article Abstract -->
-                    <p class="text-gray-700 text-base leading-relaxed mb-4">
-                        @((article.Abstract.Length > 300) ? article.Abstract.Substring(0, 300) + "..." : article.Abstract)
-                    </p>
-                    
-                    <!-- Article Metadata -->
-                    <div class="text-sm text-gray-500">
-                        <p><strong>Keywords:</strong> @article.Keywords</p>
-                    </div>
-                </div>
-            </div>
-        </a>
+
+        <div class="card">
+            <h3><a href="" @onclick="() => NavigateToDetails(article.Id)">@article.Title</a></h3>
+            <p><strong>Published by:</strong> @GetAuthorUsername(article.UserId) </p>
+            <p><strong>Abstract:</strong> @((article.Abstract.Length > 300) ? article.Abstract.Substring(0, 300) + "..." : article.Abstract)</p>
+            <p><strong>Keywords:</strong> @article.Keywords</p>
+        </div>
     }
-    </div>
-
-
 }
 
 @code{
@@ -60,7 +103,13 @@ else
         NavigationManager.NavigateTo($"/Article/{id}");
     }
 
+    private string GetAuthorUsername(int authorid){
+        return users[authorid - 1].Username;
+    }
+
+    private string user;
     private List<Article> articles;
+    private List<User> users;
     private bool isLoading = true;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -68,6 +117,7 @@ else
         if (firstRender)
         {
             articles = await homeService.getArticles();
+            users = await homeService.getUsers();
             isLoading = false;
             StateHasChanged();
         }
