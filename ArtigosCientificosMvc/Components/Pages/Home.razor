@@ -6,68 +6,74 @@
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
+
 <PageTitle>Home</PageTitle>
+
+
 
 <h1 class="text-center text-2xl font-semibold my-4">Published Articles</h1>
 <style>
     .container {
-    max-width: 1200px; /* Limits content width for better layout */
+        max-width: 1200px; /* Limits content width for better layout */
     }
 
     /* Add a hover effect */
     .hover\:bg-gray-100:hover {
-    background-color: #f7fafc; /* Light gray background on hover */
+        background-color: #f7fafc; /* Light gray background on hover */
     }
 
     /* Improve spacing */
     .px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     .mt-6 {
-    margin-top: 1.5rem;
+        margin-top: 1.5rem;
     }
 
     .space-y-6 > * + * {
-    margin-top: 1.5rem;
+        margin-top: 1.5rem;
     }
 
     .card {
-    border: 1px solid #ddd !important;
-    border-radius: 8px !important;
-    padding: 16px !important;
-    margin-bottom: 20px !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
-    max-width: 20000px !important;
+        border: 1px solid #ddd !important;
+        border-radius: 8px !important;
+        padding: 16px !important;
+        margin-bottom: 20px !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+        max-width: 20000px !important;
     }
 
-    .card h3 {
-    margin: 0 0 10px !important;
-    font-size: 18px !important;
-    }
+        .card h3 {
+            margin: 0 0 10px !important;
+            font-size: 18px !important;
+        }
 
-    .card p {
-    margin: 5px 0 !important;
-    color: #555 !important;
-    font-size: 14px !important;
-    }
+        .card p {
+            margin: 5px 0 !important;
+            color: #555 !important;
+            font-size: 14px !important;
+        }
 
-    .card a {
-    color: #007BFF !important;
-    text-decoration: none !important;
-    }
+        .card a {
+            color: #007BFF !important;
+            text-decoration: none !important;
+        }
 
-    .card a:hover {
-    text-decoration: underline !important;
-    }
+            .card a:hover {
+                text-decoration: underline !important;
+            }
 
-    .card .meta {
-    margin-top: 10px !important;
-    font-size: 12px !important;
-    color: #777 !important;
-    }
+        .card .meta {
+            margin-top: 10px !important;
+            font-size: 12px !important;
+            color: #777 !important;
+        }
 </style>
+
+
+
 @if (isLoading)
 {
     <div class="flex justify-center items-center">
@@ -84,31 +90,93 @@ else if (articles == null || articles.Count == 0)
 }
 else
 {
+    <form @onsubmit="SearchByString">
+        <input type="text" @bind="searchString" class="form-control" placeholder="Search..." />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <form>
+        <div class="filters-content">
+            <h3>Filters</h3>
+            <label for="category">Category</label>
+            <select name="category" id="category" class="form-control mb-2">
+                <option value="">All Categories</option>
+                <option value="biology">Biology</option>
+                <option value="physics">Physics</option>
+            </select>
+            <label for="author">Author</label>
+            <select name="author" id="author" class="form-control mb-2">
+                <option value="">All Authors</option>
+                @foreach (var user in users)
+                {
+                    <option value="@user.Id"> @user.Username </option>
+                }
+            </select>
+
+            <label for="views">Views</label>
+            <select name="views" id="views" class="form-control mb-2">
+                <option value="">None</option>
+                <option value="author1">Most Viewed</option>
+                <option value="author2">Least Viewed</option>
+            </select>
+
+            <label for="downloads">Downloads</label>
+            <select name="downloads" id="downloads" class="form-control mb-2">
+                <option value="">None</option>
+                <option value="author1">Most Downloaded</option>
+                <option value="author2">Least Downloded</option>
+            </select>
+            <label></label>
+
+            <button type="submit" class="btn btn-primary ml-2">Apply Filters</button>
+        </div>
+    </form>
+
     @foreach (var article in articles)
     {
 
         <div class="card">
             <h3><a href="" @onclick="() => NavigateToDetails(article.Id)">@article.Title</a></h3>
-            <p><strong>Published by:</strong> @GetAuthorUsername(article.UserId) </p>
-            <p><strong>Abstract:</strong> @((article.Abstract.Length > 300) ? article.Abstract.Substring(0, 300) + "..." : article.Abstract)</p>
-            <p><strong>Keywords:</strong> @article.Keywords</p>
+            <p><strong>Published by: </strong> @GetAuthorUsername(article.UserId) </p>
+            <p><strong>Abstract: </strong> @((article.Abstract.Length > 300) ? article.Abstract.Substring(0, 300) + "..." : article.Abstract)</p>
+            <p><strong>Keywords: </strong> @article.Keywords</p>
         </div>
     }
 }
 
-@code{
 
+
+@code {
+
+    private async void SearchByString()
+    {
+        this.articles = await homeService.getArticlesBySearch(searchString);
+        StateHasChanged();
+    }
+
+    // Navigate to Article on clicked
     private void NavigateToDetails(int id)
     {
         NavigationManager.NavigateTo($"/Article/{id}");
     }
 
-    private string GetAuthorUsername(int authorid){
+    // Instead of id, it will display the actual author name
+    private string GetAuthorUsername(int authorid)
+    {
         return users[authorid - 1].Username;
     }
 
+    private void UpdateFilters()
+    {
+
+    }
+
+    private string searchString = String.Empty;
+
     private string user;
     private List<Article> articles;
+    private List<Article> filteredArticles;
+
     private List<User> users;
     private bool isLoading = true;
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -118,9 +186,9 @@ else
         {
             articles = await homeService.getArticles();
             users = await homeService.getUsers();
+            filteredArticles = articles.ToList();
             isLoading = false;
             StateHasChanged();
         }
-
     }
 }

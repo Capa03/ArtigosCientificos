@@ -1,55 +1,13 @@
-﻿<!--
-<Bar Breakpoint="Breakpoint.Desktop"
-     Background="Background.Light"
-     ThemeContrast="ThemeContrast.Light">
-    <BarToggler />
-
-    <BarMenu>
-        <BarStart>
-            <div class="searchBarr">
-                <BarItem>
-                        <TextEdit Placeholder="Search..." />
-                </BarItem>
-            </div>
-            
-
-            <BarItem>
-                <BarLink>
-                    <Icon Name="IconName.Search"></Icon>
-                </BarLink>
-            </BarItem>
-            <BarItem>
-                <BarDropdown>
-                    <BarDropdownToggle>Filters</BarDropdownToggle>
-
-                    <BarDropdownMenu>
-                        <BarDropdownItem>
-
-                        <div class="filter"> </div>
-                        </BarDropdownItem>
-                    </BarDropdownMenu>
-                </BarDropdown>
-            </BarItem>
-        </BarStart>
-        <BarEnd>
-            <BarItem>
-                <Button Color="Color.Primary">Login</Button>
-                <Button Color="Color.Secondary">Register</Button>
-            </BarItem>
-        </BarEnd>
-    </BarMenu>
-</Bar>
--->
-
-
-
-
-    
-        <form class="form-inline ml-auto" method="get" action="/Search" style="width: 100%;">
+﻿<form class="form-inline ml-auto" method="get" style="width: 100%;">
             <div class="input-group" style="flex-grow: 1;">
                 <!-- Search Bar -->
-                <input type="text" name="query" class="form-control"
+
+
+                <input type="text" name="searchString" class="form-control"
                        placeholder="Search articles..." style="width: 60%;" />
+
+
+
                 <!-- Filters Button -->
                 <button class="btn btn-outline-secondary" type="button"
                         id="filtersToggle" onclick="toggleFilters()">

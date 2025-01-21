@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using ArtigosCientificos.Api.Models.User;
 using ArtigosCientificos.Api.Services.Author;
 using ArtigosCientificos.Api.Services.AuthService;
+using ArtigosCientificos.Api.Models.Category;
 
 namespace ArtigosCientificos.Api.Controllers
 {
@@ -34,6 +35,19 @@ namespace ArtigosCientificos.Api.Controllers
             return Ok(articles.Value);
         }
 
+        [HttpGet("categories")]
+        public async Task<ActionResult<List<Category>>> GetCategories()
+        {
+            ObjectResult objectResult = await _articleService.GetCategories();
+
+            if (objectResult.StatusCode == (int)HttpStatusCode.NotFound)
+            {
+                return NotFound(objectResult.Value);
+            }
+
+            return Ok(objectResult.Value);
+        }
+
         [HttpGet("users")]
         //[Authorize]
         public async Task<ActionResult<List<User>>> GetAllUsers()
@@ -49,19 +63,32 @@ namespace ArtigosCientificos.Api.Controllers
             return Ok(objectResult.Value);
         }
 
-        /*[HttpGet("articles")]
-        public async Task<IActionResult> GetArticleById(int id)
+        [HttpGet("search/")]
+        public async Task<IActionResult> GetAcceptedArticlesFiltered(ArticleFilteredDTO articleFilteredDTO)
         {
-            ObjectResult article = await _articleService.GetArticleB();
+            ObjectResult objectResult = await _articleService.GetAcceptedArticlesFiltered(articleFilteredDTO);
 
-            if (articles.StatusCode == (int)HttpStatusCode.NotFound)
+            if (objectResult.StatusCode == (int)HttpStatusCode.NotFound)
             {
-                return NotFound(articles.Value);
+                return NotFound(objectResult.Value);
             }
 
-            return Ok(articles.Value);
+            return Ok(objectResult.Value);
         }
-        */
+
+        [HttpGet("search/{searchString}")]
+        public async Task<IActionResult> GetApcceptedArticleByString(string searchString)
+        {
+            var result = await _articleService.GetArticlesBySearch(searchString);
+
+            if (result is NotFoundObjectResult notFound)
+            {
+                return NotFound("Review not found.");
+            }
+
+            return Ok(result.Value);
+        }
+
         [HttpPost("articles")]
         [Authorize(Roles = "Researcher")]
         public async Task<IActionResult> CreateArticle(ArticleDTO article)
@@ -77,6 +104,17 @@ namespace ArtigosCientificos.Api.Controllers
 
         [HttpGet("articles/accepted")]
         public async Task<IActionResult> GetAcceptedArticles()
+        {
+            ObjectResult articles = await _articleService.GetAcceptedArticles();
+            if (articles.StatusCode == (int)HttpStatusCode.NotFound)
+            {
+                return NotFound(articles.Value);
+            }
+            return Ok(articles.Value);
+        }
+
+        [HttpGet("articles/search")]
+        public async Task<IActionResult> Search()
         {
             ObjectResult articles = await _articleService.GetAcceptedArticles();
             if (articles.StatusCode == (int)HttpStatusCode.NotFound)

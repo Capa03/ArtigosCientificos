@@ -41,6 +41,29 @@ namespace ArtigosCientificosMvc.Service.Home
             }
         }
 
+        public async Task<List<Article>> getArticlesBySearch(string searchString)
+        {
+            try
+            {
+                List<Article> articles = await _apiService.GetTAsync<List<Article>>(_configServer.GetArticlesBySearch(searchString));
+
+                if (articles == null || !articles.Any())
+                {
+                    _logger.LogWarning("No articles found.");
+                    return new List<Article>();
+                }
+
+                return articles;
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "Error occurred while fetching articles.");
+
+                return new List<Article>();
+            }
+        }
+
         public async Task<List<User>> getUsers()
         {
             try

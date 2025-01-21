@@ -9,5 +9,6 @@ namespace ArtigosCientificos.Api.Models.Article
         public string Keywords { get; set; }
         public string File { get; set; }
         public int UserId { get; set; }
+        public int CategoryID { get; set; }
     }
 }

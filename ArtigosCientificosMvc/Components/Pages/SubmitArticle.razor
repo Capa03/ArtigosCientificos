@@ -1,5 +1,6 @@
 ﻿@page "/submitarticle"
 @using ArtigosCientificosMvc.Models.Article
+@using ArtigosCientificosMvc.Models.Category
 @using ArtigosCientificosMvc.Service.Articles
 @using ArtigosCientificosMvc.Service.Token
 @inject IArticleService articleService
@@ -34,7 +35,16 @@
                             <InputText id="keywords" class="form-control" @bind-Value="@article.Keywords" placeholder="Enter Article Keywords" />
                             <ValidationMessage For="@(() => article.Keywords)" />
                         </div>
-                        <FilePickerComponent OnFileSelected="HandleFileSelected"/>
+                        <div class="form-group">
+                            <label for="category">Categories</label>
+                            <select id="CategoryId">
+                                @foreach (Category categorie in categories)
+                                {
+                                    <option @bind="@categorie.CategoryId"> @categorie.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <FilePickerComponent OnFileSelected="HandleFileSelected" />
 
                         <div class="form-group text-center mt-4">
                             <button type="submit" class="btn btn-primary w-100">Submit</button>
@@ -57,6 +67,22 @@
     string? ErrorMessage { get; set; }
     private string selectedFileName;
 
+    private List<Category> categories = new List<Category>();
+
+    private async Task<List<Category>> GetCategories()
+    {
+        return await articleService.GetCategories();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            categories = await GetCategories();
+            StateHasChanged();
+        }
+    }
+
     private void HandleFileSelected(string fileName)
     {
         selectedFileName = fileName;
@@ -78,6 +104,8 @@
 
         ArticleResult articleResult = await articleService.Create(article);
 
+
+
         if (articleResult.Success)
         {
             Navigation.NavigateTo("/Home");
@@ -87,5 +115,6 @@
             ErrorMessage = articleResult.Message;
         }
     }
+
 
 }

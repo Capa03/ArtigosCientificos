@@ -15,5 +15,7 @@ namespace ArtigosCientificosMvc.Service.Home
         Task<List<Article>> getArticles();
 
         Task<List<User>> getUsers();
+
+        Task<List<Article>> getArticlesBySearch(string searchString);
     }
 }

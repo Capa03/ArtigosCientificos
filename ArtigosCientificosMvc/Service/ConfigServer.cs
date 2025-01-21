@@ -19,8 +19,6 @@ namespace ArtigosCientificosMvc.Service
             return this._baseUrl + "Auth/login";
         }
 
-
-
         /// <summary>
         /// Gets the URL for the registration endpoint.
         /// </summary>
@@ -82,6 +80,15 @@ namespace ArtigosCientificosMvc.Service
             return this._baseUrl + "Article/users/";
         }
 
+        public string GetCategoriesUrl()
+        {
+            return this._baseUrl + "Article/categories/";
+        }
+
+        public string GetArticlesBySearch(string searchString)
+        {
+            return this._baseUrl + "Article/search/" + searchString;
+        }
 
         /*public string GetArticleByIdUrl(int id)
         {

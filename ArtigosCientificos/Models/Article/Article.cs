@@ -22,5 +22,9 @@ namespace ArtigosCientificos.Api.Models.Article
         
         [JsonIgnore]
         public List<Review.Review> Reviews { get; set; }
+
+        public int CategoryId { get; set; }
+
+        public Category.Category? Category { get; set; }
     }
 }
