@@ -21,7 +21,7 @@ namespace ArtigosCientificos.Api.Services.Reviews
                 return new BadRequestObjectResult("Invalid review data.");
 
             Article article = _context.Articles.FirstOrDefault(a => a.Id == reviewDTO.ArticleId);
-            article.ReviewedAt = DateOnly.FromDateTime(DateTime.Now).ToString();
+            article.ReviewedAt = DateOnly.FromDateTime(DateTime.Now);
             _context.Articles.Update(article);
 
             var review = new Review

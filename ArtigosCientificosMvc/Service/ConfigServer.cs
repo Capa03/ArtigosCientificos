@@ -55,6 +55,11 @@ namespace ArtigosCientificosMvc.Service
             return this._baseUrl + "Article/articles/";
         }
 
+        public string GetArticlesByIdUrl(int id)
+        {
+            return this._baseUrl + "Article/articles/" + id;
+        }
+
         /// <summary>
         /// Gets the URL for creating articles.
         /// </summary>
@@ -84,11 +89,10 @@ namespace ArtigosCientificosMvc.Service
             return this._baseUrl + "Review/" + id;
         }
 
-
-        /*public string GetArticleByIdUrl(int id)
+        public string GetUserById(int id)
         {
-            return this._baseUrl + "Articles/" + id;
-        }*/
+            return this._baseUrl + "Author/users/" + id;
+        }
 
         /// <summary>
         /// Gets the URL for updating a specific review by its ID.
@@ -107,6 +111,11 @@ namespace ArtigosCientificosMvc.Service
         public string GetAcceptedArticlesUrl()
         {
             return this._baseUrl + "Article/articles/accepted";
+        }
+
+        public string IncrementDownloadsCounter(int id)
+        {
+            return this._baseUrl + "Article/article/downloadsCounter/" + id;
         }
     }
 }

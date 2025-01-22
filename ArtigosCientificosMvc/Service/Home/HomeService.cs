@@ -1,4 +1,5 @@
 ﻿using ArtigosCientificosMvc.Models.Article;
+using ArtigosCientificosMvc.Models.User;
 using ArtigosCientificosMvc.Service.Api;
 using Microsoft.Extensions.Logging;
 
@@ -15,6 +16,19 @@ namespace ArtigosCientificosMvc.Service.Home
             _configServer = configServer;
             _apiService = apiService;
             _logger = logger; 
+        }
+
+        public async Task<Article> GetArticle(int id)
+        {
+            Article article = await _apiService.GetTAsync<Article>(_configServer.GetArticlesByIdUrl(id));
+
+            if (article == null)
+            {
+                _logger.LogWarning("No article found.");
+                return new Article();
+            }
+
+            return article;
         }
 
         public async Task<List<Article>> getArticles()
@@ -40,28 +54,29 @@ namespace ArtigosCientificosMvc.Service.Home
             }
         }
 
-
-        /*public async Task<Article> getArticle(int id)
+        public async Task<User> GetUser(int id)
         {
-            try
-            {
-                Article article = await _apiService.GetTAsync<Article>(_configServer.GetArticleByIdUrl(id));
+            User user = await _apiService.GetTAsync<User>(_configServer.GetUserById(id));
 
-                if (article == null)
-                {
-                    _logger.LogWarning("No article found.");
-                    return new Article();
-                }
+            if (user == null) {
 
-                return article;
+                _logger.LogWarning("No user found.");
+                return new User();
             }
-            catch (Exception ex)
+            return user;
+        }
+
+        public async Task<Article> IncrementDownloadsCounter(int id)
+        {
+            Article article = await _apiService.GetTAsync<Article>(_configServer.GetUserById(id));
+
+            if (article == null)
             {
 
-                _logger.LogError(ex, "Error occurred while fetching articles.");
-
+                _logger.LogWarning("No article found.");
                 return new Article();
             }
-        }*/
+            return article;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿@page "/Article/{id:int}"
 @using ArtigosCientificosMvc.Models.Article
 @using ArtigosCientificosMvc.Models
+@using ArtigosCientificosMvc.Models.User
 @using ArtigosCientificosMvc.Service.Home
 @inject IHomeService homeService
 @inject NavigationManager NavigationManager
@@ -28,19 +29,19 @@ else
         <div class="article-container">
             <!-- Title -->
             <div class="article-field">
-                <strong>Title:</strong>@selectedArticle.Title
+                <strong>Title:</strong> @selectedArticle.Title
             </div>
             <!-- Publish Date -->
             <div class="article-field">
-                <strong>Publish Date:</strong> 2024-12-29
+                <strong>Publish Date:</strong> @selectedArticle.CreatedAt
             </div>
             <!-- Author -->
             <div class="article-field">
-                <strong>Author:</strong> John Doe
+                <strong>Author:</strong> @user.Username
             </div>
             <!-- Abstract -->
             <div class="article-field" style="height: 150px; overflow-y: auto;">
-                <strong>Abstract:</strong>@selectedArticle.Abstract
+                <strong>Abstract:</strong> @selectedArticle.Abstract
             </div>
             <!-- Buttons -->
             <div class="article-buttons">
@@ -68,7 +69,7 @@ else
     public int Id { get; set; }
 
     private Article selectedArticle;
-
+    private User user = new User();
     private List<Article> articles;
     private bool isLoading = true;
 
@@ -78,15 +79,27 @@ else
         if (firstRender)
         {
             articles = await homeService.getArticles();
-            selectedArticle = articles.FirstOrDefault(a => a.Id == Id);
+            selectedArticle = await GetArticle(Id);
+            user = await GetUser(selectedArticle);
             isLoading = false;
             StateHasChanged();
         }
 
     }
 
-    private void DownloadPDF(string fileName)
+    private async Task<Article> GetArticle(int id)
     {
+        return await homeService.GetArticle(id);
+    }
+
+    private async Task<User> GetUser(Article article)
+    {
+        return await homeService.GetUser(article.UserId);
+    }
+
+    private async void DownloadPDF(string fileName)
+    {
+		await homeService.IncrementDownloadsCounter(selectedArticle.Id);
         NavigationManager.NavigateTo($"https://localhost:7267/api/File/download/{fileName}");
     }
 

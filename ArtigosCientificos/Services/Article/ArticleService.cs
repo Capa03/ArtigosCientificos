@@ -1,8 +1,10 @@
-﻿using ArtigosCientificos.Api.Data;
+﻿
+using ArtigosCientificos.Api.Data;
 using ArtigosCientificos.Api.Models.Article;
 using ArtigosCientificos.Api.Models.Category;
 using ArtigosCientificos.Api.Models.Review;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace ArtigosCientificos.Api.Services.Articles
@@ -73,6 +75,37 @@ namespace ArtigosCientificos.Api.Services.Articles
             return new OkObjectResult(articles);
         }
 
+        public async Task<Article> GetArticlebyId(int id)
+        {
+            Article article = await _context.Articles.FirstOrDefaultAsync(a => a.Id == id);
+
+            if (article == null)
+            {
+                return null;
+            }
+
+            article.Views = article.Views + 1;
+            _context.Articles.Update(article);
+            await _context.SaveChangesAsync();
+
+            return article;
+        }
+
+        public async Task<Article> IncrementDownloadsCounter(int id)
+        {
+            Article article = await _context.Articles.FirstOrDefaultAsync(a => a.Id == id);
+
+            if (article == null)
+            {
+                return null;
+            }
+
+            article.Downloads = article.Downloads + 1;
+            _context.Articles.Update(article);
+            await _context.SaveChangesAsync();
+            return article;
+        }
+
         public async Task<ObjectResult> GetCategories()
         {
             List<Category> categories = _context.Categories.ToList();
@@ -84,5 +117,6 @@ namespace ArtigosCientificos.Api.Services.Articles
 
             return new OkObjectResult(categories);
         }
+
     }
 }

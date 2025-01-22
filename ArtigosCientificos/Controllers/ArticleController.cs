@@ -30,6 +30,23 @@ namespace ArtigosCientificos.Api.Controllers
             return Ok(articles.Value);
         }
 
+        [HttpGet("articles/{id}")]
+        public async Task<IActionResult> GetArticle(int id)
+        {
+            // Call the service method and get the article
+            var article = await _articleService.GetArticlebyId(id);
+
+            if (article == null)
+            {
+                // If article is not found, return 404 Not Found
+                return NotFound("Article not found");
+            }
+
+            // If article is found, return it with a 200 OK status
+            return Ok(article);
+        }
+
+
 
         [HttpPost("articles")]
         [Authorize(Roles = "Researcher")]
@@ -64,6 +81,20 @@ namespace ArtigosCientificos.Api.Controllers
                 return NotFound(categories.Value);
             }
             return Ok(categories.Value);
+        }
+
+        [HttpPut("article/downloadsCounter/{id}")]
+        public async Task<IActionResult> IncrementDownloadsCounter(int id)
+        {
+            Article result = await _articleService.IncrementDownloadsCounter(id);
+            if (result == null)
+            {
+                // If article is not found, return 404 Not Found
+                return NotFound("Article not found");
+            }
+
+            // If article is found, return it with a 200 OK status
+            return Ok(result);
         }
     }
 }

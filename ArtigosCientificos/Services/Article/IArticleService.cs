@@ -35,5 +35,9 @@ namespace ArtigosCientificos.Api.Services.Articles
         Task<ObjectResult> GetAcceptedArticles();
 
         Task<ObjectResult> GetCategories();
+
+        Task<Article> GetArticlebyId(int id);
+
+        Task<Article> IncrementDownloadsCounter(int id);
     }
 }

@@ -20,9 +20,13 @@ namespace ArtigosCientificosMvc.Models.Article
 
         public string File { get; set; }
 
+        public DateOnly CreatedAt { get; set; }
+
         public string Status { get; set; } = "PENDING";
 
         public int UserId { get; set; }
         public int CategoryId { get; set; }
+        public int? Downloads { get; set; }
+        public int? Views { get; set; }
     }
 }
