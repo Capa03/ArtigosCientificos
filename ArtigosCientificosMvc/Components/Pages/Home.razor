@@ -134,6 +134,7 @@ else
 
 	private void ApplyFilters()
 	{
+		// Apply filters with AND logic, only filtering by fields that are filled
 		filteredArticles = articles.Where(article =>
 			(string.IsNullOrEmpty(filterTitle) || article.Title.Contains(filterTitle, StringComparison.OrdinalIgnoreCase)) &&
 			(string.IsNullOrEmpty(filterKeywords) || article.Keywords.Contains(filterKeywords, StringComparison.OrdinalIgnoreCase)) &&
@@ -149,6 +150,7 @@ else
 
 	private void ClearFilters()
 	{
+		// Reset all filters to null or default values
 		filterTitle = null;
 		filterKeywords = null;
 		filterStartDate = null;
