@@ -33,5 +33,7 @@ namespace ArtigosCientificos.Api.Services.Articles
         /// </summary>
         /// <returns>An <see cref="ObjectResult"/> containing a list of accepted articles.</returns>
         Task<ObjectResult> GetAcceptedArticles();
+
+        Task<ObjectResult> GetCategories();
     }
 }

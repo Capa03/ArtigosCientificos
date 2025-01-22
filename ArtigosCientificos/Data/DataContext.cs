@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using ArtigosCientificos.Api.Models.Article;
+using ArtigosCientificos.Api.Models.Category;
 using ArtigosCientificos.Api.Models.Review;
 using ArtigosCientificos.Api.Models.Role;
 using ArtigosCientificos.Api.Models.Token;
@@ -16,6 +17,7 @@ namespace ArtigosCientificos.Api.Data
         public DbSet<User>? Users { get; set; }
         public DbSet<UserRole>? UserRoles { get; set; }
         public DbSet<UserToken>? UserTokens { get; set; }
+        public DbSet<Category>? Categories { get; set; }
         public DbSet<Article>? Articles { get; set; }
         public DbSet<Review>? Reviews { get; set; }
 
@@ -41,6 +43,12 @@ namespace ArtigosCientificos.Api.Data
                 new UserRole { Id = 2, Name = "Reviewer" }
             );
 
+            modelBuilder.Entity<Category>().HasData(
+                new Category { CategoryId = 1, Name = "Computer Science" },
+                new Category { CategoryId = 2, Name = "Mathematics" },
+                new Category { CategoryId = 3, Name = "Physics" }
+            );
+  
             base.OnModelCreating(modelBuilder);
         }
     }

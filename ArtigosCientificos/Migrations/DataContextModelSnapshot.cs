@@ -34,6 +34,9 @@ namespace ArtigosCientificos.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedAt")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -46,11 +49,11 @@ namespace ArtigosCientificos.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("ReviewedAt")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UpdatedAt")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -59,9 +62,45 @@ namespace ArtigosCientificos.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Articles");
+                });
+
+            modelBuilder.Entity("ArtigosCientificos.Api.Models.Category.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            Name = "Computer Science"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            Name = "Mathematics"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            Name = "Physics"
+                        });
                 });
 
             modelBuilder.Entity("ArtigosCientificos.Api.Models.Review.Review", b =>
@@ -220,11 +259,19 @@ namespace ArtigosCientificos.Api.Migrations
 
             modelBuilder.Entity("ArtigosCientificos.Api.Models.Article.Article", b =>
                 {
+                    b.HasOne("ArtigosCientificos.Api.Models.Category.Category", "Category")
+                        .WithMany("Articles")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ArtigosCientificos.Api.Models.User.User", "User")
                         .WithMany("Articles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("User");
                 });
@@ -288,6 +335,11 @@ namespace ArtigosCientificos.Api.Migrations
             modelBuilder.Entity("ArtigosCientificos.Api.Models.Article.Article", b =>
                 {
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("ArtigosCientificos.Api.Models.Category.Category", b =>
+                {
+                    b.Navigation("Articles");
                 });
 
             modelBuilder.Entity("ArtigosCientificos.Api.Models.Review.Review", b =>

@@ -23,5 +23,6 @@ namespace ArtigosCientificosMvc.Models.Article
         public string Status { get; set; } = "PENDING";
 
         public int UserId { get; set; }
+        public int CategoryId { get; set; }
     }
 }

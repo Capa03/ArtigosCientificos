@@ -30,19 +30,7 @@ namespace ArtigosCientificos.Api.Controllers
             return Ok(articles.Value);
         }
 
-        /*[HttpGet("articles")]
-        public async Task<IActionResult> GetArticleById(int id)
-        {
-            ObjectResult article = await _articleService.GetArticleB();
 
-            if (articles.StatusCode == (int)HttpStatusCode.NotFound)
-            {
-                return NotFound(articles.Value);
-            }
-
-            return Ok(articles.Value);
-        }
-        */
         [HttpPost("articles")]
         [Authorize(Roles = "Researcher")]
         public async Task<IActionResult> CreateArticle(ArticleDTO article)
@@ -65,6 +53,17 @@ namespace ArtigosCientificos.Api.Controllers
                 return NotFound(articles.Value);
             }
             return Ok(articles.Value);
+        }
+
+        [HttpGet("articles/categories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            ObjectResult categories = await _articleService.GetCategories();
+            if (categories.StatusCode == (int)HttpStatusCode.NotFound)
+            {
+                return NotFound(categories.Value);
+            }
+            return Ok(categories.Value);
         }
     }
 }

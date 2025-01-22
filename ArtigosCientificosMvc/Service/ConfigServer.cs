@@ -56,6 +56,15 @@ namespace ArtigosCientificosMvc.Service
         }
 
         /// <summary>
+        /// Gets the URL for creating articles.
+        /// </summary>
+        /// <returns>The articles creation URL as a string.</returns>
+        public string GetCategoriesUrl()
+        {
+            return this._baseUrl + "Article/articles/categories";
+        }
+
+        /// <summary>
         /// Gets the URL for retrieving reviews by status.
         /// </summary>
         /// <param name="status">The status of the reviews (e.g., "Pending", "Approved").</param>

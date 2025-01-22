@@ -15,12 +15,13 @@ namespace ArtigosCientificos.Api.Models.Article
         [DataType(DataType.Date)]
         public string CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now).ToString();
         [DataType(DataType.Date)]
-        public string UpdatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now).ToString();
+        public string ReviewedAt { get; set; } = string.Empty;
         public int UserId { get; set; }
         [JsonIgnore]
         public User.User User { get; set; }
-        
         [JsonIgnore]
         public List<Review.Review> Reviews { get; set; }
+        public int CategoryId { get; set; }
+        public Category.Category? Category { get; set; }
     }
 }

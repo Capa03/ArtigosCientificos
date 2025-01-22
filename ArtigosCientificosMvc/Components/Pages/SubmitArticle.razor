@@ -1,5 +1,6 @@
 ﻿@page "/submitarticle"
 @using ArtigosCientificosMvc.Models.Article
+@using ArtigosCientificosMvc.Models.Category
 @using ArtigosCientificosMvc.Models.User
 @using ArtigosCientificosMvc.Service.Articles
 @using ArtigosCientificosMvc.Service.Token
@@ -44,10 +45,18 @@ else if ((role == "Researcher" || role == "ResearcherReviewer"))
 								<ValidationMessage For="@(() => article.Abstract)" />
 							</div>
 							<div class="form-group">
-								<label for="keywords">Keywords</label>
+								<label for="CategoryId">Keywords</label>
 								<InputText id="keywords" class="form-control" @bind-Value="@article.Keywords" placeholder="Enter Article Keywords" />
 								<ValidationMessage For="@(() => article.Keywords)" />
 							</div>
+							<label for="CategoryId">Select a category</label>
+							<select id="CategoryId" class="form-control" @bind="article.CategoryId">
+								@foreach (Category category in categories)
+								{
+									<option value="@category.CategoryId">@category.Name</option>
+								}
+							</select>
+
 							<FilePickerComponent OnFileSelected="HandleFileSelected" />
 
 							<div class="form-group text-center mt-4">
@@ -79,6 +88,7 @@ else
 	private bool isLoading = true;
 	private string selectedFileName;
 	private string role = "";
+	List<Category> categories = new List<Category>();
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -86,6 +96,7 @@ else
 		{
 			try
 			{
+				categories = await articleService.GetCategories() ?? new List<Category>();
 				User? user = await tokenManager.GetUserAsync();
 
 				if (user?.Role != null)
@@ -143,6 +154,11 @@ else
 		{
 			ErrorMessage = articleResult.Message;
 		}
+	}
+
+	private async Task<List<Category>> GetCategories()
+	{
+		return await articleService.GetCategories();
 	}
 
 }
