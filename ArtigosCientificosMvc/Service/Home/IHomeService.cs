@@ -22,5 +22,6 @@ namespace ArtigosCientificosMvc.Service.Home
         Task<List<Category>> GetCategories();
 
         Task<ArticleStatistics> GetArticleStatistics();
+        Task<CategoryStatistics> GetCategoryStatistics(int categoryId);
     }
 }

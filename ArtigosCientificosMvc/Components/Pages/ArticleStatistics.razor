@@ -1,5 +1,6 @@
 ﻿@page "/ArticleStatistics"
 @using ArtigosCientificosMvc.Models.Article
+@using ArtigosCientificosMvc.Models.Category
 @using ArtigosCientificosMvc.Service.Home
 @inject IHomeService homeService
 @rendermode InteractiveServer
@@ -12,29 +13,58 @@
 }
 else
 {
-	<div class="container">
+	<div class="container mb-4">
+		<h2>Global Statistics</h2>
 		<p><strong>Total Articles:</strong> @statistics.TotalArticles</p>
 		<p><strong>Total Views:</strong> @statistics.TotalViews</p>
 		<p><strong>Total Downloads:</strong> @statistics.TotalDownloads</p>
 		<p><strong>Most Viewed Category:</strong> @statistics.MostViewedCategory (@statistics.MostViewedCategoryCount views)</p>
 	</div>
-
+	<div class="container">
+		<h2>Category Statistics</h2>
+		<select @onchange="OnCategorySelected" class="form-select mb-3">
+			<option value="">-- Select a Category --</option>
+			@foreach (var category in categories)
+			{
+				<option value="@category.CategoryId">@category.Name</option>
+			}
+		</select>
+		@if (selectedCategoryStatistics != null)
+		{
+			<div>
+				<p><strong>Category Name:</strong> @selectedCategoryStatistics.CategoryName</p>
+				<p><strong>Total Articles:</strong> @selectedCategoryStatistics.ArticleCount</p>
+				<p><strong>Total Views:</strong> @selectedCategoryStatistics.TotalViews</p>
+				<p><strong>Total Downloads:</strong> @selectedCategoryStatistics.TotalDownloads</p>
+			</div>
+		}
+	</div>
 }
+
 
 @code {
-    private ArtigosCientificosMvc.Models.Article.ArticleStatistics statistics = new ArtigosCientificosMvc.Models.Article.ArticleStatistics();
-    private bool isInitialized;
+	private ArtigosCientificosMvc.Models.Article.ArticleStatistics statistics = new ArtigosCientificosMvc.Models.Article.ArticleStatistics();
+	private CategoryStatistics selectedCategoryStatistics;
+	private List<Category> categories = new();
+	private bool isInitialized;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            statistics = await homeService.GetArticleStatistics();    
-            isInitialized = true;
-            StateHasChanged();
-        }
-    }
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			statistics = await homeService.GetArticleStatistics();
+			categories = await homeService.GetCategories();
+			isInitialized = true;
+			StateHasChanged();
+		}
+	}
+
+	private async Task OnCategorySelected(ChangeEventArgs e)
+	{
+		if (int.TryParse(e.Value?.ToString(), out int categoryId) && categoryId > 0)
+		{
+			selectedCategoryStatistics = await homeService.GetCategoryStatistics(categoryId);
+			StateHasChanged();
+		}
+	}
 }
-
-
-
