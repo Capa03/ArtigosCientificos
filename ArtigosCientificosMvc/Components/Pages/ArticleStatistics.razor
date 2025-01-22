@@ -2,6 +2,7 @@
 @using ArtigosCientificosMvc.Models.Article
 @using ArtigosCientificosMvc.Service.Home
 @inject IHomeService homeService
+@rendermode InteractiveServer
 
 <h1 class="text-center my-5 display-4 fw-bold text-primary">Article Statistics</h1>
 
@@ -21,10 +22,19 @@ else
 }
 
 @code {
-	private ArtigosCientificosMvc.Models.Article.ArticleStatistics statistics;
+    private ArtigosCientificosMvc.Models.Article.ArticleStatistics statistics = new ArtigosCientificosMvc.Models.Article.ArticleStatistics();
+    private bool isInitialized;
 
-	protected override async Task OnInitializedAsync()
-	{
-		statistics = await homeService.GetArticleStatistics();
-	}
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            statistics = await homeService.GetArticleStatistics();    
+            isInitialized = true;
+            StateHasChanged();
+        }
+    }
 }
+
+
+

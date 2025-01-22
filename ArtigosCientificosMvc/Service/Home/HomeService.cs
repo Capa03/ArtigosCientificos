@@ -88,25 +88,56 @@ namespace ArtigosCientificosMvc.Service.Home
 
         public async Task<ArticleStatistics> GetArticleStatistics()
         {
-            var articles = await getArticles();
-            var totalViews = articles.Sum(a => a.Views ?? 0);
-            var totalDownloads = articles.Sum(a => a.Downloads ?? 0);
-            var categoryGroups = articles.GroupBy(a => a.CategoryId)
-                                          .Select(g => new { CategoryId = g.Key, ViewCount = g.Sum(a => a.Views ?? 0) })
-                                          .OrderByDescending(g => g.ViewCount)
-                                          .FirstOrDefault();
-
-            var mostViewedCategory = categoryGroups != null ? await GetCategoryName(categoryGroups.CategoryId) : "None";
-
-            return new ArticleStatistics
+            try
             {
-                TotalArticles = articles.Count,
-                TotalViews = totalViews,
-                TotalDownloads = totalDownloads,
-                MostViewedCategory = mostViewedCategory,
-                MostViewedCategoryCount = categoryGroups?.ViewCount ?? 0
-            };
+                var articles = await _apiService.GetTAsync<List<Article>>(_configServer.GetAcceptedArticlesUrl());
+
+                if (articles == null || !articles.Any())
+                {
+                    return new ArticleStatistics { TotalArticles = 0, TotalViews = 0, TotalDownloads = 0, MostViewedCategory = "None", MostViewedCategoryCount = 0 };
+                }
+
+                var totalViews = articles.Sum(a => a.Views ?? 0);
+                var totalDownloads = articles.Sum(a => a.Downloads ?? 0);
+
+                var categoryGroups = articles.GroupBy(a => a.CategoryId)
+                                              .Select(g => new { CategoryId = g.Key, ViewCount = g.Sum(a => a.Views ?? 0) })
+                                              .OrderByDescending(g => g.ViewCount)
+                                              .FirstOrDefault();
+
+                if (categoryGroups == null)
+                {
+                    Console.WriteLine("No category groups found.");
+                }
+                else
+                {
+                    Console.WriteLine($"Most viewed category ID: {categoryGroups.CategoryId} with {categoryGroups.ViewCount} views.");
+                }
+
+                var mostViewedCategory = categoryGroups != null ? await GetCategoryName(categoryGroups.CategoryId) : "None";
+
+
+                var stats = new ArticleStatistics
+                {
+                    TotalArticles = articles.Count,
+                    TotalViews = totalViews,
+                    TotalDownloads = totalDownloads,
+                    MostViewedCategory = mostViewedCategory,
+                    MostViewedCategoryCount = categoryGroups?.ViewCount ?? 0
+                };
+
+              
+
+                return stats;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching statistics: {ex.Message}");
+                return new ArticleStatistics();  // Retorna objeto padrão vazio
+            }
         }
+
+
 
         private async Task<string> GetCategoryName(int categoryId)
         {

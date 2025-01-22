@@ -88,6 +88,7 @@ namespace ArtigosCientificosMvc.Service.Token
                 if (userId <= 0)
                 {
                     Console.WriteLine("Invalid userId. Returning null.");
+                    await this.RemoveTokenAsync();
                     return null;
                 }
 
