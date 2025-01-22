@@ -15,15 +15,16 @@ else
 		<p><strong>Total Articles:</strong> @statistics.TotalArticles</p>
 		<p><strong>Total Views:</strong> @statistics.TotalViews</p>
 		<p><strong>Total Downloads:</strong> @statistics.TotalDownloads</p>
-		<!-- Add more statistics as needed -->
+		<p><strong>Most Viewed Category:</strong> @statistics.MostViewedCategory (@statistics.MostViewedCategoryCount views)</p>
 	</div>
+
 }
 
 @code {
-	private List<Article> articles;
+	private ArtigosCientificosMvc.Models.Article.ArticleStatistics statistics;
 
 	protected override async Task OnInitializedAsync()
 	{
-		articles = await homeService.getArticles();
+		statistics = await homeService.GetArticleStatistics();
 	}
 }

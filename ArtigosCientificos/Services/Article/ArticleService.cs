@@ -27,7 +27,7 @@ namespace ArtigosCientificos.Api.Services.Articles
                 Keywords = articleDTO.Keywords,
                 File = articleDTO.File,
                 UserId = articleDTO.UserId,
-                CategoryId = articleDTO.CategoryId
+                CategoryId = articleDTO.CategoryId,
             };
             var result = await _context.Articles.AddAsync(article);
             if (result == null)
@@ -118,9 +118,16 @@ namespace ArtigosCientificos.Api.Services.Articles
             return new OkObjectResult(categories);
         }
 
-        public Task<Category> GetCategorybyId(int id)
+        public async Task<Category> GetCategorybyId(int id)
         {
-            _context.Categories.FindAsync(id);
+            Category category = await _context.Categories.FindAsync(id);
+
+            if (category == null)
+            {
+                return null;
+            }
+
+            return category;
         }
     }
 }
