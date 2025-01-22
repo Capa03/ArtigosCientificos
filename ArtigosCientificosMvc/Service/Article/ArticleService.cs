@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using ArtigosCientificosMvc.Models.Article;
+using ArtigosCientificosMvc.Models.Category;
 using ArtigosCientificosMvc.Service.Api;
 using ArtigosCientificosMvc.Service.Token;
 
@@ -66,6 +67,12 @@ namespace ArtigosCientificosMvc.Service.Articles
                 };
             }
 
+        }
+
+        public async Task<List<Category>> GetCategories()
+        {
+            List<Category> data = await apiService.GetTAsync<List<Category>>(this.configServer.GetCategoriesUrl());
+            return data;
         }
     }
 }

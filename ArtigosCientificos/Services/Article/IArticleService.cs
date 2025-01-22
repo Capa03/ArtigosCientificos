@@ -1,4 +1,5 @@
 ﻿using ArtigosCientificos.Api.Models.Article;
+using ArtigosCientificos.Api.Models.Category;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArtigosCientificos.Api.Services.Articles
@@ -15,6 +16,13 @@ namespace ArtigosCientificos.Api.Services.Articles
         Task<ObjectResult> GetAllArticles();
 
         /// <summary>
+        /// Retrieves a new specific Article in the system.
+        /// </summary>
+        /// <param name="article">The article details to be created.</param>
+        /// <returns>An <see cref="ObjectResult"/> indicating the outcome of the creation operation.</returns>
+        //Task<ObjectResult> GetArticles(int id);
+
+        /// <summary>
         /// Creates a new article in the system.
         /// </summary>
         /// <param name="article">The article details to be created.</param>
@@ -26,5 +34,12 @@ namespace ArtigosCientificos.Api.Services.Articles
         /// </summary>
         /// <returns>An <see cref="ObjectResult"/> containing a list of accepted articles.</returns>
         Task<ObjectResult> GetAcceptedArticles();
+
+        Task<ObjectResult> GetCategories();
+
+        Task<Article> GetArticlebyId(int id);
+
+        Task<Article> IncrementDownloadsCounter(int id);
+        Task<Category> GetCategorybyId(int id);
     }
 }

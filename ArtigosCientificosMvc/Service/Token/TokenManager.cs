@@ -56,6 +56,7 @@ namespace ArtigosCientificosMvc.Service.Token
         public async Task<string?> GetTokenAsync()
         {
             var result = await _protectedLocalStorage.GetAsync<string>(AuthTokenKey);
+            
             return result.Success ? result.Value : null;
         }
 
@@ -86,16 +87,25 @@ namespace ArtigosCientificosMvc.Service.Token
                 var userId = await GetUserIdAsync();
                 if (userId <= 0)
                 {
+                    Console.WriteLine("Invalid userId. Returning null.");
                     return null;
                 }
 
-                return await _apiService.Value.GetTAsync<User>($"{_configServer.GetUsersUrl()}{userId}");
+                var userUrl = $"{_configServer.GetUsersUrl()}{userId}";
+
+                var user = await _apiService.Value.GetTAsync<User>(userUrl);
+                if (user == null)
+                {
+                }
+                return user;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error fetching user: {ex.Message}");
                 return null;
             }
         }
+
 
         /// <summary>
         /// Refreshes the authentication token by calling the API.
@@ -118,7 +128,7 @@ namespace ArtigosCientificosMvc.Service.Token
                 return (int)Response.ERROR;
             }
 
-            var userIdClaim = ReadClaim(token, ClaimTypes.Name);
+            var userIdClaim = ReadClaim(token, "sub") ?? ReadClaim(token, ClaimTypes.Name);
             if (string.IsNullOrWhiteSpace(userIdClaim))
             {
                 return (int)Response.NOT_FOUND_ID;
@@ -126,6 +136,7 @@ namespace ArtigosCientificosMvc.Service.Token
 
             return int.TryParse(userIdClaim, out var userId) ? userId : (int)Response.ERROR;
         }
+
 
         /// <summary>
         /// Extracts a specific claim from the JWT token.
@@ -159,17 +170,5 @@ namespace ArtigosCientificosMvc.Service.Token
                 throw new InvalidOperationException("An error occurred while reading the claim.", ex);
             }
         }
-
-        public async Task<string?> GetUserRoleAsync()
-        {
-            var token = await GetTokenAsync();
-            if (string.IsNullOrEmpty(token))
-            {
-                return null;
-            }
-            Console.WriteLine("ROLEEEEE" + ReadClaim(token, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"));
-            return ReadClaim(token, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
-        }
-
     }
 }

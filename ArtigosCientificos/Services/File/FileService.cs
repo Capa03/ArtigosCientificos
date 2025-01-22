@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ArtigosCientificos.Api.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ArtigosCientificos.Api.Services.File
 {
     public class FileService : IFileService
     {
+        private readonly DataContext _context;
+        public FileService() { }
+
         public async Task<ObjectResult> DownloadFile(string fileName)
         {
             try
@@ -55,8 +59,6 @@ namespace ArtigosCientificos.Api.Services.File
                     StatusCode = 500
                 };
             }
-
-
         }
     }
 }

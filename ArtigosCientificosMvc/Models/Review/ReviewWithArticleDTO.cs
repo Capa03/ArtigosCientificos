@@ -2,6 +2,7 @@
 {
     public class ReviewWithArticleDTO
     {
+        public int AuthorId { get; set; }   
         public int ReviewId { get; set; }
         public string Status { get; set; }
         public DateTime CreatedDate { get; set; }

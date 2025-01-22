@@ -1,0 +1,120 @@
+﻿@page "/Article/{id:int}"
+@using ArtigosCientificosMvc.Models.Article
+@using ArtigosCientificosMvc.Models
+@using ArtigosCientificosMvc.Models.User
+@using ArtigosCientificosMvc.Models.Category
+@using ArtigosCientificosMvc.Service.Home
+@inject IHomeService homeService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@if (isLoading)
+{
+    <div class="flex justify-center items-center">
+        <div class="spinner-border text-blue-500" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+}
+else if (selectedArticle == null)
+{
+    <div class="text-center">
+        <p class="text-gray-500">No article available.</p>
+    </div>
+}
+else
+{
+    <div class="article-container">
+        <!-- Title -->
+        <div class="article-field">
+            <strong>Title:</strong> @selectedArticle.Title
+        </div>
+        <!-- Publish Date -->
+        <div class="article-field">
+            <strong>Publish Date:</strong> @selectedArticle.CreatedAt
+        </div>
+        <!-- Author -->
+        <div class="article-field">
+            <strong>Author:</strong> @user.Username
+        </div>
+        <!-- Category -->
+        <div class="article-field">
+            <strong>Category:</strong> @GetCategoryName(selectedArticle.CategoryId)
+        </div>
+        <!-- Abstract -->
+        <div class="article-field" style="height: 150px; overflow-y: auto;">
+            <strong>Abstract:</strong> @selectedArticle.Abstract
+        </div>
+        <!-- Views and Downloads -->
+        <div class="article-field">
+            <strong>Views:</strong> @selectedArticle.Views
+        </div>
+        <div class="article-field">
+            <strong>Downloads:</strong> @selectedArticle.Downloads
+        </div>
+        <!-- Buttons -->
+        <div class="article-buttons">
+            <Button @onclick="()=>DownloadPDF(selectedArticle.File)" Color="Color.Primary">
+                Download
+            </Button>
+
+            <Button Color="Color.Secondary">
+                <a href="@($"https://localhost:7267/api/File/showPdf/{selectedArticle.File}")" target="_blank" class="text-white text-decoration-none">
+                    Open PDF in Browser
+                </a>
+            </Button>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Article selectedArticle;
+    private User user = new User();
+    private List<Article> articles;
+    private bool isLoading = true;
+    private List<Category> categories = new List<Category>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            articles = await homeService.getArticles();
+            selectedArticle = await GetArticle(Id);
+            user = await GetUser(selectedArticle);
+            categories = await homeService.GetCategories(); // Get the list of categories
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task<Article> GetArticle(int id)
+    {
+        return await homeService.GetArticle(id);
+    }
+
+    private async Task<User> GetUser(Article article)
+    {
+        return await homeService.GetUser(article.UserId);
+    }
+
+    private async Task<List<Category>> GetCategories()
+    {
+        return await homeService.GetCategories(); // Fetch all categories
+    }
+
+    private string GetCategoryName(int categoryId)
+    {
+        var category = categories.FirstOrDefault(c => c.CategoryId == categoryId);
+        return category?.Name ?? "Unknown"; // Return category name, or "Unknown" if not found
+    }
+
+    private async void DownloadPDF(string fileName)
+    {
+        await homeService.IncrementDownloadsCounter(selectedArticle.Id);
+        NavigationManager.NavigateTo($"https://localhost:7267/api/File/download/{fileName}");
+    }
+}

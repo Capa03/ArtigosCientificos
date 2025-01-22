@@ -1,5 +1,6 @@
 ﻿@page "/review/{id:int}"
 @using ArtigosCientificosMvc.Models.Review
+@using ArtigosCientificosMvc.Models.User
 @using ArtigosCientificosMvc.Service.Review
 @using ArtigosCientificosMvc.Service.Token
 @inject IReviewService ReviewService
@@ -10,15 +11,16 @@
 @if (isLoading)
 {
 	<Skeleton Animation="SkeletonAnimation.Wave">
-    <SkeletonItem ColumnSize="ColumnSize.Is7" />
-    <SkeletonItem ColumnSize="ColumnSize.Is4" />
-    <SkeletonItem ColumnSize="ColumnSize.Is4" />
-    <SkeletonItem ColumnSize="ColumnSize.Is6" />
-    <SkeletonItem ColumnSize="ColumnSize.Is8" />
-</Skeleton>
+		<SkeletonItem ColumnSize="ColumnSize.Is7" />
+		<SkeletonItem ColumnSize="ColumnSize.Is4" />
+		<SkeletonItem ColumnSize="ColumnSize.Is4" />
+		<SkeletonItem ColumnSize="ColumnSize.Is6" />
+		<SkeletonItem ColumnSize="ColumnSize.Is8" />
+	</Skeleton>
 }
-else if (role == "Reviewer")
+else if (role == "Reviewer" || role == "ResearcherReviewer")
 {
+	<p><a href="/Home">Home</a> > <a href="/review-list">Review</a> > Review Details</p>
 	<PageTitle>Review Details</PageTitle>
 
 	<Layout>
@@ -67,11 +69,18 @@ else if (role == "Reviewer")
 							<Label for="reviewFeedback">Provide Feedback:</Label>
 							<textarea class="form-control" id="reviewFeedback" rows="3" @bind="Feedback">@article.Description</textarea>
 						</div>
-						<Button Color="Color.Secondary">
+						<Button Color="Color.Primary" style="margin-right: 1rem;">
 							<a href="@($"https://localhost:7267/api/File/download/{article.File}")" target="_blank" class="text-white text-decoration-none">
 								Download
 							</a>
 						</Button>
+
+						<Button Color="Color.Secondary" style="padding-left:1rem">
+							<a href="@($"https://localhost:7267/api/File/showPdf/{article.File}")" target="_blank" class="text-white text-decoration-none">
+								View on Browser
+							</a>
+						</Button>
+
 
 					}
 				</CardBody>
@@ -178,6 +187,7 @@ else
 	private string ConfirmationAction;
 
 	private string role = "";
+	private User user;
 	private bool isLoading = true;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -186,15 +196,26 @@ else
 		{
 			try
 			{
-				role = await tokenManager.GetUserRoleAsync();
-				if (role != "Reviewer")
+				user = await tokenManager.GetUserAsync();
+
+				if (user?.Role != null)
 				{
-					NavigationManager.NavigateTo("/unauthorized");
+					if (user.Role.Any(r => r.Name.Equals("Researcher", StringComparison.OrdinalIgnoreCase)) &&
+						user.Role.Any(r => r.Name.Equals("Reviewer", StringComparison.OrdinalIgnoreCase)))
+					{
+						role = "ResearcherReviewer";
+					}
+					else if (user.Role.Any(r => r.Name.Equals("Researcher", StringComparison.OrdinalIgnoreCase)))
+					{
+						role = "Researcher";
+					}
+					else if (user.Role.Any(r => r.Name.Equals("Reviewer", StringComparison.OrdinalIgnoreCase)))
+					{
+						role = "Reviewer";
+					}
 				}
-				else
-				{
-					await LoadReview();
-				}
+
+				await LoadReview();
 			}
 			catch (Exception ex)
 			{

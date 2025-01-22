@@ -3,59 +3,171 @@
 @using ArtigosCientificosMvc.Models.User
 @using ArtigosCientificosMvc.Service.Home
 @inject IHomeService homeService
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
+<div class="container mb-4">
+	<button class="btn btn-success mb-3" @onclick="NavigateToStatistics">View Article Statistics</button>
+</div>
 
-<h1 class="text-center text-2xl font-semibold my-4">Published Articles</h1>
+<h1 class="text-center my-5 display-4 fw-bold text-primary">Published Articles</h1>
+
+<!-- Search and Filter Section -->
+<div class="container mb-4">
+	<form class="row g-3" @onsubmit="ApplyFilters">
+		<div class="col-md-4">
+			<label for="searchTitle" class="form-label">Title</label>
+			<input type="text" id="searchTitle" class="form-control" @bind="filterTitle">
+		</div>
+		<div class="col-md-4">
+			<label for="searchKeywords" class="form-label">Keywords</label>
+			<input type="text" id="searchKeywords" class="form-control" @bind="filterKeywords">
+		</div>
+		<div class="col-md-4">
+			<label for="dateRange" class="form-label">Date Range</label>
+			<div class="d-flex">
+				<input type="date" id="startDate" class="form-control me-2" @bind="filterStartDate">
+				<input type="date" id="endDate" class="form-control" @bind="filterEndDate">
+			</div>
+		</div>
+		<div class="col-md-4">
+			<label for="viewsRange" class="form-label">Views Range</label>
+			<div class="d-flex">
+				<input type="number" id="minViews" class="form-control me-2" placeholder="Min" @bind="filterMinViews">
+				<input type="number" id="maxViews" class="form-control" placeholder="Max" @bind="filterMaxViews">
+			</div>
+		</div>
+		<div class="col-md-4">
+			<label for="downloadsRange" class="form-label">Downloads Range</label>
+			<div class="d-flex">
+				<input type="number" id="minDownloads" class="form-control me-2" placeholder="Min" @bind="filterMinDownloads">
+				<input type="number" id="maxDownloads" class="form-control" placeholder="Max" @bind="filterMaxDownloads">
+			</div>
+		</div>
+		<div class="col-12">
+			<button type="submit" class="btn btn-primary">Apply Filters</button>
+			<button type="button" class="btn btn-secondary" @onclick="ClearFilters">Clear</button>
+		</div>
+	</form>
+</div>
 
 @if (isLoading)
 {
-    <div class="flex justify-center items-center">
-        <div class="spinner-border text-blue-500" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
+	<div class="d-flex justify-content-center align-items-center my-5">
+		<div class="spinner-border text-primary" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
 }
-else if (articles == null || articles.Count == 0)
+else if (filteredArticles == null || filteredArticles.Count == 0)
 {
-    <div class="text-center">
-        <p class="text-gray-500">No articles available.</p>
-    </div>
+	<div class="text-center">
+		<p class="text-muted">No articles available.</p>
+	</div>
 }
 else
 {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-        @foreach (var article in articles)
-        {
-            <div class="max-w-xs mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="p-4">
-                    <h2 class="text-xl font-bold text-blue-600 truncate">@article.Title</h2>
-                    <p class="text-gray-700 mt-2">@article.Abstract</p>
-                    <div class="mt-4 text-sm text-gray-500">
-                        <p>Keywords: @article.Keywords</p>
-                    </div>
-                    <div class="mt-4">
-                        <a href="#" class="text-blue-500 hover:underline">Read more</a>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
+	<div class="container">
+		<div class="row g-4">
+			@foreach (var article in filteredArticles)
+			{
+				<div class="col-sm-12 col-md-6 col-lg-4">
+					<div class="card shadow-sm border-0 h-100" @onclick="() => NavigateToDetails(article.Id)" style="cursor: pointer;">
+						<div class="card-body">
+							<h5 class="card-title text-primary text-truncate">@article.Title</h5>
+							<span><strong>Author:</strong> @usernames[article.UserId]</span>
+							<p class="card-text text-secondary">
+								@((article.Abstract.Length > 150) ? article.Abstract.Substring(0, 150) + "..." : article.Abstract)
+							</p>
+							<div class="mt-3">
+								<span class="badge bg-info text-dark">Keywords: @article.Keywords</span>
+								<small class="d-block text-muted mt-2">Published on: @article.CreatedAt</small>
+								<small class="d-block text-muted">Views: @article.Views | Downloads: @article.Downloads</small>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
 }
 
-@code{
-    private List<Article> articles;
-    private bool isLoading = true;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
+@code {
+	private void NavigateToDetails(int id)
+	{
+		NavigationManager.NavigateTo($"/Article/{id}");
+	}
 
-        if (firstRender)
-        {
-            articles = await homeService.getArticles();
-            isLoading = false;
-            StateHasChanged();
-        }
+	private List<Article> articles;
+	private List<Article> filteredArticles;
+	private Dictionary<int, string> usernames = new();
+	private bool isLoading = true;
 
-    }
+	private string filterTitle;
+	private string filterKeywords;
+	private DateTime? filterStartDate;
+	private DateTime? filterEndDate;
+	private int? filterMinViews;
+	private int? filterMaxViews;
+	private int? filterMinDownloads;
+	private int? filterMaxDownloads;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			articles = await homeService.getArticles();
+			filteredArticles = articles;
+			await LoadUsernames();
+			isLoading = false;
+			StateHasChanged();
+		}
+	}
+
+	private async Task LoadUsernames()
+	{
+		var userIds = articles.Select(a => a.UserId).Distinct();
+		foreach (var id in userIds)
+		{
+			var user = await homeService.GetUser(id);
+			usernames[id] = user.Username;
+		}
+	}
+
+	private void ApplyFilters()
+	{
+		// Apply filters with AND logic, only filtering by fields that are filled
+		filteredArticles = articles.Where(article =>
+			(string.IsNullOrEmpty(filterTitle) || article.Title.Contains(filterTitle, StringComparison.OrdinalIgnoreCase)) &&
+			(string.IsNullOrEmpty(filterKeywords) || article.Keywords.Contains(filterKeywords, StringComparison.OrdinalIgnoreCase)) &&
+			(!filterStartDate.HasValue || article.CreatedAt.ToDateTime(TimeOnly.MinValue) >= filterStartDate) &&
+			(!filterEndDate.HasValue || article.CreatedAt.ToDateTime(TimeOnly.MinValue) <= filterEndDate) &&
+			(!filterMinViews.HasValue || article.Views >= filterMinViews) &&
+			(!filterMaxViews.HasValue || article.Views <= filterMaxViews) &&
+			(!filterMinDownloads.HasValue || article.Downloads >= filterMinDownloads) &&
+			(!filterMaxDownloads.HasValue || article.Downloads <= filterMaxDownloads)
+		).ToList();
+		StateHasChanged();
+	}
+
+	private void ClearFilters()
+	{
+		// Reset all filters to null or default values
+		filterTitle = null;
+		filterKeywords = null;
+		filterStartDate = null;
+		filterEndDate = null;
+		filterMinViews = null;
+		filterMaxViews = null;
+		filterMinDownloads = null;
+		filterMaxDownloads = null;
+		filteredArticles = articles;
+		StateHasChanged();
+	}
+
+	private void NavigateToStatistics()
+	{
+		NavigationManager.NavigateTo("/ArticleStatistics");
+	}
 }

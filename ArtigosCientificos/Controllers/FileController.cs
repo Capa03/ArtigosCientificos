@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Net.Http;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -9,9 +10,12 @@ public class FileController : Controller
 {
     private readonly IFileService _fileService;
 
-    public FileController(IFileService fileService)
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public FileController(IFileService fileService, IHttpClientFactory httpClientFactory)
     {
         this._fileService = fileService;
+        _httpClientFactory = httpClientFactory;
     }
 
     [HttpPost("upload")]
@@ -54,5 +58,24 @@ public class FileController : Controller
         string downloadFileName = result.FileName;
 
         return File(fileBytes, "application/pdf", downloadFileName);
+    }
+
+    [HttpGet]
+    [Route("showPdf/{fileName}")]
+    public async Task<IActionResult> ShowPdf(string fileName)
+    {
+        var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+        var filePath = Path.Combine(uploadPath, fileName);
+
+        if (!System.IO.File.Exists(filePath))
+        {
+            return NotFound("The requested file does not exist.");
+        }
+
+        var memoryStream = new MemoryStream(await System.IO.File.ReadAllBytesAsync(filePath));
+
+        // Set the inline Content-Disposition to open in the browser
+        Response.Headers.Append("Content-Disposition", $"inline; filename={fileName}");
+        return new FileStreamResult(memoryStream, "application/pdf");
     }
 }
