@@ -118,5 +118,9 @@ namespace ArtigosCientificos.Api.Services.Articles
             return new OkObjectResult(categories);
         }
 
+        public Task<Category> GetCategorybyId(int id)
+        {
+            _context.Categories.FindAsync(id);
+        }
     }
 }

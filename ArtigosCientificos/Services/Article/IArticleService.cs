@@ -1,4 +1,5 @@
 ﻿using ArtigosCientificos.Api.Models.Article;
+using ArtigosCientificos.Api.Models.Category;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArtigosCientificos.Api.Services.Articles
@@ -39,5 +40,6 @@ namespace ArtigosCientificos.Api.Services.Articles
         Task<Article> GetArticlebyId(int id);
 
         Task<Article> IncrementDownloadsCounter(int id);
+        Task<Category> GetCategorybyId(int id);
     }
 }

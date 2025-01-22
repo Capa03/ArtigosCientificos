@@ -25,7 +25,7 @@ namespace ArtigosCientificos.Api.Controllers
         /// <response code="401">If the user is not authorized.</response>
         /// 
         [HttpGet("users")]
-        [Authorize]
+     
         public async Task<ActionResult<List<User>>> GetAllUsers()
         {
 
@@ -40,7 +40,6 @@ namespace ArtigosCientificos.Api.Controllers
         }
 
         [HttpGet("users/{id}")]
-        [Authorize]
         public async Task<ActionResult<User>> GetUserById(int id)
         {
             ObjectResult objectResult = await authorService.GetUserById(id);

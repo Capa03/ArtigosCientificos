@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using ArtigosCientificos.Api.Models.Article;
+using ArtigosCientificos.Api.Models.Category;
 using ArtigosCientificos.Api.Services.Articles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -81,6 +82,18 @@ namespace ArtigosCientificos.Api.Controllers
                 return NotFound(categories.Value);
             }
             return Ok(categories.Value);
+        }
+
+        [HttpGet("articles/categories/{id}")]
+
+        public async Task<IActionResult> GetCategorybyId(int id)
+        {
+            Category category = await _articleService.GetCategorybyId(id);
+            if (category == null)
+            {
+                return NotFound("Category not found");
+            }
+            return Ok(category);
         }
 
         [HttpPut("article/downloadsCounter/{id}")]

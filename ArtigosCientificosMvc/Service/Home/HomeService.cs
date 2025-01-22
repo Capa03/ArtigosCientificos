@@ -1,4 +1,5 @@
 ﻿using ArtigosCientificosMvc.Models.Article;
+using ArtigosCientificosMvc.Models.Category;
 using ArtigosCientificosMvc.Models.User;
 using ArtigosCientificosMvc.Service.Api;
 using Microsoft.Extensions.Logging;
@@ -77,6 +78,46 @@ namespace ArtigosCientificosMvc.Service.Home
                 return new Article();
             }
             return article;
+        }
+
+        public async Task<List<Category>> GetCategories()
+        {
+            List<Category> data = await _apiService.GetTAsync<List<Category>>(this._configServer.GetCategoriesUrl());
+            return data;
+        }
+
+        public async Task<ArticleStatistics> GetArticleStatistics()
+        {
+            var articles = await getArticles();
+            var totalViews = articles.Sum(a => a.Views ?? 0);
+            var totalDownloads = articles.Sum(a => a.Downloads ?? 0);
+            var categoryGroups = articles.GroupBy(a => a.CategoryId)
+                                          .Select(g => new { CategoryId = g.Key, ViewCount = g.Sum(a => a.Views ?? 0) })
+                                          .OrderByDescending(g => g.ViewCount)
+                                          .FirstOrDefault();
+
+            var mostViewedCategory = categoryGroups != null ? await GetCategoryName(categoryGroups.CategoryId) : "None";
+
+            return new ArticleStatistics
+            {
+                TotalArticles = articles.Count,
+                TotalViews = totalViews,
+                TotalDownloads = totalDownloads,
+                MostViewedCategory = mostViewedCategory,
+                MostViewedCategoryCount = categoryGroups?.ViewCount ?? 0
+            };
+        }
+
+        private async Task<string> GetCategoryName(int categoryId)
+        {
+            var category = await GetCategory(categoryId);  
+            return category?.Name ?? "Unknown";
+        }
+
+        private async Task<Category> GetCategory(int categoryId)
+        {
+            Category data = await _apiService.GetTAsync<Category>(this._configServer.GetCategoriesByIdUrl(categoryId));
+            return data;
         }
     }
 }

@@ -1,0 +1,29 @@
+﻿@page "/ArticleStatistics"
+@using ArtigosCientificosMvc.Models.Article
+@using ArtigosCientificosMvc.Service.Home
+@inject IHomeService homeService
+
+<h1 class="text-center my-5 display-4 fw-bold text-primary">Article Statistics</h1>
+
+@if (statistics == null)
+{
+	<p>Loading statistics...</p>
+}
+else
+{
+	<div class="container">
+		<p><strong>Total Articles:</strong> @statistics.TotalArticles</p>
+		<p><strong>Total Views:</strong> @statistics.TotalViews</p>
+		<p><strong>Total Downloads:</strong> @statistics.TotalDownloads</p>
+		<!-- Add more statistics as needed -->
+	</div>
+}
+
+@code {
+	private List<Article> articles;
+
+	protected override async Task OnInitializedAsync()
+	{
+		articles = await homeService.getArticles();
+	}
+}

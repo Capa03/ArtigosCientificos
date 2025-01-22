@@ -69,6 +69,11 @@ namespace ArtigosCientificosMvc.Service
             return this._baseUrl + "Article/articles/categories";
         }
 
+        public string GetCategoriesByIdUrl(int id)
+        {
+            return this._baseUrl + "Article/articles/categories" + id;
+        }
+
         /// <summary>
         /// Gets the URL for retrieving reviews by status.
         /// </summary>

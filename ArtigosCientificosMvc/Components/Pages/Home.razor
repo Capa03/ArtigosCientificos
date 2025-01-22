@@ -7,6 +7,9 @@
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
+<div class="container mb-4">
+	<button class="btn btn-success mb-3" @onclick="NavigateToStatistics">View Article Statistics</button>
+</div>
 
 <h1 class="text-center my-5 display-4 fw-bold text-primary">Published Articles</h1>
 
@@ -161,5 +164,10 @@ else
 		filterMaxDownloads = null;
 		filteredArticles = articles;
 		StateHasChanged();
+	}
+
+	private void NavigateToStatistics()
+	{
+		NavigationManager.NavigateTo("/ArticleStatistics");
 	}
 }
