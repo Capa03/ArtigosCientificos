@@ -1,0 +1,32 @@
+﻿@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<div class="d-flex flex-column align-items-center justify-content-center" style="height: 100%; min-height: 250px;">
+    <h3 class="mb-3">Article Statistics</h3>
+    <canvas id="articleStatisticsChartSingle" width="200px" height="200px"></canvas>
+</div>
+
+@code {
+    [Parameter]
+    public int TotalArticles { get; set; }
+
+    [Parameter]
+    public int TotalViews { get; set; }
+
+    [Parameter]
+    public int TotalDownloads { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        var data = new
+        {
+            totalArticles = TotalArticles,
+            totalViews = TotalViews,
+            totalDownloads = TotalDownloads
+        };
+
+        await JS.InvokeVoidAsync("console.log", "Updating chart with new data:", data);
+        await JS.InvokeVoidAsync("drawSmallChartSingle", data);
+    }
+}

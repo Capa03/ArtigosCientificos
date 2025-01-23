@@ -88,25 +88,56 @@ namespace ArtigosCientificosMvc.Service.Home
 
         public async Task<ArticleStatistics> GetArticleStatistics()
         {
-            var articles = await getArticles();
-            var totalViews = articles.Sum(a => a.Views ?? 0);
-            var totalDownloads = articles.Sum(a => a.Downloads ?? 0);
-            var categoryGroups = articles.GroupBy(a => a.CategoryId)
-                                          .Select(g => new { CategoryId = g.Key, ViewCount = g.Sum(a => a.Views ?? 0) })
-                                          .OrderByDescending(g => g.ViewCount)
-                                          .FirstOrDefault();
-
-            var mostViewedCategory = categoryGroups != null ? await GetCategoryName(categoryGroups.CategoryId) : "None";
-
-            return new ArticleStatistics
+            try
             {
-                TotalArticles = articles.Count,
-                TotalViews = totalViews,
-                TotalDownloads = totalDownloads,
-                MostViewedCategory = mostViewedCategory,
-                MostViewedCategoryCount = categoryGroups?.ViewCount ?? 0
-            };
+                var articles = await _apiService.GetTAsync<List<Article>>(_configServer.GetAcceptedArticlesUrl());
+
+                if (articles == null || !articles.Any())
+                {
+                    return new ArticleStatistics { TotalArticles = 0, TotalViews = 0, TotalDownloads = 0, MostViewedCategory = "None", MostViewedCategoryCount = 0 };
+                }
+
+                var totalViews = articles.Sum(a => a.Views ?? 0);
+                var totalDownloads = articles.Sum(a => a.Downloads ?? 0);
+
+                var categoryGroups = articles.GroupBy(a => a.CategoryId)
+                                              .Select(g => new { CategoryId = g.Key, ViewCount = g.Sum(a => a.Views ?? 0) })
+                                              .OrderByDescending(g => g.ViewCount)
+                                              .FirstOrDefault();
+
+                if (categoryGroups == null)
+                {
+                    Console.WriteLine("No category groups found.");
+                }
+                else
+                {
+                    Console.WriteLine($"Most viewed category ID: {categoryGroups.CategoryId} with {categoryGroups.ViewCount} views.");
+                }
+
+                var mostViewedCategory = categoryGroups != null ? await GetCategoryName(categoryGroups.CategoryId) : "None";
+
+
+                var stats = new ArticleStatistics
+                {
+                    TotalArticles = articles.Count,
+                    TotalViews = totalViews,
+                    TotalDownloads = totalDownloads,
+                    MostViewedCategory = mostViewedCategory,
+                    MostViewedCategoryCount = categoryGroups?.ViewCount ?? 0
+                };
+
+              
+
+                return stats;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching statistics: {ex.Message}");
+                return new ArticleStatistics();  // Retorna objeto padrão vazio
+            }
         }
+
+
 
         private async Task<string> GetCategoryName(int categoryId)
         {
@@ -119,5 +150,73 @@ namespace ArtigosCientificosMvc.Service.Home
             Category data = await _apiService.GetTAsync<Category>(this._configServer.GetCategoriesByIdUrl(categoryId));
             return data;
         }
+
+        public async Task<CategoryStatistics> GetCategoryStatistics(int categoryId)
+        {
+            try
+            {
+                // Obter todos os artigos
+                var articles = await _apiService.GetTAsync<List<Article>>(_configServer.GetAcceptedArticlesUrl());
+
+                if (articles == null || !articles.Any())
+                {
+                    return new CategoryStatistics
+                    {
+                        CategoryId = categoryId,
+                        CategoryName = "Unknown",
+                        ArticleCount = 0,
+                        TotalViews = 0,
+                        TotalDownloads = 0
+                    };
+                }
+
+                // Filtrar artigos pela categoria
+                var categoryArticles = articles.Where(a => a.CategoryId == categoryId).ToList();
+
+                if (!categoryArticles.Any())
+                {
+                    return new CategoryStatistics
+                    {
+                        CategoryId = categoryId,
+                        CategoryName = "Unknown",
+                        ArticleCount = 0,
+                        TotalViews = 0,
+                        TotalDownloads = 0
+                    };
+                }
+
+                // Calcular as estatísticas para a categoria
+                var totalViews = categoryArticles.Sum(a => a.Views ?? 0);
+                var totalDownloads = categoryArticles.Sum(a => a.Downloads ?? 0);
+                var articleCount = categoryArticles.Count;
+
+                // Obter o nome da categoria
+                var category = await GetCategory(categoryId);
+                var categoryName = category?.Name ?? "Unknown";
+
+                // Retornar as estatísticas da categoria
+                return new CategoryStatistics
+                {
+                    CategoryId = categoryId,
+                    CategoryName = categoryName,
+                    ArticleCount = articleCount,
+                    TotalViews = totalViews,
+                    TotalDownloads = totalDownloads
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching category statistics.");
+                return new CategoryStatistics
+                {
+                    CategoryId = categoryId,
+                    CategoryName = "Error",
+                    ArticleCount = 0,
+                    TotalViews = 0,
+                    TotalDownloads = 0
+                };
+            }
+        }
+
     }
 }

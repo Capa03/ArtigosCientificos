@@ -71,7 +71,7 @@ namespace ArtigosCientificosMvc.Service
 
         public string GetCategoriesByIdUrl(int id)
         {
-            return this._baseUrl + "Article/articles/categories" + id;
+            return this._baseUrl + "Article/articles/categories/" + id;
         }
 
         /// <summary>

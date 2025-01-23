@@ -1,29 +1,98 @@
 ﻿@page "/ArticleStatistics"
 @using ArtigosCientificosMvc.Models.Article
+@using ArtigosCientificosMvc.Models.Category
 @using ArtigosCientificosMvc.Service.Home
 @inject IHomeService homeService
+@rendermode InteractiveServer
 
-<h1 class="text-center my-5 display-4 fw-bold text-primary">Article Statistics</h1>
 
 @if (statistics == null)
 {
-	<p>Loading statistics...</p>
+    <p class="text-center text-secondary">Loading statistics...</p>
 }
 else
 {
-	<div class="container">
-		<p><strong>Total Articles:</strong> @statistics.TotalArticles</p>
-		<p><strong>Total Views:</strong> @statistics.TotalViews</p>
-		<p><strong>Total Downloads:</strong> @statistics.TotalDownloads</p>
-		<!-- Add more statistics as needed -->
-	</div>
+    <div class="container">
+        <h2 class="text-center my-4 text-secondary">Global Statistics</h2>
+        <div class="row align-items-center mb-5">
+            <div class="col-md-6">
+                <p><strong>Total Articles:</strong> @statistics.TotalArticles</p>
+                <p><strong>Total Views:</strong> @statistics.TotalViews</p>
+                <p><strong>Total Downloads:</strong> @statistics.TotalDownloads</p>
+                <p><strong>Most Viewed Category:</strong> @statistics.MostViewedCategory (@statistics.MostViewedCategoryCount views)</p>
+            </div>
+            <div class="col-md-6 text-center">
+                <ArticleStatisticsChart TotalArticles="@statistics.TotalArticles"
+                                        TotalViews="@statistics.TotalViews"
+                                        TotalDownloads="@statistics.TotalDownloads"
+                                        MostViewedCategoryCount="@statistics.MostViewedCategoryCount" />
+            </div>
+        </div>
+
+        <h2 class="text-center my-4 text-secondary">Category Statistics</h2>
+        <div class="mb-3">
+            <select @onchange="OnCategorySelected" class="form-select">
+                <option value="">-- Select a Category --</option>
+                @foreach (var category in categories)
+                {
+                    <option value="@category.CategoryId">@category.Name</option>
+                }
+            </select>
+        </div>
+
+        @if (selectedCategoryStatistics != null)
+        {
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p><strong>Category Name:</strong> @selectedCategoryStatistics.CategoryName</p>
+                    <p><strong>Total Articles:</strong> @selectedCategoryStatistics.ArticleCount</p>
+                    <p><strong>Total Views:</strong> @selectedCategoryStatistics.TotalViews</p>
+                    <p><strong>Total Downloads:</strong> @selectedCategoryStatistics.TotalDownloads</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <SingleArticleStatistics TotalArticles="@selectedCategoryStatistics.ArticleCount"
+                                             TotalViews="@selectedCategoryStatistics.TotalViews"
+                                             TotalDownloads="@selectedCategoryStatistics.TotalDownloads" />
+                </div>
+            </div>
+        }
+        else
+        {
+            <p class="text-secondary">Select a category to view detailed statistics.</p>
+        }
+    </div>
 }
 
 @code {
-	private List<Article> articles;
+    private ArtigosCientificosMvc.Models.Article.ArticleStatistics statistics = new ArtigosCientificosMvc.Models.Article.ArticleStatistics();
+    private CategoryStatistics selectedCategoryStatistics;
+    private List<Category> categories = new();
+    private bool isInitialized;
 
-	protected override async Task OnInitializedAsync()
-	{
-		articles = await homeService.getArticles();
-	}
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            statistics = await homeService.GetArticleStatistics();
+            categories = await homeService.GetCategories();
+            isInitialized = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnCategorySelected(ChangeEventArgs e)
+    {
+        var selectedValue = e.Value?.ToString();
+
+        if (int.TryParse(selectedValue, out int categoryId) && categoryId > 0)
+        {
+            selectedCategoryStatistics = await homeService.GetCategoryStatistics(categoryId);
+            StateHasChanged();
+        }
+        else
+        {
+            selectedCategoryStatistics = null;
+            StateHasChanged();
+        }
+    }
 }
