@@ -1,44 +1,40 @@
 ﻿@inject IJSRuntime JS
 @rendermode InteractiveServer
 
-<h3>Article Statistics</h3>
-<canvas id="articleStatisticsChart" width="200px" height="200px"></canvas>  
-
+<div class="d-flex flex-column align-items-center justify-content-center" style="height: 100%; min-height: 250px;">
+	<h3>Article Statistics</h3>
+	<canvas id="articleStatisticsChart" width="200px" height="200px"></canvas>
+</div>
 @code {
-    [Parameter]
-    public int TotalArticles { get; set; }
+	[Parameter]
+	public int TotalArticles { get; set; }
 
-    [Parameter]
-    public int TotalViews { get; set; }
+	[Parameter]
+	public int TotalViews { get; set; }
 
-    [Parameter]
-    public int TotalDownloads { get; set; }
+	[Parameter]
+	public int TotalDownloads { get; set; }
 
-    [Parameter]
-    public int MostViewedCategoryCount { get; set; }
+	[Parameter]
+	public int MostViewedCategoryCount { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            StateHasChanged(); // Atualiza o estado da página
-            await Task.Delay(500);
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			StateHasChanged(); // Atualiza o estado da página
+			await Task.Delay(500);
 
-            var data = new
-            {
-                totalArticles = TotalArticles,
-                totalViews = TotalViews,
-                totalDownloads = TotalDownloads,
-                mostViewedCategoryCount = MostViewedCategoryCount
-            };
+			var data = new
+			{
+				totalArticles = TotalArticles,
+				totalViews = TotalViews,
+				totalDownloads = TotalDownloads,
+				mostViewedCategoryCount = MostViewedCategoryCount
+			};
 
-            Console.WriteLine($"TotalArticles: {TotalArticles}");
-            Console.WriteLine($"TotalViews: {TotalViews}");
-            Console.WriteLine($"TotalDownloads: {TotalDownloads}");
-            Console.WriteLine($"MostViewedCategoryCount: {MostViewedCategoryCount}");
-
-            await JS.InvokeVoidAsync("console.log", "Sending data to chart.js:", data);
-            await JS.InvokeVoidAsync("drawSmallChart", data);
-        }
-    }
+			await JS.InvokeVoidAsync("console.log", "Sending data to chart.js:", data);
+			await JS.InvokeVoidAsync("drawSmallChart", data);
+		}
+	}
 }

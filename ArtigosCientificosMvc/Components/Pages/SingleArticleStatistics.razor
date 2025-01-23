@@ -1,8 +1,10 @@
 ﻿@inject IJSRuntime JS
 @rendermode InteractiveServer
 
-<h3>Article Statistics</h3>
-<canvas id="articleStatisticsChartSingle" width="200px" height="200px"></canvas>
+<div class="d-flex flex-column align-items-center justify-content-center" style="height: 100%; min-height: 250px;">
+    <h3 class="mb-3">Article Statistics</h3>
+    <canvas id="articleStatisticsChartSingle" width="200px" height="200px"></canvas>
+</div>
 
 @code {
     [Parameter]
@@ -16,9 +18,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        Console.WriteLine($"Parameters Updated: TotalArticles={TotalArticles}, TotalViews={TotalViews}, TotalDownloads={TotalDownloads}");
 
-        // Ensure the chart is updated with the new data
         var data = new
         {
             totalArticles = TotalArticles,

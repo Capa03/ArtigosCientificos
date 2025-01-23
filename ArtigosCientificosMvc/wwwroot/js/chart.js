@@ -1,6 +1,5 @@
 ﻿function drawSmallChart(stats) {
     var ctx = document.getElementById('articleStatisticsChart').getContext('2d');
-    console.log(stats);
     new Chart(ctx, {
         type: 'bar',
         data: {
