@@ -20,6 +20,16 @@ else
 		<p><strong>Total Downloads:</strong> @statistics.TotalDownloads</p>
 		<p><strong>Most Viewed Category:</strong> @statistics.MostViewedCategory (@statistics.MostViewedCategoryCount views)</p>
 	</div>
+
+
+	<div class="container mb-4">
+		<ArticleStatisticsChart TotalArticles="@statistics.TotalArticles"
+		TotalViews="@statistics.TotalViews"
+		TotalDownloads="@statistics.TotalDownloads"
+		MostViewedCategoryCount="@statistics.MostViewedCategoryCount" />
+	</div>	
+
+
 	<div class="container">
 		<h2>Category Statistics</h2>
 		<select @onchange="OnCategorySelected" class="form-select mb-3">
@@ -37,12 +47,21 @@ else
 				<p><strong>Total Views:</strong> @selectedCategoryStatistics.TotalViews</p>
 				<p><strong>Total Downloads:</strong> @selectedCategoryStatistics.TotalDownloads</p>
 			</div>
+
+			<div class="container mb-4">
+				<SingleArticleStatistics TotalArticles="@selectedCategoryStatistics.ArticleCount"
+										TotalViews="@selectedCategoryStatistics.TotalViews"
+										TotalDownloads="@selectedCategoryStatistics.TotalDownloads" />
+			</div>
+
 		}
 	</div>
 }
 
 
 @code {
+
+
 	private ArtigosCientificosMvc.Models.Article.ArticleStatistics statistics = new ArtigosCientificosMvc.Models.Article.ArticleStatistics();
 	private CategoryStatistics selectedCategoryStatistics;
 	private List<Category> categories = new();
@@ -61,10 +80,16 @@ else
 
 	private async Task OnCategorySelected(ChangeEventArgs e)
 	{
-		if (int.TryParse(e.Value?.ToString(), out int categoryId) && categoryId > 0)
+
+		var selectedValue = e.Value?.ToString();
+		Console.WriteLine($"Selected Category ID: {selectedValue}");
+
+		if (int.TryParse(selectedValue, out int categoryId) && categoryId > 0)
 		{
 			selectedCategoryStatistics = await homeService.GetCategoryStatistics(categoryId);
-			StateHasChanged();
+			Console.WriteLine($"Fetched stats for category {categoryId}: {selectedCategoryStatistics?.ArticleCount} articles");
+
+			StateHasChanged();  // Força a atualização da interface
 		}
 	}
 }
