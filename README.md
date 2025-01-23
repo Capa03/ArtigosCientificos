@@ -1,28 +1,24 @@
-Aqui está um README completo e bem formatado para o seu projeto ASP.NET MVC com as instruções de configuração recomendadas:
+# ArtigosCientíficos
 
----
-
-# ArtigosCientificos
-
-ArtigosCientificos é um sistema ASP.NET MVC para a gestão de artigos científicos e suas estatísticas. Este guia irá ajudá-lo a configurar o projeto para sua primeira execução.
+ArtigosCientíficos é um sistema ASP.NET MVC para a gestão de artigos científicos e respetivas estatísticas. Este guia irá ajudá-lo a configurar o projeto para a sua primeira execução.
 
 ## 🚀 Configuração do Projeto
 
-Antes de executar o projeto pela primeira vez, siga os passos abaixo para configurar a base de dados e garantir que tudo esteja funcionando corretamente.
+Antes de executar o projeto pela primeira vez, siga os passos abaixo para configurar a base de dados e garantir que tudo funcione corretamente.
 
 ### Pré-requisitos
 
-Certifique-se de que você possui o seguinte instalado em sua máquina:
+Certifique-se de que tem o seguinte instalado no seu computador:
 
 - [.NET 6 ou superior](https://dotnet.microsoft.com/download)
-- [SQL Server](https://www.microsoft.com/sql-server/sql-server-downloads) ou um banco de dados compatível
+- [SQL Server](https://www.microsoft.com/sql-server/sql-server-downloads) ou um sistema de base de dados compatível
 - [Entity Framework Core CLI](https://learn.microsoft.com/en-us/ef/core/cli/dotnet)
 
 ### 📂 Passos para configurar
 
 1. **Clonar o repositório:**
 
-   Clone o repositório para sua máquina local:
+   Clone o repositório para o seu computador:
    ```bash
    git clone https://github.com/Capa03/ArtigosCientificos.git
    cd ArtigosCientificos
@@ -30,10 +26,10 @@ Certifique-se de que você possui o seguinte instalado em sua máquina:
 
 2. **Configurar a base de dados:**
 
-   O projeto utiliza o Entity Framework Core para gerenciar a base de dados. Siga as instruções abaixo para criar o banco de dados.
+   O projeto utiliza o Entity Framework Core para gerir a base de dados. Siga os passos abaixo para criar a base de dados:
 
-   - Abra o **Package Manager Console** no Visual Studio ou use o terminal integrado.
-   - Navegue até o diretório do projeto principal:
+   - Abra o **Package Manager Console** no Visual Studio ou utilize o terminal integrado.
+   - Navegue até ao diretório do projeto principal:
      ```bash
      cd ArtigosCientificos
      ```
@@ -42,11 +38,11 @@ Certifique-se de que você possui o seguinte instalado em sua máquina:
      dotnet ef database update
      ```
 
-   Este comando criará a base de dados de acordo com as migrações configuradas no projeto.
+   Este comando irá criar a base de dados de acordo com as migrações configuradas no projeto.
 
-3. **Configurar a string de conexão:**
+3. **Configurar a string de ligação:**
 
-   - Verifique se a string de conexão do banco de dados está configurada corretamente no arquivo `appsettings.json`:
+   - Certifique-se de que a string de ligação à base de dados está corretamente configurada no ficheiro `appsettings.json`:
      ```json
      "ConnectionStrings": {
        "DefaultConnection": "Server=SEU_SERVIDOR;Database=ArtigosCientificos;Trusted_Connection=True;MultipleActiveResultSets=true"
@@ -56,16 +52,16 @@ Certifique-se de que você possui o seguinte instalado em sua máquina:
 
 4. **Executar o projeto:**
 
-   Agora o projeto está pronto para ser executado. Você pode iniciar o servidor executando o seguinte comando no terminal:
+   O projeto está agora pronto para ser executado. Pode iniciar o servidor executando o seguinte comando no terminal:
    ```bash
    dotnet run
    ```
 
-   Ou, alternativamente, use o botão de execução no Visual Studio.
+   Alternativamente, pode utilizar o botão de execução no Visual Studio.
 
-5. **Acessar a aplicação:**
+5. **Aceder à aplicação:**
 
-   Abra seu navegador e acesse o endereço:
+   Abra o seu navegador e aceda ao endereço:
    ```
    http://localhost:5000
    ```
@@ -75,41 +71,27 @@ Certifique-se de que você possui o seguinte instalado em sua máquina:
 ## 🛠 Tecnologias Utilizadas
 
 - **ASP.NET Core MVC**: Framework principal do projeto.
-- **Entity Framework Core**: Gerenciamento de banco de dados.
+- **Entity Framework Core**: Gestão de base de dados.
 - **Bootstrap**: Para estilização do front-end.
 - **Chart.js**: Geração de gráficos dinâmicos.
 
 ---
 
-## 🧑‍💻 Contribuindo
+## 🧑‍💻 Contribuir
 
-Contribuições são bem-vindas! Siga os passos abaixo para contribuir com o projeto:
+Contribuições são bem-vindas! Siga os passos abaixo para contribuir para o projeto:
 
 1. Faça um fork do repositório.
-2. Crie uma nova branch com sua feature ou correção:
+2. Crie uma nova branch com a sua funcionalidade ou correção:
    ```bash
-   git checkout -b minha-feature
+   git checkout -b minha-funcionalidade
    ```
-3. Realize suas alterações e faça o commit:
+3. Realize as suas alterações e faça o commit:
    ```bash
-   git commit -m "Adiciona minha nova feature"
+   git commit -m "Adiciona a minha nova funcionalidade"
    ```
 4. Envie para o repositório remoto:
    ```bash
-   git push origin minha-feature
+   git push origin minha-funcionalidade
    ```
 5. Abra um Pull Request.
-
----
-
-## 📄 Licença
-
-Este projeto está sob a licença **MIT**. Consulte o arquivo `LICENSE` para mais detalhes.
-
----
-
-Caso encontre problemas ou tenha dúvidas, sinta-se à vontade para abrir uma issue no repositório.
-
---- 
-
-Se precisar de algo mais no README, é só falar!
