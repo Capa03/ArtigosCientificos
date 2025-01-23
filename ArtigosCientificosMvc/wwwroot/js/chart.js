@@ -25,34 +25,47 @@
     });
 }
 
+// Maintain a reference to the chart instance
+let singleArticleChart;
+
 function drawSmallChartSingle(stats) {
-    var ctx = document.getElementById('articleStatisticsChartSingle').getContext('2d');
+    try {
+        // Get the canvas context
+        const ctx = document.getElementById('articleStatisticsChartSingle').getContext('2d');
 
-    console.log(stats);
+        // If a chart already exists, destroy it
+        if (singleArticleChart) {
+            singleArticleChart.destroy();
+        }
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Articles', 'Views', 'Downloads'],
-            datasets: [{
-                data: [stats.totalArticles, stats.totalViews, stats.totalDownloads],
-                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-            }]
-        },
-        options: {
-            responsive: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                title: {
-                    display: true,
-                    text: 'Article Statistics Overview'
+        // Create a new chart instance
+        singleArticleChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Articles', 'Views', 'Downloads'],
+                datasets: [{
+                    data: [stats.totalArticles, stats.totalViews, stats.totalDownloads],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Article Statistics Overview'
+                    }
                 }
             }
-        }
-    });
+        });
+    } catch (err) {
+        console.error("Error in drawSmallChartSingle:", err);
+    }
 }
+
 
 
 

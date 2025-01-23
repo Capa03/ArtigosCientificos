@@ -14,27 +14,19 @@
     [Parameter]
     public int TotalDownloads { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender)
+        Console.WriteLine($"Parameters Updated: TotalArticles={TotalArticles}, TotalViews={TotalViews}, TotalDownloads={TotalDownloads}");
+
+        // Ensure the chart is updated with the new data
+        var data = new
         {
-            StateHasChanged(); // Atualiza o estado da página
-            await Task.Delay(500);
+            totalArticles = TotalArticles,
+            totalViews = TotalViews,
+            totalDownloads = TotalDownloads
+        };
 
-            Console.WriteLine($"TotalArticles: {TotalArticles}");
-            Console.WriteLine($"TotalViews: {TotalViews}");
-            Console.WriteLine($"TotalDownloads: {TotalDownloads}");
-
-            var data = new
-            {
-                totalArticles = TotalArticles,
-                totalViews = TotalViews,
-                totalDownloads = TotalDownloads
-            };
-
-            await JS.InvokeVoidAsync("console.log", "Sending data to chart.js:", data);
-            await JS.InvokeVoidAsync("drawSmallChartSingle", data);
-
-        }
+        await JS.InvokeVoidAsync("console.log", "Updating chart with new data:", data);
+        await JS.InvokeVoidAsync("drawSmallChartSingle", data);
     }
 }

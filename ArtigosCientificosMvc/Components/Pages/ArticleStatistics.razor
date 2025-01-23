@@ -24,10 +24,10 @@ else
 
 	<div class="container mb-4">
 		<ArticleStatisticsChart TotalArticles="@statistics.TotalArticles"
-		TotalViews="@statistics.TotalViews"
-		TotalDownloads="@statistics.TotalDownloads"
-		MostViewedCategoryCount="@statistics.MostViewedCategoryCount" />
-	</div>	
+								TotalViews="@statistics.TotalViews"
+								TotalDownloads="@statistics.TotalDownloads"
+								MostViewedCategoryCount="@statistics.MostViewedCategoryCount" />
+	</div>
 
 
 	<div class="container">
@@ -50,11 +50,11 @@ else
 
 			<div class="container mb-4">
 				<SingleArticleStatistics TotalArticles="@selectedCategoryStatistics.ArticleCount"
-										TotalViews="@selectedCategoryStatistics.TotalViews"
-										TotalDownloads="@selectedCategoryStatistics.TotalDownloads" />
+										 TotalViews="@selectedCategoryStatistics.TotalViews"
+										 TotalDownloads="@selectedCategoryStatistics.TotalDownloads" />
 			</div>
-
 		}
+
 	</div>
 }
 
@@ -80,16 +80,24 @@ else
 
 	private async Task OnCategorySelected(ChangeEventArgs e)
 	{
-
 		var selectedValue = e.Value?.ToString();
 		Console.WriteLine($"Selected Category ID: {selectedValue}");
 
 		if (int.TryParse(selectedValue, out int categoryId) && categoryId > 0)
 		{
+			// Fetch new statistics for the selected category
 			selectedCategoryStatistics = await homeService.GetCategoryStatistics(categoryId);
 			Console.WriteLine($"Fetched stats for category {categoryId}: {selectedCategoryStatistics?.ArticleCount} articles");
 
-			StateHasChanged();  // Força a atualização da interface
+			// Force the SingleArticleStatistics component to re-render
+			StateHasChanged();
+		}
+		else
+		{
+			// Reset selectedCategoryStatistics if no valid category is selected
+			selectedCategoryStatistics = null;
+			StateHasChanged();
 		}
 	}
+
 }
