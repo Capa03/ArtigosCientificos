@@ -24,7 +24,7 @@ Certifique-se de que você possui o seguinte instalado em sua máquina:
 
    Clone o repositório para sua máquina local:
    ```bash
-   git clone https://github.com/seu-usuario/ArtigosCientificos.git
+   git clone https://github.com/Capa03/ArtigosCientificos.git
    cd ArtigosCientificos
    ```
 
