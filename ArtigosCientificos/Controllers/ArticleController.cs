@@ -96,7 +96,7 @@ namespace ArtigosCientificos.Api.Controllers
             return Ok(category);
         }
 
-        [HttpPut("article/downloadsCounter/{id}")]
+        [HttpGet("article/downloadsCounter/{id}")]
         public async Task<IActionResult> IncrementDownloadsCounter(int id)
         {
             Article result = await _articleService.IncrementDownloadsCounter(id);

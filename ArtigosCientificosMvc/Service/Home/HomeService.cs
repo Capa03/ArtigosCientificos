@@ -73,7 +73,6 @@ namespace ArtigosCientificosMvc.Service.Home
 
             if (article == null)
             {
-
                 _logger.LogWarning("No article found.");
                 return new Article();
             }
