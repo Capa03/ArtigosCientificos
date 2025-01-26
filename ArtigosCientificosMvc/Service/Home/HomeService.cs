@@ -69,7 +69,7 @@ namespace ArtigosCientificosMvc.Service.Home
 
         public async Task<Article> IncrementDownloadsCounter(int id)
         {
-            Article article = await _apiService.GetTAsync<Article>(_configServer.GetUserById(id));
+            Article article = await _apiService.GetTAsync<Article>(_configServer.IncrementDownloadsCounter(id));
 
             if (article == null)
             {
